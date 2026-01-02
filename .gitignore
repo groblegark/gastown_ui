@@ -69,6 +69,7 @@ ADR
 /deacon/
 /spawn/
 /plugins/
+/logs/
 /.events.jsonl
 /.feed.jsonl
 
