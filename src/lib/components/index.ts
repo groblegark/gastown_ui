@@ -11,6 +11,9 @@ export { default as ShimmerText } from './ShimmerText.svelte';
 export { default as StatusIndicator } from './StatusIndicator.svelte';
 export type { StatusIndicatorProps } from './StatusIndicator.svelte';
 
+// Layout components
+export { default as DashboardLayout } from './DashboardLayout.svelte';
+
 // Skeleton components
 export { default as Skeleton } from './Skeleton.svelte';
 export type { SkeletonProps } from './Skeleton.svelte';

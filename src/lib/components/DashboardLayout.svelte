@@ -1,0 +1,85 @@
+<script lang="ts">
+	import { cn } from '$lib/utils';
+	import GridPattern from './GridPattern.svelte';
+	import StatusIndicator from './StatusIndicator.svelte';
+
+	interface Props {
+		title?: string;
+		systemStatus?: 'running' | 'idle' | 'error' | 'warning';
+		class?: string;
+	}
+
+	let {
+		title = 'Gas Town',
+		systemStatus = 'running',
+		class: className = ''
+	}: Props = $props();
+</script>
+
+<div class={cn('relative min-h-screen bg-background', className)}>
+	<!-- Grid pattern background -->
+	<GridPattern variant="dots" opacity={0.15} />
+
+	<!-- Main content wrapper -->
+	<div class="relative z-10 flex flex-col min-h-screen">
+		<!-- Header -->
+		<header class="sticky top-0 z-50 panel-glass border-b border-border px-4 py-3">
+			<div class="container flex items-center justify-between gap-4">
+				<!-- Branding -->
+				<div class="flex items-center gap-3">
+					<h1 class="text-lg font-semibold text-foreground">{title}</h1>
+				</div>
+
+				<!-- System status -->
+				<div class="flex items-center gap-2">
+					<StatusIndicator status={systemStatus} size="md" />
+					<span class="text-sm text-muted-foreground capitalize">{systemStatus}</span>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main content area -->
+		<main class="flex-1 container py-6 space-y-6">
+			<!-- Stats section -->
+			{#if $$slots.stats}
+				<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					<slot name="stats" />
+				</section>
+			{/if}
+
+			<!-- Agent grid -->
+			{#if $$slots.agents}
+				<section class="space-y-4">
+					<h2 class="text-lg font-medium text-foreground">Agents</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+						<slot name="agents" />
+					</div>
+				</section>
+			{/if}
+
+			<!-- Activity feed -->
+			{#if $$slots.activity}
+				<section class="space-y-4">
+					<h2 class="text-lg font-medium text-foreground">Recent Activity</h2>
+					<div class="panel-glass divide-y divide-border overflow-hidden">
+						<slot name="activity" />
+					</div>
+				</section>
+			{/if}
+
+			<!-- Default slot for custom content -->
+			{#if $$slots.default}
+				<slot />
+			{/if}
+		</main>
+
+		<!-- Footer slot -->
+		{#if $$slots.footer}
+			<footer class="mt-auto border-t border-border px-4 py-3">
+				<div class="container">
+					<slot name="footer" />
+				</div>
+			</footer>
+		{/if}
+	</div>
+</div>
