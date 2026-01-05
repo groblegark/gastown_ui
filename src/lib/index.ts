@@ -13,3 +13,4 @@ export {
 	type ServiceWorkerState,
 	type ServiceWorkerRegistrationResult
 } from './serviceWorker';
+export * as sw from './sw';
