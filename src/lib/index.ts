@@ -47,3 +47,16 @@ export {
 	type LoginCredentials,
 	type AuthResponse
 } from './auth';
+
+// Export WebSocket client (client-side only)
+export {
+	wsClient,
+	createWebSocketClient,
+	type ConnectionState,
+	type MessageType,
+	type WSMessage,
+	type AgentStatusPayload,
+	type LogEntryPayload,
+	type QueueUpdatePayload,
+	type WorkflowUpdatePayload
+} from './stores/websocket.svelte';
