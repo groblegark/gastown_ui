@@ -81,14 +81,17 @@
 {#if showOverflow}
 	<div
 		class="fixed bottom-16 left-0 right-0 z-50 pb-safe px-safe md:hidden animate-in slide-in-from-bottom duration-200"
+		role="menu"
+		aria-label="Additional navigation options"
 	>
 		<div class="panel-glass border border-border rounded-t-xl mx-2 mb-2 p-2 max-h-[60vh] overflow-y-auto">
-			<div class="grid grid-cols-4 gap-1">
+			<div class="grid grid-cols-4 gap-1" role="none">
 				{#each overflowItems as item}
 					{@const isActive = item.id === activeId}
 					<a
 						href={item.href ?? '#'}
 						class={cn(navItemVariants({ active: isActive }), 'relative rounded-lg')}
+						role="menuitem"
 						aria-current={isActive ? 'page' : undefined}
 						onclick={() => { triggerHaptic(); closeOverflow(); }}
 					>

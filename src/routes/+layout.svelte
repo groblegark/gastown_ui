@@ -3,6 +3,7 @@
 	import { SkipLink, Announcer, BottomNav, GlobalSearch } from '$lib/components';
 	import { preloadRoute } from '$lib/preload';
 	import { page } from '$app/stores';
+	import { afterNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -14,6 +15,10 @@
 	// Badge counts (fetched from API)
 	let unreadMail = $state(0);
 	let escalationCount = $state(0);
+
+	// Accessibility: Route change announcement
+	let routeAnnouncement = $state('');
+	let mainContentRef = $state<HTMLElement | null>(null);
 
 	// Navigation items for bottom nav (reactive for badge updates)
 	// Grouped: Core → Operations → Communication → Monitoring → System
@@ -88,6 +93,29 @@
 		const interval = setInterval(fetchBadgeCounts, 30000); // Poll every 30s
 		return () => clearInterval(interval);
 	});
+
+	// Focus management and route announcements on navigation
+	afterNavigate(({ to }) => {
+		// Get page title from nav items or path
+		const path = to?.url?.pathname || '/';
+		const navItem = navItems.find((item) => item.href === path);
+		const pageTitle = navItem?.label || getPageTitleFromPath(path);
+
+		// Announce the page change for screen readers
+		routeAnnouncement = `Navigated to ${pageTitle}`;
+
+		// Focus the main content area for keyboard users
+		// Use requestAnimationFrame to ensure DOM is updated
+		requestAnimationFrame(() => {
+			mainContentRef?.focus();
+		});
+	});
+
+	// Get page title from path for pages not in nav
+	function getPageTitleFromPath(path: string): string {
+		const segment = path.split('/')[1] || 'Dashboard';
+		return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+	}
 </script>
 
 <svelte:head>
@@ -98,8 +126,8 @@
 <!-- Skip link for keyboard users -->
 <SkipLink href="main-content" />
 
-<!-- Screen reader announcements -->
-<Announcer />
+<!-- Screen reader announcements for route changes -->
+<Announcer message={routeAnnouncement} clearAfter={3000} />
 
 <!-- Global search (always rendered, handles its own visibility) -->
 {#if !hideNav}
@@ -115,7 +143,12 @@
 {/if}
 
 <!-- Main content area -->
-<div id="main-content" tabindex="-1" class="min-h-screen {hideNav ? '' : 'pb-20 md:pb-0'}">
+<div
+	bind:this={mainContentRef}
+	id="main-content"
+	tabindex="-1"
+	class="min-h-screen {hideNav ? '' : 'pb-20 md:pb-0'} outline-none"
+>
 	{@render children()}
 </div>
 

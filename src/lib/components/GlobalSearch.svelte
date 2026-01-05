@@ -341,12 +341,15 @@
 
 <!-- Modal overlay -->
 {#if isOpen}
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Global search"
+		aria-labelledby="search-dialog-title"
+		tabindex="-1"
 		onclick={handleBackdropClick}
+		onkeydown={(e) => e.key === 'Escape' && close()}
 	>
 		<!-- Backdrop -->
 		<div class="absolute inset-0 bg-background/80 backdrop-blur-sm" aria-hidden="true"></div>
@@ -355,12 +358,16 @@
 		<div class="relative w-full max-w-xl bg-popover border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 			<!-- Search input -->
 			<div class="flex items-center gap-3 px-4 py-3 border-b border-border">
-				<svg class="w-5 h-5 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<label for="global-search-input" class="sr-only" id="search-dialog-title">
+					Search agents, issues, convoys, or commands
+				</label>
+				<svg class="w-5 h-5 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 				</svg>
 				<input
 					bind:this={inputRef}
 					bind:value={query}
+					id="global-search-input"
 					type="text"
 					placeholder={isCommandMode ? 'Type a command...' : 'Search agents, issues, convoys, or type > for commands...'}
 					class="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-base"
