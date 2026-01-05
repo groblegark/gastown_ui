@@ -6,10 +6,10 @@
 	 * Navigation item variant definitions
 	 */
 	const navItemVariants = tv({
-		base: 'flex flex-col items-center justify-center gap-1 min-w-[64px] py-2 px-3 touch-target-interactive transition-colors',
+		base: 'flex flex-col items-center justify-center gap-1 min-w-[64px] py-2 px-3 touch-target-interactive transition-all duration-200',
 		variants: {
 			active: {
-				true: 'text-primary',
+				true: 'text-primary shadow-[0_0_10px_#00dba8]',
 				false: 'text-muted-foreground hover:text-foreground'
 			}
 		},
@@ -71,7 +71,7 @@
 <!-- Overflow backdrop -->
 {#if showOverflow}
 	<button
-		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
 		onclick={closeOverflow}
 		aria-label="Close navigation menu"
 	></button>
@@ -80,11 +80,11 @@
 <!-- Overflow panel -->
 {#if showOverflow}
 	<div
-		class="fixed bottom-16 left-0 right-0 z-50 pb-safe px-safe md:hidden animate-in slide-in-from-bottom duration-200"
+		class="fixed bottom-16 left-0 right-0 z-50 pb-safe px-safe animate-in slide-in-from-bottom duration-200"
 		role="menu"
 		aria-label="Additional navigation options"
 	>
-		<div class="panel-glass border border-border rounded-t-xl mx-2 mb-2 p-2 max-h-[60vh] overflow-y-auto">
+		<div class="bg-gas-surface/90 backdrop-blur-md border border-gas-border rounded-t-xl mx-2 mb-2 p-2 max-h-[60vh] overflow-y-auto">
 			<div class="grid grid-cols-4 gap-1" role="none">
 				{#each overflowItems as item}
 					{@const isActive = item.id === activeId}
@@ -110,7 +110,7 @@
 								</span>
 							{/if}
 						</span>
-						<span class="text-2xs font-medium">{item.label}</span>
+						<span class="text-2xs font-medium uppercase tracking-wider">{item.label}</span>
 						{#if isActive}
 							<span
 								class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
@@ -127,9 +127,8 @@
 <nav
 	class={cn(
 		'fixed bottom-0 left-0 right-0 z-50',
-		'panel-glass border-t border-border',
+		'bg-gas-surface/90 backdrop-blur-md border-t border-gas-border',
 		'pb-safe px-safe',
-		'md:hidden',
 		className
 	)}
 	aria-label="Bottom navigation"
@@ -160,7 +159,7 @@
 							</span>
 						{/if}
 					</span>
-					<span class="text-2xs font-medium">{item.label}</span>
+					<span class="text-2xs font-medium uppercase tracking-wider">{item.label}</span>
 					{#if isActive}
 						<span
 							class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
@@ -186,7 +185,7 @@
 						></span>
 					{/if}
 				</span>
-				<span class="text-2xs font-medium">More</span>
+				<span class="text-2xs font-medium uppercase tracking-wider">More</span>
 				{#if showOverflow}
 					<span
 						class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
@@ -219,7 +218,7 @@
 							</span>
 						{/if}
 					</span>
-					<span class="text-2xs font-medium">{item.label}</span>
+					<span class="text-2xs font-medium uppercase tracking-wider">{item.label}</span>
 					{#if isActive}
 						<span
 							class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
@@ -233,4 +232,4 @@
 </nav>
 
 <!-- Spacer to prevent content overlap -->
-<div class="h-16 pb-safe md:hidden" aria-hidden="true"></div>
+<div class="h-16 pb-safe" aria-hidden="true"></div>

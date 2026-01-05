@@ -147,18 +147,17 @@
 	bind:this={mainContentRef}
 	id="main-content"
 	tabindex="-1"
-	class="min-h-screen {hideNav ? '' : 'pb-20 md:pb-0'} outline-none"
+	class="min-h-screen {hideNav ? '' : 'pb-20'} outline-none"
 >
 	{@render children()}
 </div>
 
-<!-- Bottom navigation (mobile) with preload on hover -->
+<!-- Bottom navigation with preload on hover -->
 {#if !hideNav}
-	<nav class="md:hidden">
+	<nav class="sr-only">
 		{#each navItems as item}
 			<a
 				href={item.href}
-				class="sr-only"
 				onmouseenter={() => handleNavHover(item.href)}
 				onfocus={() => handleNavHover(item.href)}
 			>
