@@ -36,6 +36,7 @@ export { default as UpdatePrompt } from './UpdatePrompt.svelte';
 export { default as Toast } from './Toast.svelte';
 export { default as ToastContainer } from './ToastContainer.svelte';
 export { default as OfflineIndicator } from './OfflineIndicator.svelte';
+export { default as ConnectionLost } from './ConnectionLost.svelte';
 
 // Search components
 export { default as GlobalSearch } from './GlobalSearch.svelte';
