@@ -192,7 +192,7 @@
 				<!-- Actions -->
 				<div class="px-6 py-4 border-t border-border flex items-center gap-3">
 					<a
-						href="/mail"
+						href="/mail/compose?to={encodeURIComponent(data.message.from)}&subject={encodeURIComponent('Re: ' + data.message.subject)}"
 						class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground bg-muted/30 hover:bg-muted/50 rounded-md transition-colors"
 					>
 						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
