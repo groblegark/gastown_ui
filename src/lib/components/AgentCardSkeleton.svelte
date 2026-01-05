@@ -2,34 +2,48 @@
 	import Skeleton from './Skeleton.svelte';
 	import { cn } from '$lib/utils';
 
-	let { class: className = '' }: { class?: string } = $props();
+	interface Props {
+		class?: string;
+		compact?: boolean;
+	}
+
+	let { class: className = '', compact = false }: Props = $props();
 </script>
 
 <!-- Agent Card Skeleton: matches the AgentCard component layout -->
 <div
-	class={cn('panel-glass p-4 space-y-3', className)}
+	class={cn(
+		'bg-card/80 backdrop-blur-xl border border-border rounded-lg shadow-sm overflow-hidden',
+		className
+	)}
 	role="status"
 	aria-label="Loading agent card"
 	aria-busy="true"
 >
-	<!-- Header: Avatar + Name/Status -->
-	<div class="flex items-center gap-3">
-		<Skeleton type="avatar" width="auto" />
-		<div class="flex-1 space-y-2">
-			<Skeleton type="title" width="2/3" />
-			<Skeleton type="text" width="1/3" />
+	<!-- Hero Section with Icon (matches AgentCard hero) -->
+	{#if !compact}
+		<div class="flex items-center justify-center p-4 bg-gradient-to-br from-muted/30 to-muted/10">
+			<Skeleton type="avatar" width="auto" class="w-12 h-12 rounded-xl" />
 		</div>
-	</div>
+	{/if}
 
-	<!-- Body: Description lines -->
-	<div class="space-y-2">
-		<Skeleton type="text" width="full" />
-		<Skeleton type="text" width="3/4" />
-	</div>
+	<div class={cn('p-4 space-y-3', compact && 'p-3')}>
+		<!-- Header: Status + Name + Badge -->
+		<div class="flex items-center justify-between gap-3">
+			<div class="flex items-center gap-2 min-w-0 flex-1">
+				<Skeleton type="avatar" width="auto" class="w-3 h-3 rounded-full flex-shrink-0" />
+				<Skeleton type="title" width="2/3" />
+			</div>
+			<Skeleton type="text" width="auto" class="w-16 h-5 rounded-full flex-shrink-0" />
+		</div>
 
-	<!-- Footer: Action buttons -->
-	<div class="flex gap-2 pt-2">
-		<Skeleton type="button" width="1/4" />
-		<Skeleton type="button" width="1/4" />
+		<!-- Body: Task + Metadata -->
+		<div class="space-y-2">
+			<Skeleton type="text" width="full" />
+			<div class="flex gap-4">
+				<Skeleton type="text" width="1/4" />
+				<Skeleton type="text" width="1/4" />
+			</div>
+		</div>
 	</div>
 </div>
