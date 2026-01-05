@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { GridPattern } from '$lib/components';
 	import { cn } from '$lib/utils';
+	import { ChevronDown } from 'lucide-svelte';
 
 	const { data, form } = $props();
 
@@ -198,18 +199,12 @@
 											</div>
 										</div>
 									</div>
-									<svg
-										class={cn(
-											'w-5 h-5 text-muted-foreground transition-transform',
-											expandedRig === rig.name && 'rotate-180'
-										)}
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-									>
-										<path d="M6 9l6 6 6-6" />
-									</svg>
+									<ChevronDown
+									class={cn(
+										'w-5 h-5 text-muted-foreground transition-transform',
+										expandedRig === rig.name && 'rotate-180'
+									)}
+								/>
 								</button>
 
 								<!-- Rig Detail View -->

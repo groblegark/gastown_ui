@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { GridPattern, StatusIndicator } from '$lib/components';
 	import { login } from '$lib/auth';
+	import { Loader2 } from 'lucide-svelte';
 
 	// Auth method selection
 	type AuthMethod = 'bio-scan' | 'keycard';
@@ -287,10 +288,7 @@
 						>
 							{#if isLoading}
 								<span class="flex items-center justify-center gap-2">
-									<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-										<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-25" />
-										<path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-									</svg>
+									<Loader2 class="w-4 h-4 animate-spin" />
 									Authenticating...
 								</span>
 							{:else}

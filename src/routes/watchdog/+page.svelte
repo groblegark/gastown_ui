@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GridPattern, StatusIndicator } from '$lib/components';
+	import { ArrowDown } from 'lucide-svelte';
 
 	const { data } = $props();
 
@@ -129,19 +130,7 @@
 								{#if i > 0}
 									<!-- Arrow down -->
 									<div class="flex justify-center py-1">
-										<svg
-											class="w-6 h-6 text-muted-foreground"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M19 14l-7 7m0 0l-7-7m7 7V3"
-											></path>
-										</svg>
+										<ArrowDown class="w-6 h-6 text-muted-foreground" />
 									</div>
 								{/if}
 

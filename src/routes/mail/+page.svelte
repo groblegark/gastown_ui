@@ -3,6 +3,7 @@
 	import { GridPattern } from '$lib/components';
 	import { cn } from '$lib/utils';
 	import type { PageData } from './$types';
+	import { Plus, ChevronDown, ChevronRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -103,16 +104,9 @@
 						href="/mail/compose"
 						class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors"
 					>
-						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4v16m8-8H4"
-							/>
-						</svg>
-						Compose
-					</a>
+					<Plus class="w-4 h-4" />
+					Compose
+				</a>
 				</div>
 			</div>
 		</header>
@@ -197,20 +191,9 @@
 
 										<!-- Expand indicator -->
 										<div class="flex-shrink-0 text-muted-foreground">
-											<svg
-												class="w-5 h-5 transition-transform"
-												class:rotate-180={isExpanded}
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M19 9l-7 7-7-7"
-												/>
-											</svg>
+											<ChevronDown
+												class="w-5 h-5 transition-transform {isExpanded ? 'rotate-180' : ''}"
+											/>
 										</div>
 									</div>
 								</button>
@@ -237,9 +220,7 @@
 												class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-accent hover:text-accent/80 bg-accent/10 hover:bg-accent/20 rounded-md transition-colors"
 											>
 												View full message
-												<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-												</svg>
+												<ChevronRight class="w-3.5 h-3.5" />
 											</a>
 										</div>
 									</div>

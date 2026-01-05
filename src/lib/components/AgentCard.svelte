@@ -83,6 +83,7 @@
 	import { cn } from '$lib/utils';
 	import StatusIndicator from './StatusIndicator.svelte';
 	import ProgressBar from './ProgressBar.svelte';
+	import { ChevronDown, ClipboardList, Clock, AlertTriangle, Search, RefreshCw } from 'lucide-svelte';
 
 	// Component props
 	let {
@@ -188,16 +189,10 @@
 					{statusLabels[status ?? 'idle']}
 				</span>
 				{#if expandable}
-					<svg
-						class="w-4 h-4 text-muted-foreground transition-transform duration-200"
-						class:rotate-180={isExpanded}
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
+					<ChevronDown
+						class="w-4 h-4 text-muted-foreground transition-transform duration-200 {isExpanded ? 'rotate-180' : ''}"
 						aria-hidden="true"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-					</svg>
+					/>
 				{/if}
 			</div>
 		</header>
@@ -211,17 +206,13 @@
 				<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
 					{#if meta}
 						<span class="flex items-center gap-1">
-							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-							</svg>
+							<ClipboardList class="w-3.5 h-3.5" />
 							{meta}
 						</span>
 					{/if}
 					{#if uptime}
 						<span class="flex items-center gap-1">
-							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-							</svg>
+							<Clock class="w-3.5 h-3.5" />
 							{uptime}
 						</span>
 					{/if}
@@ -233,9 +224,7 @@
 		{#if status === 'error' && errorMessage}
 			<div class="p-3 rounded-lg bg-status-offline/10 border border-status-offline/20">
 				<p class="text-sm text-status-offline font-medium flex items-start gap-2">
-					<svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-					</svg>
+					<AlertTriangle class="w-4 h-4 flex-shrink-0 mt-0.5" />
 					{errorMessage}
 				</p>
 			</div>
@@ -265,9 +254,7 @@
 									class={cn(styles.actionBtn(), 'bg-secondary hover:bg-secondary/80 text-secondary-foreground')}
 									onclick={(e) => { e.stopPropagation(); onInspect?.(); }}
 								>
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-									</svg>
+									<Search class="w-4 h-4" />
 									Inspect
 								</button>
 							{/if}
@@ -282,9 +269,7 @@
 									)}
 									onclick={(e) => { e.stopPropagation(); onReboot?.(); }}
 								>
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-									</svg>
+									<RefreshCw class="w-4 h-4" />
 									Reboot
 								</button>
 							{/if}

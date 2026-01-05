@@ -2,6 +2,7 @@
 	import { tv } from 'tailwind-variants';
 	import { GridPattern } from '$lib/components';
 	import type { PageData } from './$types';
+	import { ArrowLeft, Reply, Forward } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -99,14 +100,7 @@
 						href="/mail"
 						class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
 					>
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 19l-7-7m0 0l7-7m-7 7h18"
-							/>
-						</svg>
+						<ArrowLeft class="w-5 h-5" />
 						<span class="text-sm font-medium">Back to Inbox</span>
 					</a>
 				</div>
@@ -195,28 +189,14 @@
 						href="/mail/compose?to={encodeURIComponent(data.message.from)}&subject={encodeURIComponent('Re: ' + data.message.subject)}"
 						class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground bg-muted/30 hover:bg-muted/50 rounded-md transition-colors"
 					>
-						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-							/>
-						</svg>
+						<Reply class="w-4 h-4" />
 						Reply
 					</a>
 					<button
 						type="button"
 						class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground bg-muted/30 hover:bg-muted/50 rounded-md transition-colors"
 					>
-						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-							/>
-						</svg>
+						<Forward class="w-4 h-4" />
 						Forward
 					</button>
 				</div>

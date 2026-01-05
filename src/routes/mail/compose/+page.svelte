@@ -4,6 +4,7 @@
 	import { GridPattern } from '$lib/components';
 	import type { PageData, ActionData } from './$types';
 	import type { AgentAddress } from './+page.server';
+	import { ArrowLeft, Loader2, Send } from 'lucide-svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -131,14 +132,7 @@
 						href="/mail"
 						class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
 					>
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 19l-7-7m0 0l7-7m-7 7h18"
-							/>
-						</svg>
+						<ArrowLeft class="w-5 h-5" />
 						<span class="text-sm font-medium">Back to Inbox</span>
 					</a>
 				</div>
@@ -280,31 +274,10 @@
 								class="inline-flex items-center gap-2 px-6 py-2 text-sm font-medium bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
 							>
 								{#if sending}
-									<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-										<circle
-											class="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											stroke-width="4"
-										></circle>
-										<path
-											class="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										></path>
-									</svg>
+									<Loader2 class="w-4 h-4 animate-spin" />
 									Sending...
 								{:else}
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-										/>
-									</svg>
+									<Send class="w-4 h-4" />
 									Send Message
 								{/if}
 							</button>

@@ -2,6 +2,7 @@
 	import { DashboardLayout, StatusIndicator, ProgressBar, Skeleton } from '$lib/components';
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
+	import { X } from 'lucide-svelte';
 
 	interface Formula {
 		name: string;
@@ -549,9 +550,7 @@
 					class="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
 					aria-label="Close"
 				>
-					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M6 18L18 6M6 6l12 12" />
-					</svg>
+					<X class="w-5 h-5" />
 				</button>
 			</div>
 

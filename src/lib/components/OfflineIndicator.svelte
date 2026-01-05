@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { networkState, toastStore } from '$lib/stores';
 	import { onMount } from 'svelte';
+	import { WifiOff } from 'lucide-svelte';
 
 	interface Props {
 		/** Show queued actions count badge */
@@ -112,21 +113,8 @@
 		aria-live="polite"
 		aria-label={hasQueuedActions ? `Offline. ${queuedCount} action${queuedCount === 1 ? '' : 's'} queued.` : 'Offline'}
 	>
-		<!-- Offline icon (cloud with slash) -->
-		<svg
-			class={cn(sizes.icon, 'flex-shrink-0')}
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke="currentColor"
-			stroke-width="2"
-			aria-hidden="true"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M18.364 5.636a9 9 0 010 12.728m0 0l-12.728-12.728m12.728 12.728L5.636 5.636"
-			/>
-		</svg>
+		<!-- Offline icon -->
+		<WifiOff class={cn(sizes.icon, 'flex-shrink-0')} aria-hidden="true" />
 
 		<!-- Offline text -->
 		<span class={cn(sizes.text, 'font-medium')}>Offline</span>

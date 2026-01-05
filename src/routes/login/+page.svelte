@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { login, getAuthState } from '$lib/auth';
 	import { cn } from '$lib/utils';
+	import { User, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-svelte';
 
 	// Form state
 	let operatorId = $state('');
@@ -138,10 +139,7 @@
 							class="w-full h-12 px-4 bg-input border border-border rounded-md text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent font-mono transition-shadow"
 						/>
 						<div class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-							<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-								<circle cx="12" cy="7" r="4"/>
-							</svg>
+							<User class="w-5 h-5" />
 						</div>
 					</div>
 				</div>
@@ -168,15 +166,9 @@
 							aria-label={showSecurityKey ? 'Hide security key' : 'Show security key'}
 						>
 							{#if showSecurityKey}
-								<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-									<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-									<line x1="1" y1="1" x2="23" y2="23"/>
-								</svg>
+								<EyeOff class="w-5 h-5" />
 							{:else}
-								<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-									<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-									<circle cx="12" cy="12" r="3"/>
-								</svg>
+								<Eye class="w-5 h-5" />
 							{/if}
 						</button>
 					</div>
@@ -186,11 +178,7 @@
 				{#if errorMessage}
 					<div class="p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive text-sm font-mono" role="alert">
 						<div class="flex items-center gap-2">
-							<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<circle cx="12" cy="12" r="10"/>
-								<line x1="12" y1="8" x2="12" y2="12"/>
-								<line x1="12" y1="16" x2="12.01" y2="16"/>
-							</svg>
+							<AlertCircle class="w-4 h-4 flex-shrink-0" />
 							<span>{errorMessage}</span>
 						</div>
 					</div>
@@ -210,9 +198,7 @@
 				>
 					{#if isSubmitting}
 						<span class="flex items-center justify-center gap-2">
-							<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-							</svg>
+							<Loader2 class="w-4 h-4 animate-spin" />
 							AUTHENTICATING...
 						</span>
 					{:else}
