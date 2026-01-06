@@ -4,44 +4,83 @@
 	/**
 	 * AgentCard variant definitions using tailwind-variants
 	 * Enhanced for mobile with rich interactions and expandable details
+	 *
+	 * Design tokens used:
+	 * - Typography: label-sm for badges, body-sm for content
+	 * - Shadows: elevation system + colored glows
+	 * - Animations: ease-spring for expand, ease-out-expo for hover
+	 * - Gradients: gradient-surface-subtle for hero depth
 	 */
 	export const agentCardVariants = tv({
 		slots: {
-			card: 'panel-glass transition-all duration-200 hover:shadow-lg hover:border-accent/50 overflow-hidden',
-			hero: 'flex items-center justify-center p-4 bg-gradient-to-br',
-			heroIcon: 'w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md',
+			card: [
+				'panel-glass overflow-hidden',
+				'transition-all duration-normal ease-out-expo',
+				'hover:shadow-elevation-3 hover:border-accent/40 hover:-translate-y-0.5'
+			].join(' '),
+			hero: [
+				'relative flex items-center justify-center p-6',
+				'bg-gradient-to-br gradient-surface-subtle'
+			].join(' '),
+			heroIcon: [
+				'w-14 h-14 rounded-2xl',
+				'flex items-center justify-center',
+				'shadow-elevation-2 gradient-shine',
+				'transition-transform duration-normal ease-out-expo'
+			].join(' '),
 			content: 'p-4 space-y-3',
 			header: 'flex items-center justify-between gap-3',
-			badge: 'px-2 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide',
-			details: 'overflow-hidden transition-all duration-300 ease-out',
+			badge: [
+				'inline-flex items-center gap-1.5',
+				'px-2.5 py-1 rounded-full',
+				'text-label-sm uppercase tracking-wide'
+			].join(' '),
+			badgeDot: 'w-1.5 h-1.5 rounded-full',
+			details: 'overflow-hidden transition-all duration-slow ease-spring',
 			actions: 'flex gap-2 pt-3 border-t border-border/50',
-			actionBtn: 'flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 active:scale-95 min-h-[44px]'
+			actionBtn: [
+				'flex-1 flex items-center justify-center gap-2',
+				'px-3 py-2.5 rounded-lg',
+				'text-label-md font-medium',
+				'transition-all duration-fast ease-out-expo',
+				'active:scale-95 min-h-touch'
+			].join(' '),
+			progressWrapper: 'flex items-center gap-3',
+			progressLabel: 'text-label-sm tabular-nums text-muted-foreground min-w-[3ch]'
 		},
 		variants: {
 			status: {
 				running: {
-					card: 'border-status-online/30',
+					card: 'border-status-online/30 hover:shadow-glow-success',
 					hero: 'from-status-online/10 to-status-online/5',
 					heroIcon: 'bg-status-online/20 text-status-online',
-					badge: 'bg-status-online/15 text-status-online'
+					badge: 'bg-status-online/15 text-status-online',
+					badgeDot: 'bg-status-online animate-pulse'
 				},
 				idle: {
 					card: 'border-status-idle/30',
 					hero: 'from-status-idle/10 to-status-idle/5',
 					heroIcon: 'bg-status-idle/20 text-status-idle',
-					badge: 'bg-status-idle/15 text-status-idle'
+					badge: 'bg-status-idle/15 text-status-idle',
+					badgeDot: 'bg-status-idle'
 				},
 				error: {
-					card: 'border-status-offline/50 shadow-[0_0_20px_-5px_hsl(var(--status-offline)/0.3)] animate-shake',
+					card: [
+						'border-status-offline/60',
+						'shadow-glow-destructive',
+						'animate-[pulse-status_2s_ease-in-out_infinite]'
+					].join(' '),
 					hero: 'from-status-offline/15 to-status-offline/5',
-					heroIcon: 'bg-status-offline/25 text-status-offline animate-pulse',
-					badge: 'bg-status-offline/20 text-status-offline animate-pulse'
+					heroIcon: 'bg-status-offline/25 text-status-offline',
+					badge: 'bg-status-offline/20 text-status-offline',
+					badgeDot: 'bg-status-offline animate-pulse'
 				},
 				complete: {
 					card: 'border-status-online/30',
 					hero: 'from-status-online/10 to-status-online/5',
 					heroIcon: 'bg-status-online/20 text-status-online',
-					badge: 'bg-status-online/15 text-status-online'
+					badge: 'bg-status-online/15 text-status-online',
+					badgeDot: 'bg-status-online'
 				}
 			},
 			expanded: {
@@ -70,7 +109,6 @@
 		progress?: number;
 		class?: string;
 		// Mobile-rich props
-		icon?: string;
 		uptime?: string;
 		errorMessage?: string;
 		expandable?: boolean;
@@ -84,7 +122,19 @@
 	import StatusIndicator from './StatusIndicator.svelte';
 	import ProgressBar from './ProgressBar.svelte';
 	import type { Snippet } from 'svelte';
-	import { ChevronDown, ClipboardList, Clock, AlertTriangle, Search, RefreshCw } from 'lucide-svelte';
+	import {
+		ChevronDown,
+		ClipboardList,
+		Clock,
+		AlertTriangle,
+		Search,
+		RefreshCw,
+		// Status icons (replacing emojis)
+		Zap,
+		Moon,
+		AlertCircle,
+		CheckCircle2
+	} from 'lucide-svelte';
 
 	// Component props with slot snippets
 	interface Props extends Omit<AgentCardProps, 'expanded'> {
@@ -101,7 +151,6 @@
 		progress = 0,
 		class: className = '',
 		// Mobile-rich props
-		icon = '',
 		uptime = '',
 		errorMessage = '',
 		expandable = false,
@@ -144,16 +193,16 @@
 		complete: 'Complete'
 	} as const;
 
-	// Default icons by status
-	const defaultIcons = {
-		running: '⚡',
-		idle: '💤',
-		error: '⚠️',
-		complete: '✅'
+	// Default Lucide icons by status (replacing emojis)
+	const statusIcons = {
+		running: Zap,
+		idle: Moon,
+		error: AlertCircle,
+		complete: CheckCircle2
 	} as const;
 
-	// Get display icon
-	const displayIcon = $derived(icon || defaultIcons[status ?? 'idle']);
+	// Get the icon component for current status
+	const StatusIcon = $derived(statusIcons[status ?? 'idle']);
 
 	// Toggle expanded state
 	function toggleExpanded() {
@@ -179,11 +228,11 @@
 	onclick={expandable ? toggleExpanded : undefined}
 	onkeydown={expandable ? handleKeyDown : undefined}
 >
-	<!-- Hero Section with Icon -->
+	<!-- Hero Section with Lucide Icon -->
 	{#if !compact}
 		<div class={styles.hero()}>
 			<div class={styles.heroIcon()}>
-				{displayIcon}
+				<StatusIcon class="w-7 h-7" strokeWidth={2} />
 			</div>
 		</div>
 	{/if}
@@ -197,11 +246,12 @@
 			</div>
 			<div class="flex items-center gap-2 flex-shrink-0">
 				<span class={styles.badge()}>
+					<span class={styles.badgeDot()} aria-hidden="true"></span>
 					{statusLabels[status ?? 'idle']}
 				</span>
 				{#if expandable}
 					<ChevronDown
-						class="w-4 h-4 text-muted-foreground transition-transform duration-200 {isExpanded ? 'rotate-180' : ''}"
+						class="w-4 h-4 text-muted-foreground transition-transform duration-normal ease-spring {isExpanded ? 'rotate-180' : ''}"
 						aria-hidden="true"
 					/>
 				{/if}
@@ -241,58 +291,63 @@
 			</div>
 		{/if}
 
-		<!-- Progress Bar -->
+		<!-- Progress Bar with Percentage Label -->
 		{#if status === 'running' && progress > 0}
-			<div class="pt-1">
-				<ProgressBar
-					value={progress}
-					size="sm"
-					color={progressColorMap[status ?? 'idle']}
-				/>
+			<div class={styles.progressWrapper()}>
+				<div class="flex-1">
+					<ProgressBar
+						value={progress}
+						size="sm"
+						color={progressColorMap[status ?? 'idle']}
+					/>
+				</div>
+				<span class={styles.progressLabel()}>{Math.round(progress)}%</span>
 			</div>
 		{/if}
 
-		<!-- Expandable Details Section -->
+		<!-- Expandable Details Section with Spring Animation -->
 		{#if expandable}
 			<div class={styles.details()}>
 				{#if isExpanded}
-					<!-- Quick Actions -->
-					{#if onInspect || onReboot}
-						<div class={styles.actions()}>
-							{#if onInspect}
-								<button
-									type="button"
-									class={cn(styles.actionBtn(), 'bg-secondary hover:bg-secondary/80 text-secondary-foreground')}
-									onclick={(e) => { e.stopPropagation(); onInspect?.(); }}
-								>
-									<Search class="w-4 h-4" />
-									Inspect
-								</button>
-							{/if}
-							{#if onReboot}
-								<button
-									type="button"
-									class={cn(
-										styles.actionBtn(),
-										status === 'error'
-											? 'bg-status-offline/15 hover:bg-status-offline/25 text-status-offline'
-											: 'bg-primary/10 hover:bg-primary/20 text-primary'
-									)}
-									onclick={(e) => { e.stopPropagation(); onReboot?.(); }}
-								>
-									<RefreshCw class="w-4 h-4" />
-									Reboot
-								</button>
-							{/if}
-						</div>
-					{/if}
+					<div class="animate-fade-in">
+						<!-- Quick Actions -->
+						{#if onInspect || onReboot}
+							<div class={styles.actions()}>
+								{#if onInspect}
+									<button
+										type="button"
+										class={cn(styles.actionBtn(), 'bg-secondary hover:bg-secondary/80 text-secondary-foreground')}
+										onclick={(e) => { e.stopPropagation(); onInspect?.(); }}
+									>
+										<Search class="w-4 h-4" />
+										Inspect
+									</button>
+								{/if}
+								{#if onReboot}
+									<button
+										type="button"
+										class={cn(
+											styles.actionBtn(),
+											status === 'error'
+												? 'bg-status-offline/15 hover:bg-status-offline/25 text-status-offline'
+												: 'bg-primary/10 hover:bg-primary/20 text-primary'
+										)}
+										onclick={(e) => { e.stopPropagation(); onReboot?.(); }}
+									>
+										<RefreshCw class="w-4 h-4" />
+										Reboot
+									</button>
+								{/if}
+							</div>
+						{/if}
 
-					<!-- Custom expanded content -->
-					{#if expandedSlot}
-						<div class="pt-3">
-							{@render expandedSlot()}
-						</div>
-					{/if}
+						<!-- Custom expanded content -->
+						{#if expandedSlot}
+							<div class="pt-3">
+								{@render expandedSlot()}
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		{/if}
