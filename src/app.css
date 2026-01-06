@@ -637,6 +637,7 @@
 
 /* === Performant Shimmer Effect === */
 /* Uses transform (composited) instead of backgroundPosition (triggers repaint) */
+/* Updated: 1.5s duration, subtler gradient (0.06 opacity) per Loading States spec */
 @layer components {
 	.shimmer-effect {
 		position: relative;
@@ -651,13 +652,31 @@
 		background: linear-gradient(
 			90deg,
 			transparent 0%,
-			hsl(var(--muted-foreground) / 0.1) 50%,
+			hsl(var(--muted-foreground) / 0.06) 50%,
 			transparent 100%
 		);
 		transform: translateX(-100%);
-		animation: shimmer 2s infinite linear;
+		animation: shimmer 1.5s infinite linear;
 		will-change: transform;
 	}
+
+	/* Skeleton loading container with staggered children */
+	.skeleton-group {
+		/* Children get staggered delays automatically */
+	}
+
+	.skeleton-group > * {
+		animation-fill-mode: both;
+	}
+
+	.skeleton-group > *:nth-child(1) { animation-delay: calc(0 * 50ms); }
+	.skeleton-group > *:nth-child(2) { animation-delay: calc(1 * 50ms); }
+	.skeleton-group > *:nth-child(3) { animation-delay: calc(2 * 50ms); }
+	.skeleton-group > *:nth-child(4) { animation-delay: calc(3 * 50ms); }
+	.skeleton-group > *:nth-child(5) { animation-delay: calc(4 * 50ms); }
+	.skeleton-group > *:nth-child(6) { animation-delay: calc(5 * 50ms); }
+	.skeleton-group > *:nth-child(7) { animation-delay: calc(6 * 50ms); }
+	.skeleton-group > *:nth-child(8) { animation-delay: calc(7 * 50ms); }
 }
 
 /* === Reduced Motion Preference === */

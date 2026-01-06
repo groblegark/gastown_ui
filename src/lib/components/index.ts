@@ -28,6 +28,7 @@ export { default as WorkflowLayout } from './WorkflowLayout.svelte';
 
 // Skeleton components
 export { default as Skeleton } from './Skeleton.svelte';
+export { default as SkeletonGroup } from './SkeletonGroup.svelte';
 export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
 export { default as LogEntrySkeleton } from './LogEntrySkeleton.svelte';
 
