@@ -96,7 +96,8 @@
 		id: string;
 		label: string;
 		href?: string;
-		icon?: string;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		icon?: any;
 		badge?: number | string;
 	}
 
@@ -258,7 +259,9 @@
 							>
 								<span class="relative shrink-0">
 									{#if item.icon}
-										<span class="text-xl w-6 h-6 flex items-center justify-center" aria-hidden="true">{item.icon}</span>
+										<span class="w-6 h-6 flex items-center justify-center" aria-hidden="true">
+											<item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+										</span>
 									{:else}
 										<span class="w-6 h-6 rounded-full bg-current opacity-20" aria-hidden="true"></span>
 									{/if}
