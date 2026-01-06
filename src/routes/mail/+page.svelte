@@ -175,7 +175,7 @@
 												<span class="text-sm font-medium text-foreground">
 													{formatSender(message.from)}
 												</span>
-												<span class="text-xs text-muted-foreground ml-auto flex-shrink-0">
+												<span class="text-xs text-muted-foreground ml-auto flex-shrink-0 font-mono">
 													{formatTime(message.timestamp)}
 												</span>
 											</div>

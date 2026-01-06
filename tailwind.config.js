@@ -74,12 +74,28 @@ export default {
 				info: {
 					DEFAULT: 'hsl(var(--info) / <alpha-value>)',
 					foreground: 'hsl(var(--info-foreground) / <alpha-value>)'
+				},
+
+				// Gas Town Dark Industrial Palette
+				gas: {
+					black: '#050a09',
+					dark: '#0B1210',
+					surface: '#131F1C',
+					surfaceHighlight: '#1A2A27',
+					border: '#2A3A36',
+					primary: '#EF6F2E',
+					primaryDim: '#B85422',
+					text: '#E8E8E8',
+					muted: '#6A7282',
+					accent: '#3B82F6',
+					error: '#EF4444'
 				}
 			},
 
 			fontFamily: {
-				sans: ['Inter', 'system-ui', '-apple-system', ...fontFamily.sans],
-				mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', ...fontFamily.mono]
+				sans: ['Inter', 'sans-serif'],
+				display: ['Space Grotesk', 'sans-serif'],
+				mono: ['JetBrains Mono', 'monospace']
 			},
 
 			fontSize: {
@@ -127,7 +143,10 @@ export default {
 				'lg': 'var(--shadow-lg)',
 				'xl': 'var(--shadow-xl)',
 				'glow': 'var(--shadow-glow)',
-				'focus': 'var(--shadow-focus)'
+				'focus': 'var(--shadow-focus)',
+				// Gas Town glow effects
+				'glow-primary': '0 0 20px -5px #EF6F2E, 0 0 40px -10px #B85422',
+				'glow-accent': '0 0 20px -5px #3B82F6, 0 0 40px -10px #1D4ED8'
 			},
 
 			minHeight: {

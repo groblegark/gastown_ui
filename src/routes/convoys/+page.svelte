@@ -109,7 +109,7 @@
 										<h3 class="font-medium text-foreground truncate">{convoy.title}</h3>
 										<div class="flex items-center gap-2 mt-1">
 											<span class="text-xs text-muted-foreground font-mono">{convoy.id}</span>
-											<span class="text-xs text-muted-foreground">
+											<span class="text-xs text-muted-foreground font-mono">
 												{formatDate(convoy.createdAt)}
 											</span>
 										</div>
