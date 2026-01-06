@@ -3,7 +3,8 @@
 	import { GridPattern } from '$lib/components';
 	import { cn } from '$lib/utils';
 	import { browser } from '$app/environment';
-	import { Trash2 } from 'lucide-svelte';
+	import { Trash2, Sun, Moon, Monitor, Palette, Bot, Settings, AlertTriangle, Info } from 'lucide-svelte';
+	import type { ComponentType } from 'svelte';
 
 	const { data, form } = $props();
 
@@ -55,11 +56,11 @@
 	}
 
 	// Theme options
-	const themeOptions = [
-		{ value: 'light', label: 'Light', icon: '☀️' },
-		{ value: 'dark', label: 'Dark', icon: '🌙' },
-		{ value: 'system', label: 'System', icon: '💻' }
-	] as const;
+	const themeOptions: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: ComponentType }> = [
+		{ value: 'light', label: 'Light', icon: Sun },
+		{ value: 'dark', label: 'Dark', icon: Moon },
+		{ value: 'system', label: 'System', icon: Monitor }
+	];
 </script>
 
 <svelte:head>
@@ -101,7 +102,7 @@
 			<section class="panel-glass p-6">
 				<div class="flex items-center gap-3 mb-4">
 					<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-						<span class="text-xl">🎨</span>
+						<Palette size={24} strokeWidth={1.5} class="text-primary" />
 					</div>
 					<div>
 						<h2 class="text-lg font-semibold text-foreground">Appearance</h2>
@@ -123,7 +124,7 @@
 									: 'border-border bg-card'
 							)}
 						>
-							<span class="text-2xl">{option.icon}</span>
+							<option.icon size={28} strokeWidth={1.5} />
 							<span class="text-sm font-medium text-foreground">{option.label}</span>
 						</button>
 					{/each}
@@ -134,7 +135,7 @@
 			<section class="panel-glass p-6">
 				<div class="flex items-center gap-3 mb-4">
 					<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-						<span class="text-xl">🤖</span>
+						<Bot size={24} strokeWidth={1.5} class="text-primary" />
 					</div>
 					<div>
 						<h2 class="text-lg font-semibold text-foreground">Default Agent</h2>
@@ -194,7 +195,7 @@
 				<div class="flex items-center justify-between mb-4">
 					<div class="flex items-center gap-3">
 						<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-							<span class="text-xl">⚙️</span>
+							<Settings size={24} strokeWidth={1.5} class="text-primary" />
 						</div>
 						<div>
 							<h2 class="text-lg font-semibold text-foreground">Agent Configuration</h2>
@@ -293,7 +294,7 @@ tttttttttt<Trash2 class="w-4 h-4" />
 			<section class="panel-glass p-6">
 				<div class="flex items-center gap-3 mb-4">
 					<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-						<span class="text-xl">🚨</span>
+						<AlertTriangle size={24} strokeWidth={1.5} class="text-primary" />
 					</div>
 					<div>
 						<h2 class="text-lg font-semibold text-foreground">Patrol Controls</h2>
@@ -421,7 +422,7 @@ tttttttttt<Trash2 class="w-4 h-4" />
 			<section class="panel-glass p-6">
 				<div class="flex items-center gap-3 mb-4">
 					<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-						<span class="text-xl">ℹ️</span>
+						<Info size={24} strokeWidth={1.5} class="text-primary" />
 					</div>
 					<div>
 						<h2 class="text-lg font-semibold text-foreground">About Gas Town</h2>

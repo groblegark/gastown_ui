@@ -8,8 +8,8 @@
 	 * @example
 	 * <SwipeableTabs
 	 *   tabs={[
-	 *     { id: 'agents', label: 'Agents', icon: '🤖' },
-	 *     { id: 'flows', label: 'Flows', icon: '⚗️' },
+	 *     { id: 'agents', label: 'Agents', icon: Bot },
+	 *     { id: 'flows', label: 'Flows', icon: FlaskConical },
 	 *   ]}
 	 *   bind:activeTab
 	 * >
@@ -23,7 +23,7 @@
 	import { tv } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
 	import { browser } from '$app/environment';
-	import type { Snippet } from 'svelte';
+	import type { Snippet, ComponentType } from 'svelte';
 
 	const swipeableTabs = tv({
 		slots: {
@@ -64,7 +64,7 @@
 	interface Tab {
 		id: string;
 		label: string;
-		icon?: string;
+		icon?: ComponentType;
 		badge?: number | string;
 		disabled?: boolean;
 	}
@@ -301,7 +301,9 @@
 					onclick={() => setActiveTab(tab.id)}
 				>
 					{#if tab.icon}
-						<span class="text-lg" aria-hidden="true">{tab.icon}</span>
+						<span class="w-5 h-5 flex items-center justify-center" aria-hidden="true">
+							<tab.icon size={18} strokeWidth={2} />
+						</span>
 					{/if}
 					<span>{tab.label}</span>
 					{#if tab.badge}

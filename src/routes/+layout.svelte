@@ -5,6 +5,24 @@
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import {
+		Home,
+		Target,
+		Bot,
+		Mail,
+		ClipboardList,
+		Truck,
+		FlaskConical,
+		Factory,
+		Bell,
+		HeartPulse,
+		BarChart3,
+		Eye,
+		Users,
+		Dog,
+		Settings,
+		ScrollText
+	} from 'lucide-svelte';
 
 	interface Props {
 		children: import('svelte').Snippet;
@@ -28,27 +46,27 @@
 	// Primary items shown in bottom nav: Dashboard, Work, Agents, Mail + More
 	const navItems = $derived([
 		// Core (primary visibility)
-		{ id: 'dashboard', label: 'Dashboard', href: '/', icon: '🏠' },
-		{ id: 'work', label: 'Work', href: '/work', icon: '🎯' },
-		{ id: 'agents', label: 'Agents', href: '/agents', icon: '🤖' },
-		{ id: 'mail', label: 'Mail', href: '/mail', icon: '📬', badge: unreadMail || undefined },
+		{ id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
+		{ id: 'work', label: 'Work', href: '/work', icon: Target },
+		{ id: 'agents', label: 'Agents', href: '/agents', icon: Bot },
+		{ id: 'mail', label: 'Mail', href: '/mail', icon: Mail, badge: unreadMail || undefined },
 		// Core (in overflow)
-		{ id: 'queue', label: 'Queue', href: '/queue', icon: '📋' },
+		{ id: 'queue', label: 'Queue', href: '/queue', icon: ClipboardList },
 		// Operations
-		{ id: 'convoys', label: 'Convoys', href: '/convoys', icon: '🚛' },
-		{ id: 'workflows', label: 'Workflows', href: '/workflows', icon: '⚗️' },
-		{ id: 'rigs', label: 'Rigs', href: '/rigs', icon: '🏭' },
+		{ id: 'convoys', label: 'Convoys', href: '/convoys', icon: Truck },
+		{ id: 'workflows', label: 'Workflows', href: '/workflows', icon: FlaskConical },
+		{ id: 'rigs', label: 'Rigs', href: '/rigs', icon: Factory },
 		// Communication
-		{ id: 'escalations', label: 'Alerts', href: '/escalations', icon: '🚨', badge: escalationCount || undefined },
+		{ id: 'escalations', label: 'Alerts', href: '/escalations', icon: Bell, badge: escalationCount || undefined },
 		// Monitoring
-		{ id: 'health', label: 'Health', href: '/health', icon: '🩺' },
-		{ id: 'activity', label: 'Activity', href: '/activity', icon: '📊' },
-		{ id: 'watchdog', label: 'Watchdog', href: '/watchdog', icon: '🐺' },
+		{ id: 'health', label: 'Health', href: '/health', icon: HeartPulse },
+		{ id: 'activity', label: 'Activity', href: '/activity', icon: BarChart3 },
+		{ id: 'watchdog', label: 'Watchdog', href: '/watchdog', icon: Eye },
 		// System
-		{ id: 'crew', label: 'Crew', href: '/crew', icon: '👷' },
-		{ id: 'dogs', label: 'Dogs', href: '/dogs', icon: '🐕' },
-		{ id: 'settings', label: 'Settings', href: '/settings', icon: '⚙️' },
-		{ id: 'logs', label: 'Logs', href: '/logs', icon: '📜' }
+		{ id: 'crew', label: 'Crew', href: '/crew', icon: Users },
+		{ id: 'dogs', label: 'Dogs', href: '/dogs', icon: Dog },
+		{ id: 'settings', label: 'Settings', href: '/settings', icon: Settings },
+		{ id: 'logs', label: 'Logs', href: '/logs', icon: ScrollText }
 	]);
 
 	// Determine active nav item from current route

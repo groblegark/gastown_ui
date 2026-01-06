@@ -2,7 +2,24 @@
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { Search } from 'lucide-svelte';
+	import {
+		Search,
+		Home,
+		Bot,
+		Target,
+		Truck,
+		ClipboardList,
+		Mail,
+		Bell,
+		ScrollText,
+		Settings,
+		Users,
+		Dog,
+		Zap,
+		FileText,
+		FolderOpen
+	} from 'lucide-svelte';
+	import type { ComponentType } from 'svelte';
 
 	interface Props {
 		class?: string;
@@ -52,18 +69,18 @@
 		{ id: 'convoy-003', name: 'Mobile PWA', status: 'stale', progress: 30 }
 	];
 
-	const routes = [
-		{ path: '/', label: 'Dashboard', icon: '🏠' },
-		{ path: '/agents', label: 'Agents', icon: '🤖' },
-		{ path: '/work', label: 'Work', icon: '🎯' },
-		{ path: '/convoys', label: 'Convoys', icon: '🚛' },
-		{ path: '/queue', label: 'Queue', icon: '📋' },
-		{ path: '/mail', label: 'Mail', icon: '📬' },
-		{ path: '/escalations', label: 'Escalations', icon: '🚨' },
-		{ path: '/logs', label: 'Logs', icon: '📜' },
-		{ path: '/settings', label: 'Settings', icon: '⚙️' },
-		{ path: '/crew', label: 'Crew', icon: '👥' },
-		{ path: '/watchdog', label: 'Watchdog', icon: '🐕' }
+	const routes: Array<{ path: string; label: string; icon: ComponentType }> = [
+		{ path: '/', label: 'Dashboard', icon: Home },
+		{ path: '/agents', label: 'Agents', icon: Bot },
+		{ path: '/work', label: 'Work', icon: Target },
+		{ path: '/convoys', label: 'Convoys', icon: Truck },
+		{ path: '/queue', label: 'Queue', icon: ClipboardList },
+		{ path: '/mail', label: 'Mail', icon: Mail },
+		{ path: '/escalations', label: 'Escalations', icon: Bell },
+		{ path: '/logs', label: 'Logs', icon: ScrollText },
+		{ path: '/settings', label: 'Settings', icon: Settings },
+		{ path: '/crew', label: 'Crew', icon: Users },
+		{ path: '/watchdog', label: 'Watchdog', icon: Dog }
 	];
 
 	const commands = [
@@ -133,7 +150,7 @@
 		id: string;
 		label: string;
 		sublabel?: string;
-		icon?: string;
+		icon?: ComponentType;
 		action: () => void;
 	}
 
@@ -144,7 +161,7 @@
 				id: c.id,
 				label: c.label,
 				sublabel: c.description,
-				icon: '⚡',
+				icon: Zap,
 				action: () => { c.action(); close(); }
 			}));
 		}
@@ -159,7 +176,7 @@
 					id: item.id,
 					label: item.label,
 					sublabel: `Recent ${item.type}`,
-					icon: item.type === 'agent' ? '🤖' : item.type === 'issue' ? '📝' : '📁',
+					icon: item.type === 'agent' ? Bot : item.type === 'issue' ? FileText : FolderOpen,
 					action: () => { goto(item.path); close(); }
 				});
 			});
@@ -173,7 +190,7 @@
 				id: a.id,
 				label: a.name,
 				sublabel: a.task,
-				icon: '🤖',
+				icon: Bot,
 				action: () => { goto(`/agents/${a.id}`); close(); }
 			});
 		});
@@ -185,7 +202,7 @@
 				id: i.id,
 				label: i.title,
 				sublabel: `${i.id} · ${i.type} · P${i.priority}`,
-				icon: '📝',
+				icon: FileText,
 				action: () => { goto('/work'); close(); }
 			});
 		});
@@ -197,7 +214,7 @@
 				id: c.id,
 				label: c.name,
 				sublabel: `${c.status} · ${c.progress}%`,
-				icon: '🚛',
+				icon: Truck,
 				action: () => { goto(`/convoys/${c.id}`); close(); }
 			});
 		});
@@ -443,8 +460,10 @@
 										onclick={() => item.action()}
 										onmouseenter={() => selectedIndex = flatIndex}
 									>
-										<span class="w-6 h-6 flex items-center justify-center text-base flex-shrink-0">
-											{item.icon}
+										<span class="w-6 h-6 flex items-center justify-center flex-shrink-0">
+											{#if item.icon}
+												<item.icon size={20} strokeWidth={2} />
+											{/if}
 										</span>
 										<div class="flex-1 min-w-0">
 											<div class="font-medium truncate">{item.label}</div>

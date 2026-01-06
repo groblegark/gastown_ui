@@ -20,7 +20,8 @@
 	import SwipeableTabs from './SwipeableTabs.svelte';
 	import StatusIndicator from './StatusIndicator.svelte';
 	import GridPattern from './GridPattern.svelte';
-	import type { Snippet } from 'svelte';
+	import type { Snippet, ComponentType } from 'svelte';
+	import { Bot, FlaskConical, ClipboardList, ScrollText } from 'lucide-svelte';
 
 	interface Props {
 		/** Dashboard title */
@@ -65,29 +66,29 @@
 	}: Props = $props();
 
 	// Tab definitions
-	const tabs = $derived([
+	const tabs: Array<{ id: string; label: string; icon: ComponentType; badge?: number }> = $derived([
 		{
 			id: 'agents',
 			label: 'Agents',
-			icon: '🤖',
+			icon: Bot,
 			badge: agentsBadge
 		},
 		{
 			id: 'flows',
 			label: 'Flows',
-			icon: '⚗️',
+			icon: FlaskConical,
 			badge: flowsBadge
 		},
 		{
 			id: 'queue',
 			label: 'Queue',
-			icon: '📋',
+			icon: ClipboardList,
 			badge: queueBadge
 		},
 		{
 			id: 'logs',
 			label: 'Logs',
-			icon: '📜',
+			icon: ScrollText,
 			badge: logsBadge
 		}
 	]);
@@ -137,8 +138,16 @@
 					{:else}
 						<!-- Empty state -->
 						<div class="flex flex-col items-center justify-center h-64 text-muted-foreground">
-							<span class="text-4xl mb-2">
-								{tabId === 'agents' ? '🤖' : tabId === 'flows' ? '⚗️' : tabId === 'queue' ? '📋' : '📜'}
+							<span class="mb-2">
+								{#if tabId === 'agents'}
+									<Bot size={48} strokeWidth={1.5} />
+								{:else if tabId === 'flows'}
+									<FlaskConical size={48} strokeWidth={1.5} />
+								{:else if tabId === 'queue'}
+									<ClipboardList size={48} strokeWidth={1.5} />
+								{:else}
+									<ScrollText size={48} strokeWidth={1.5} />
+								{/if}
 							</span>
 							<p class="text-sm">No content available</p>
 						</div>

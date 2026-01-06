@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { tv } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
+	import { X, MoreHorizontal } from 'lucide-svelte';
+	import type { ComponentType } from 'svelte';
 
 	/**
 	 * Navigation item variant definitions
@@ -22,7 +24,7 @@
 		id: string;
 		label: string;
 		href?: string;
-		icon?: string;
+		icon?: ComponentType;
 		badge?: number | string;
 	}
 
@@ -97,7 +99,9 @@
 					>
 						<span class="relative">
 							{#if item.icon}
-								<span class="w-6 h-6 flex items-center justify-center text-xl" aria-hidden="true">{item.icon}</span>
+								<span class="w-6 h-6 flex items-center justify-center" aria-hidden="true">
+									<item.icon size={20} strokeWidth={2} />
+								</span>
 							{:else}
 								<span class="w-6 h-6 rounded-full bg-current opacity-20" aria-hidden="true"></span>
 							{/if}
@@ -146,7 +150,9 @@
 				>
 					<span class="relative">
 						{#if item.icon}
-							<span class="text-xl" aria-hidden="true">{item.icon}</span>
+							<span class="w-6 h-6 flex items-center justify-center" aria-hidden="true">
+								<item.icon size={20} strokeWidth={2} />
+							</span>
 						{:else}
 							<span class="w-6 h-6 rounded-full bg-current opacity-20" aria-hidden="true"></span>
 						{/if}
@@ -177,7 +183,13 @@
 				aria-label="More navigation options"
 			>
 				<span class="relative">
-					<span class="w-6 h-6 flex items-center justify-center text-xl" aria-hidden="true">{showOverflow ? '✕' : '⋯'}</span>
+					<span class="w-6 h-6 flex items-center justify-center" aria-hidden="true">
+						{#if showOverflow}
+							<X size={20} strokeWidth={2} />
+						{:else}
+							<MoreHorizontal size={20} strokeWidth={2} />
+						{/if}
+					</span>
 					{#if activeInOverflow && !showOverflow}
 						<span
 							class="absolute -top-1 -right-2 w-2 h-2 bg-primary rounded-full"
@@ -205,7 +217,9 @@
 				>
 					<span class="relative">
 						{#if item.icon}
-							<span class="text-xl" aria-hidden="true">{item.icon}</span>
+							<span class="w-6 h-6 flex items-center justify-center" aria-hidden="true">
+								<item.icon size={20} strokeWidth={2} />
+							</span>
 						{:else}
 							<span class="w-6 h-6 rounded-full bg-current opacity-20" aria-hidden="true"></span>
 						{/if}
