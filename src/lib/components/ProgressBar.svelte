@@ -26,11 +26,7 @@
 				lg: { base: 'h-3', indicator: 'h-3' }
 			},
 			color: {
-<<<<<<< HEAD
-				default: { indicator: 'bg-accent' },
-=======
 				default: { indicator: 'bg-primary' },
->>>>>>> polecat/furiosa-mk1ppoio
 				success: { indicator: 'bg-success' },
 				warning: { indicator: 'bg-warning' },
 				error: { indicator: 'bg-destructive' }

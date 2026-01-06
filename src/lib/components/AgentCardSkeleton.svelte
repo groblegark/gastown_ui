@@ -12,14 +12,10 @@
 
 <!-- Agent Card Skeleton: matches the AgentCard component layout -->
 <div
-<<<<<<< HEAD
-	class={cn('bg-card text-card-foreground border border-border rounded-lg shadow-sm p-4 space-y-3', className)}
-=======
 	class={cn(
 		'bg-card/80 backdrop-blur-xl border border-border rounded-lg shadow-sm overflow-hidden',
 		className
 	)}
->>>>>>> polecat/cheedo-mk1qula2
 	role="status"
 	aria-label="Loading agent card"
 	aria-busy="true"
