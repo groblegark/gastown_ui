@@ -19,8 +19,8 @@
 		class: className = ''
 	}: Props = $props();
 
-	// Track displayed message for clearing
-	let displayedMessage = $state(message);
+	// Track displayed message for clearing (effect updates it when message changes)
+	let displayedMessage = $state('');
 
 	// Update displayed message when message changes
 	$effect(() => {

@@ -3,6 +3,7 @@
 	import { cn } from '$lib/utils';
 	import StatusIndicator from './StatusIndicator.svelte';
 	import GridPattern from './GridPattern.svelte';
+	import type { Snippet } from 'svelte';
 
 	/**
 	 * WorkflowStep variant definitions
@@ -39,13 +40,21 @@
 		steps?: Step[];
 		currentStep?: number;
 		class?: string;
+		actions?: Snippet;
+		details?: Snippet;
+		children?: Snippet;
+		footer?: Snippet;
 	}
 
 	let {
 		title = 'Workflow',
 		steps = [],
 		currentStep = 0,
-		class: className = ''
+		class: className = '',
+		actions,
+		details,
+		children,
+		footer
 	}: Props = $props();
 
 	// Map step status to StatusIndicator status
@@ -82,9 +91,9 @@
 						({steps.filter((s) => s.status === 'complete').length}/{steps.length} steps)
 					</p>
 				</div>
-				{#if $$slots.actions}
+				{#if actions}
 					<div class="flex items-center gap-2">
-						<slot name="actions" />
+						{@render actions()}
 					</div>
 				{/if}
 			</div>
@@ -122,26 +131,26 @@
 		</section>
 
 		<!-- Step details section -->
-		{#if $$slots.details}
+		{#if details}
 			<section class="container pb-6">
 				<div class="panel-glass p-4">
-					<slot name="details" />
+					{@render details()}
 				</div>
 			</section>
 		{/if}
 
 		<!-- Main content slot -->
-		{#if $$slots.default}
+		{#if children}
 			<main class="flex-1 container pb-6">
-				<slot />
+				{@render children()}
 			</main>
 		{/if}
 
 		<!-- Footer slot -->
-		{#if $$slots.footer}
+		{#if footer}
 			<footer class="mt-auto border-t border-border px-4 py-3">
 				<div class="container">
-					<slot name="footer" />
+					{@render footer()}
 				</div>
 			</footer>
 		{/if}

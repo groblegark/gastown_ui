@@ -12,13 +12,13 @@
 	let messageRoleFilter = $state<'all' | 'user' | 'assistant' | 'tool'>('all');
 	let searchInTranscript = $state('');
 
-	// Filter state
-	let selectedAgent = $state(data.filters.agent);
-	let selectedRig = $state(data.filters.rig);
-	let selectedStatus = $state(data.filters.status);
-	let searchQuery = $state(data.filters.search);
-	let dateFrom = $state(data.filters.dateFrom);
-	let dateTo = $state(data.filters.dateTo);
+	// Filter state - use $state with $effect to sync from URL/data
+	let selectedAgent = $state('');
+	let selectedRig = $state('');
+	let selectedStatus = $state('');
+	let searchQuery = $state('');
+	let dateFrom = $state('');
+	let dateTo = $state('');
 
 	// Icon SVGs
 	const icons: Record<string, string> = {

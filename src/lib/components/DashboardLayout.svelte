@@ -2,17 +2,28 @@
 	import { cn } from '$lib/utils';
 	import GridPattern from './GridPattern.svelte';
 	import StatusIndicator from './StatusIndicator.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		title?: string;
 		systemStatus?: 'running' | 'idle' | 'error' | 'warning';
 		class?: string;
+		stats?: Snippet;
+		agents?: Snippet;
+		activity?: Snippet;
+		children?: Snippet;
+		footer?: Snippet;
 	}
 
 	let {
 		title = 'Gas Town',
 		systemStatus = 'running',
-		class: className = ''
+		class: className = '',
+		stats,
+		agents,
+		activity,
+		children,
+		footer
 	}: Props = $props();
 </script>
 
@@ -41,43 +52,43 @@
 		<!-- Main content area -->
 		<main class="flex-1 container py-6 space-y-6">
 			<!-- Stats section -->
-			{#if $$slots.stats}
+			{#if stats}
 				<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					<slot name="stats" />
+					{@render stats()}
 				</section>
 			{/if}
 
 			<!-- Agent grid -->
-			{#if $$slots.agents}
+			{#if agents}
 				<section class="space-y-4">
 					<h2 class="text-lg font-medium text-foreground">Agents</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-						<slot name="agents" />
+						{@render agents()}
 					</div>
 				</section>
 			{/if}
 
 			<!-- Activity feed -->
-			{#if $$slots.activity}
+			{#if activity}
 				<section class="space-y-4">
 					<h2 class="text-lg font-medium text-foreground">Recent Activity</h2>
 					<div class="panel-glass divide-y divide-border overflow-hidden">
-						<slot name="activity" />
+						{@render activity()}
 					</div>
 				</section>
 			{/if}
 
 			<!-- Default slot for custom content -->
-			{#if $$slots.default}
-				<slot />
+			{#if children}
+				{@render children()}
 			{/if}
 		</main>
 
 		<!-- Footer slot -->
-		{#if $$slots.footer}
+		{#if footer}
 			<footer class="mt-auto border-t border-border px-4 py-3">
 				<div class="container">
-					<slot name="footer" />
+					{@render footer()}
 				</div>
 			</footer>
 		{/if}

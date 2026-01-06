@@ -2,6 +2,7 @@
 	import { tv } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
 	import GridPattern from './GridPattern.svelte';
+	import type { Snippet } from 'svelte';
 
 	/**
 	 * Priority badge variant definitions
@@ -34,12 +35,18 @@
 		title?: string;
 		items?: QueueItem[];
 		class?: string;
+		actions?: Snippet;
+		itemActions?: Snippet<[{ item: QueueItem; index: number }]>;
+		footer?: Snippet;
 	}
 
 	let {
 		title = 'Queue',
 		items = [],
-		class: className = ''
+		class: className = '',
+		actions,
+		itemActions,
+		footer
 	}: Props = $props();
 
 	// Priority labels
@@ -59,9 +66,9 @@
 					<h1 class="text-xl font-semibold text-foreground">{title}</h1>
 					<p class="text-sm text-muted-foreground">{items.length} items in queue</p>
 				</div>
-				{#if $$slots.actions}
+				{#if actions}
 					<div class="flex items-center gap-2">
-						<slot name="actions" />
+						{@render actions()}
 					</div>
 				{/if}
 			</div>
@@ -101,9 +108,9 @@
 								{/if}
 
 								<!-- Actions slot -->
-								{#if $$slots['item-actions']}
+								{#if itemActions}
 									<div class="flex-shrink-0">
-										<slot name="item-actions" {item} {index} />
+										{@render itemActions({ item, index })}
 									</div>
 								{/if}
 							</li>
@@ -118,10 +125,10 @@
 		</main>
 
 		<!-- Footer slot -->
-		{#if $$slots.footer}
+		{#if footer}
 			<footer class="mt-auto border-t border-border px-4 py-3">
 				<div class="container">
-					<slot name="footer" />
+					{@render footer()}
 				</div>
 			</footer>
 		{/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		/** Live region politeness: assertive interrupts, polite waits */
@@ -14,6 +15,8 @@
 		hidden?: boolean;
 		/** Additional classes */
 		class?: string;
+		/** Content to announce */
+		children?: Snippet;
 	}
 
 	let {
@@ -22,7 +25,8 @@
 		relevant = 'additions',
 		role = 'status',
 		hidden = false,
-		class: className = ''
+		class: className = '',
+		children
 	}: Props = $props();
 
 	// Derive aria-live value
@@ -36,5 +40,5 @@
 	aria-relevant={relevant}
 	{role}
 >
-	<slot />
+	{@render children?.()}
 </div>

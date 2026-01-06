@@ -23,7 +23,12 @@
 	let slingMessage = $state<{ type: 'success' | 'error'; text: string } | null>(null);
 
 	// Local copy of issues that updates after creation
-	let localIssues = $state([...data.issues]);
+	let localIssues = $state<typeof data.issues>([]);
+
+	// Sync with server data
+	$effect(() => {
+		localIssues = [...data.issues];
+	});
 
 	const issueTypes = [
 		{ value: 'task', label: 'Task' },
@@ -266,9 +271,9 @@
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-foreground mb-2">
+						<span class="block text-sm font-medium text-foreground mb-2">
 							Select Issues ({selectedIssues.length} selected)
-						</label>
+						</span>
 						{#if localIssues.length === 0}
 							<p class="text-sm text-muted-foreground">No open issues available</p>
 						{:else}

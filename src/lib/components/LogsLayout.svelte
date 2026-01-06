@@ -2,6 +2,7 @@
 	import { tv } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
 	import GridPattern from './GridPattern.svelte';
+	import type { Snippet } from 'svelte';
 
 	/**
 	 * Filter button variant definitions
@@ -33,6 +34,9 @@
 		searchQuery?: string;
 		autoScroll?: boolean;
 		class?: string;
+		actions?: Snippet;
+		children?: Snippet;
+		footer?: Snippet;
 	}
 
 	let {
@@ -42,7 +46,10 @@
 		selectedSource = '',
 		searchQuery = '',
 		autoScroll = true,
-		class: className = ''
+		class: className = '',
+		actions,
+		children,
+		footer
 	}: Props = $props();
 
 	const levels: ('INF' | 'WRN' | 'ERR' | 'DBG')[] = ['INF', 'WRN', 'ERR', 'DBG'];
@@ -59,9 +66,9 @@
 			<div class="container space-y-4">
 				<div class="flex items-center justify-between">
 					<h1 class="text-xl font-semibold text-foreground">{title}</h1>
-					{#if $$slots.actions}
+					{#if actions}
 						<div class="flex items-center gap-2">
-							<slot name="actions" />
+							{@render actions()}
 						</div>
 					{/if}
 				</div>
@@ -129,8 +136,8 @@
 		<main class="flex-1 container py-4">
 			<div class="panel-glass overflow-hidden h-[calc(100vh-16rem)]">
 				<div class="h-full overflow-y-auto" class:scroll-smooth={autoScroll}>
-					{#if $$slots.default}
-						<slot />
+					{#if children}
+						{@render children()}
 					{:else}
 						<div class="p-8 text-center text-muted-foreground">
 							<p>No log entries</p>
@@ -141,10 +148,10 @@
 		</main>
 
 		<!-- Footer slot -->
-		{#if $$slots.footer}
+		{#if footer}
 			<footer class="mt-auto border-t border-border px-4 py-3">
 				<div class="container">
-					<slot name="footer" />
+					{@render footer()}
 				</div>
 			</footer>
 		{/if}

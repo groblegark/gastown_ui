@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
 	import { tv, type VariantProps } from 'tailwind-variants';
 
 	/**
@@ -83,8 +83,15 @@
 	import { cn } from '$lib/utils';
 	import StatusIndicator from './StatusIndicator.svelte';
 	import ProgressBar from './ProgressBar.svelte';
+	import type { Snippet } from 'svelte';
 
-	// Component props
+	// Component props with slot snippets
+	interface Props extends AgentCardProps {
+		expanded?: Snippet;
+		actions?: Snippet;
+		children?: Snippet;
+	}
+
 	let {
 		name,
 		status = 'idle',
@@ -99,8 +106,12 @@
 		expandable = false,
 		compact = false,
 		onInspect,
-		onReboot
-	}: AgentCardProps = $props();
+		onReboot,
+		// Slot snippets
+		expanded: expandedSlot,
+		actions: actionsSlot,
+		children
+	}: Props = $props();
 
 	// Expandable state
 	let isExpanded = $state(false);
@@ -291,28 +302,28 @@
 						</div>
 					{/if}
 
-					<!-- Custom expanded content slot -->
-					{#if $$slots.expanded}
+					<!-- Custom expanded content -->
+					{#if expandedSlot}
 						<div class="pt-3">
-							<slot name="expanded" />
+							{@render expandedSlot()}
 						</div>
 					{/if}
 				{/if}
 			</div>
 		{/if}
 
-		<!-- Legacy actions slot (non-expandable cards) -->
-		{#if !expandable && $$slots.actions}
+		<!-- Legacy actions (non-expandable cards) -->
+		{#if !expandable && actionsSlot}
 			<div class="flex items-center gap-1 pt-2">
-				<slot name="actions" />
+				{@render actionsSlot()}
 			</div>
 		{/if}
 	</div>
 
-	<!-- Custom content slot -->
-	{#if $$slots.default}
+	<!-- Custom content -->
+	{#if children}
 		<div class="px-4 pb-4 pt-2 border-t border-border/50">
-			<slot />
+			{@render children()}
 		</div>
 	{/if}
 </article>

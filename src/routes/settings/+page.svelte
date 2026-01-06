@@ -8,8 +8,13 @@
 
 	// Theme state (persisted to localStorage)
 	let theme = $state<'light' | 'dark' | 'system'>('system');
-	let selectedAgent = $state(data.defaultAgent);
+	let selectedAgent = $state('');
 	let showAddAgent = $state(false);
+
+	// Sync selected agent from data
+	$effect(() => {
+		selectedAgent = data.defaultAgent;
+	});
 	let newAgentName = $state('');
 	let newAgentCommand = $state('');
 

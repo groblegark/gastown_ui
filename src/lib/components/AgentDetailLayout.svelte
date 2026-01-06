@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import GridPattern from './GridPattern.svelte';
 	import StatusIndicator from './StatusIndicator.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		name: string;
@@ -9,6 +10,11 @@
 		task?: string;
 		meta?: string;
 		class?: string;
+		actions?: Snippet;
+		details?: Snippet;
+		logActions?: Snippet;
+		logs?: Snippet;
+		footer?: Snippet;
 	}
 
 	let {
@@ -16,7 +22,12 @@
 		status = 'idle',
 		task = '',
 		meta = '',
-		class: className = ''
+		class: className = '',
+		actions,
+		details,
+		logActions,
+		logs,
+		footer
 	}: Props = $props();
 </script>
 
@@ -42,9 +53,9 @@
 					</div>
 
 					<!-- Action buttons -->
-					{#if $$slots.actions}
+					{#if actions}
 						<div class="flex items-center gap-2">
-							<slot name="actions" />
+							{@render actions()}
 						</div>
 					{/if}
 				</div>
@@ -69,12 +80,12 @@
 					</section>
 
 					<!-- Task details slot -->
-					{#if $$slots.details}
+					{#if details}
 						<section class="panel-glass p-4 space-y-3">
 							<h2 class="text-sm font-medium text-muted-foreground uppercase tracking-wide">
 								Details
 							</h2>
-							<slot name="details" />
+							{@render details()}
 						</section>
 					{/if}
 				</div>
@@ -86,13 +97,13 @@
 							<h2 class="text-sm font-medium text-muted-foreground uppercase tracking-wide">
 								Live Log
 							</h2>
-							{#if $$slots['log-actions']}
-								<slot name="log-actions" />
+							{#if logActions}
+								{@render logActions()}
 							{/if}
 						</header>
 						<div class="flex-1 overflow-y-auto">
-							{#if $$slots.logs}
-								<slot name="logs" />
+							{#if logs}
+								{@render logs()}
 							{:else}
 								<div class="p-4 text-center text-muted-foreground">
 									<p>No log entries</p>
@@ -105,10 +116,10 @@
 		</main>
 
 		<!-- Footer slot -->
-		{#if $$slots.footer}
+		{#if footer}
 			<footer class="mt-auto border-t border-border px-4 py-3">
 				<div class="container">
-					<slot name="footer" />
+					{@render footer()}
 				</div>
 			</footer>
 		{/if}

@@ -15,9 +15,9 @@
 	let intervalId: ReturnType<typeof setInterval> | null = null;
 	let lastRefresh = $state(new Date());
 
-	// Local filter state
-	let selectedType = $state(data.filters.type);
-	let selectedActor = $state(data.filters.actor);
+	// Local filter state - use $derived to track URL/data changes
+	let selectedType = $derived(data.filters.type);
+	let selectedActor = $derived(data.filters.actor);
 
 	// Icon mapping
 	const iconSvgs: Record<string, string> = {

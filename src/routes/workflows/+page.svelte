@@ -594,7 +594,7 @@
 							<div class="space-y-3">
 								{#each selectedFormula.variables as variable}
 									<div class="space-y-1">
-										<label class="flex items-center gap-2 text-sm">
+										<label for="var-{variable.name}" class="flex items-center gap-2 text-sm">
 											<span class="font-medium text-foreground">{variable.name}</span>
 											{#if variable.required}
 												<span class="text-xs text-destructive">*</span>
@@ -604,6 +604,7 @@
 											<p class="text-xs text-muted-foreground">{variable.description}</p>
 										{/if}
 										<input
+											id="var-{variable.name}"
 											type="text"
 											bind:value={varInputs[variable.name]}
 											placeholder={variable.default || `Enter ${variable.name}`}

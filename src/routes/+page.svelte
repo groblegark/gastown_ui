@@ -3,7 +3,12 @@
 
 	let { data } = $props();
 
-	const { agents, stats, systemStatus, townName, error } = data;
+	// Use $derived to track data changes (from navigation/invalidation)
+	const agents = $derived(data.agents);
+	const stats = $derived(data.stats);
+	const systemStatus = $derived(data.systemStatus);
+	const townName = $derived(data.townName);
+	const error = $derived(data.error);
 </script>
 
 <DashboardLayout title={townName} {systemStatus}>

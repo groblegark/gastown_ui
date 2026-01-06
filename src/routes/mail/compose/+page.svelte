@@ -7,13 +7,25 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	// Form state
-	let recipient = $state(form?.to ?? data.prefillTo ?? '');
-	let subject = $state(form?.subject ?? data.prefillSubject ?? '');
-	let body = $state(form?.body ?? '');
+	// Form state - use $state with $effect to sync from form/data
+	let recipient = $state('');
+	let subject = $state('');
+	let body = $state('');
 	let showDropdown = $state(false);
 	let searchQuery = $state('');
 	let sending = $state(false);
+
+	// Sync form fields from data/form on changes
+	$effect(() => {
+		recipient = form?.to ?? data.prefillTo ?? '';
+		searchQuery = form?.to ?? data.prefillTo ?? '';
+	});
+	$effect(() => {
+		subject = form?.subject ?? data.prefillSubject ?? '';
+	});
+	$effect(() => {
+		body = form?.body ?? '';
+	});
 
 	// Filter addresses based on search
 	let filteredAddresses = $derived(() => {

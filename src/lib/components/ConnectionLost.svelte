@@ -25,9 +25,14 @@
 	let mounted = $state(false);
 
 	// Countdown state
-	let countdown = $state(retryInterval);
+	let countdown = $state(30);
 	let retryCount = $state(0);
 	let isRetrying = $state(false);
+
+	// Initialize countdown from prop (runs once on mount)
+	$effect(() => {
+		countdown = retryInterval;
+	});
 
 	// Timer reference
 	let countdownTimer: ReturnType<typeof setInterval> | null = null;

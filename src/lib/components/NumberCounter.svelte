@@ -39,8 +39,9 @@
 	}: Props = $props();
 
 	// Create tweened store with animation settings
+	// Duration is set at creation time (tweened options are not reactive)
 	const displayValue = tweened(0, {
-		duration,
+		duration: 500, // Default animation duration
 		easing: cubicOut
 	});
 

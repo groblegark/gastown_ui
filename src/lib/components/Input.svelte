@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tv, type VariantProps } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
+	import type { Snippet } from 'svelte';
 
 	/**
 	 * Input component following shadcn patterns with tailwind-variants.
@@ -130,6 +131,10 @@
 		oninput?: (e: Event) => void;
 		onfocus?: (e: FocusEvent) => void;
 		onblur?: (e: FocusEvent) => void;
+
+		// Slots
+		icon?: Snippet;
+		action?: Snippet;
 	}
 
 	let {
@@ -158,14 +163,16 @@
 		oninput,
 		onfocus,
 		onblur,
+		icon,
+		action,
 		...restProps
 	}: Props = $props();
 
 	// State for password visibility
 	let showPassword = $state(false);
 
-	// Determine if we have an icon slot
-	let hasIcon = $state(false);
+	// Determine if we have an icon snippet
+	const hasIcon = $derived(!!icon);
 
 	// Computed input type (for password toggle)
 	const computedType = $derived(
@@ -207,13 +214,6 @@
 		showPassword = !showPassword;
 	}
 
-	// Check for icon slot content
-	function checkIconSlot(node: HTMLElement) {
-		hasIcon = node.children.length > 0;
-		return {
-			destroy() {}
-		};
-	}
 </script>
 
 <div class={cn(styles.wrapper(), className)}>
@@ -272,10 +272,12 @@
 			></span>
 		{/if}
 
-		<!-- Icon prefix slot -->
-		<div class={styles.iconWrapper()} use:checkIconSlot>
-			<slot name="icon" />
-		</div>
+		<!-- Icon prefix -->
+		{#if icon}
+			<div class={styles.iconWrapper()}>
+				{@render icon()}
+			</div>
+		{/if}
 
 		<input
 			{...restProps}
@@ -328,7 +330,7 @@
 					{/if}
 				</button>
 			{/if}
-			<slot name="action" />
+			{@render action?.()}
 		</div>
 	</div>
 
