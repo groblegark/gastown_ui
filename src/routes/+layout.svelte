@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import { SkipLink, Announcer, BottomNav, Sidebar, GlobalSearch } from '$lib/components';
+	import { SkipLink, Announcer, BottomNav, Sidebar, GlobalSearch, NavigationLoader } from '$lib/components';
 	import { preloadRoute } from '$lib/preload';
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
@@ -143,6 +143,9 @@
 	<title>Gas Town</title>
 	<meta name="description" content="Gas Town - Multi-agent orchestration dashboard" />
 </svelte:head>
+
+<!-- Navigation loading indicator -->
+<NavigationLoader />
 
 <!-- Skip link for keyboard users -->
 <SkipLink href="main-content" />

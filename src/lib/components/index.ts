@@ -31,6 +31,9 @@ export { default as Skeleton } from './Skeleton.svelte';
 export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
 export { default as LogEntrySkeleton } from './LogEntrySkeleton.svelte';
 
+// Navigation components
+export { default as NavigationLoader } from './NavigationLoader.svelte';
+
 // Interactive components
 export { default as SwipeableItem } from './SwipeableItem.svelte';
 export { default as PullToRefresh } from './PullToRefresh.svelte';
