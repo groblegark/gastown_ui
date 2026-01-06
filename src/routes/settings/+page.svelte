@@ -57,10 +57,15 @@
 
 	// Theme options
 	const themeOptions: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: ComponentType }> = [
-		{ value: 'light', label: 'Light', icon: Sun },
 		{ value: 'dark', label: 'Dark', icon: Moon },
+		{ value: 'light', label: 'Light', icon: Sun },
 		{ value: 'system', label: 'System', icon: Monitor }
 	];
+
+	function getThemeIndex() {
+		const index = themeOptions.findIndex((option) => option.value === theme);
+		return index === -1 ? 0 : index;
+	}
 </script>
 
 <svelte:head>
@@ -110,24 +115,30 @@
 					</div>
 				</div>
 
-				<div class="grid grid-cols-3 gap-3">
-					{#each themeOptions as option}
-						<button
-							type="button"
-							onclick={() => setTheme(option.value)}
-							class={cn(
-								'p-4 rounded-lg border-2 transition-all',
-								'flex flex-col items-center gap-2',
-								'hover:border-primary/50',
-								theme === option.value
-									? 'border-primary bg-primary/5'
-									: 'border-border bg-card'
-							)}
-						>
-							<option.icon size={28} strokeWidth={1.5} />
-							<span class="text-sm font-medium text-foreground">{option.label}</span>
-						</button>
-					{/each}
+				<div class="flex items-center">
+					<div class="relative flex items-center rounded-lg border border-border bg-muted/40 p-1 shadow-sm">
+						<div
+							class="pointer-events-none absolute top-1 left-1 h-8 w-[calc((100%-0.5rem)/3)] rounded-md bg-card shadow-sm transition-transform duration-300 ease-out"
+							style={`transform: translateX(${getThemeIndex() * 100}%)`}
+						></div>
+						{#each themeOptions as option}
+							<button
+								type="button"
+								onclick={() => setTheme(option.value)}
+								aria-pressed={theme === option.value}
+								class={cn(
+									'relative z-10 flex h-8 w-20 items-center justify-center gap-1 rounded-md px-2 text-xs font-semibold uppercase tracking-wide transition-all',
+									'hover:text-foreground',
+									theme === option.value ? 'text-foreground' : 'text-muted-foreground'
+								)}
+							>
+								<span class="flex items-center justify-center">
+									<option.icon size={14} strokeWidth={1.8} />
+								</span>
+								<span class="hidden sm:inline">{option.label}</span>
+							</button>
+						{/each}
+					</div>
 				</div>
 			</section>
 
