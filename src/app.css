@@ -39,14 +39,14 @@
  *    - bg-status-idle                     → Idle/waiting agents
  *
  * USAGE EXAMPLES:
- *    ❌ bg-green-500 text-green-500       → Hardcoded, won't adapt to themes
- *    ✅ bg-success text-success           → Uses semantic tokens
+ *    BAD bg-green-500 text-green-500      → Hardcoded, won't adapt to themes
+ *    OK  bg-success text-success          → Uses semantic tokens
  *
- *    ❌ bg-red-500/10 text-red-500        → Hardcoded
- *    ✅ bg-destructive/10 text-destructive → Semantic with opacity
+ *    BAD bg-red-500/10 text-red-500       → Hardcoded
+ *    OK  bg-destructive/10 text-destructive → Semantic with opacity
  *
- *    ❌ border-amber-500                  → Hardcoded
- *    ✅ border-warning                    → Semantic
+ *    BAD border-amber-500                 → Hardcoded
+ *    OK  border-warning                   → Semantic
  *
  * All tokens support opacity via Tailwind: bg-success/10, text-warning/80, etc.
  * Tokens are defined in both :root (light) and .dark (dark) for theme support.

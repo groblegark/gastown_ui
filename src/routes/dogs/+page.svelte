@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GridPattern, StatusIndicator } from '$lib/components';
+	import { Check, Clock, HelpCircle, PawPrint, Pointer, Rocket, Shield } from 'lucide-svelte';
 
 	const { data } = $props();
 
@@ -62,18 +63,18 @@
 		}
 	}
 
-	function getTriageIcon(triage: TriageDecision): string {
+	function getTriageIcon(triage: TriageDecision) {
 		switch (triage) {
 			case 'START':
-				return '🚀';
+				return Rocket;
 			case 'WAKE':
-				return '⏰';
+				return Clock;
 			case 'NUDGE':
-				return '👉';
+				return Pointer;
 			case 'NOTHING':
-				return '✓';
+				return Check;
 			case 'unknown':
-				return '?';
+				return HelpCircle;
 		}
 	}
 
@@ -104,7 +105,7 @@
 		<header class="sticky top-0 z-50 panel-glass border-b border-border px-4 py-4">
 			<div class="container">
 				<div class="flex items-center gap-3">
-					<span class="text-2xl">🐕</span>
+					<PawPrint class="w-6 h-6 text-foreground" strokeWidth={2} />
 					<h1 class="text-xl font-semibold text-foreground">Deacon Dogs</h1>
 					{#if data.dogs}
 						<StatusIndicator status={getStatusVariant(data.dogs.boot.status)} size="lg" />
@@ -127,9 +128,9 @@
 				<div class="panel-glass p-6">
 					<div class="flex items-center gap-4 mb-6">
 						<div
-							class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center text-3xl"
+							class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center"
 						>
-							🐕‍🦺
+							<Shield class="w-8 h-8 text-warning" strokeWidth={2} />
 						</div>
 						<div class="flex-1">
 							<div class="flex items-center gap-2">
@@ -160,7 +161,11 @@
 						<div class="p-4 rounded-lg bg-background/50 border border-border">
 							<p class="text-xs text-muted-foreground uppercase tracking-wide">Last Decision</p>
 							<div class="flex items-center gap-2 mt-2">
-								<span class="text-lg">{getTriageIcon(data.dogs.boot.lastTriage)}</span>
+								<svelte:component
+									this={getTriageIcon(data.dogs.boot.lastTriage)}
+									class="w-5 h-5 text-muted-foreground"
+									strokeWidth={2}
+								/>
 								<span class="font-semibold">{data.dogs.boot.lastTriage}</span>
 							</div>
 						</div>

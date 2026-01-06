@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GridPattern } from '$lib/components';
+	import { ClipboardList, PenLine, Target, Truck } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -169,7 +170,7 @@
 			<!-- Create Issue Section -->
 			<section class="panel-glass p-6">
 				<h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-					<span class="text-xl">📝</span>
+					<PenLine class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Create Issue
 				</h2>
 
@@ -249,7 +250,7 @@
 			<!-- Create Convoy Section -->
 			<section class="panel-glass p-6">
 				<h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-					<span class="text-xl">🚚</span>
+					<Truck class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Create Convoy
 				</h2>
 
@@ -326,7 +327,7 @@
 			<!-- Sling Work Section -->
 			<section class="panel-glass p-6">
 				<h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-					<span class="text-xl">🎯</span>
+					<Target class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Sling Work
 				</h2>
 
@@ -394,7 +395,7 @@
 			<!-- Current Issues List -->
 			<section class="panel-glass p-6">
 				<h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-					<span class="text-xl">📋</span>
+					<ClipboardList class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Open Issues ({localIssues.length})
 				</h2>
 
