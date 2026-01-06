@@ -36,15 +36,23 @@
 		<!-- Header -->
 		<header class="sticky top-0 z-50 panel-glass border-b border-border px-4 py-3">
 			<div class="container flex items-center justify-between gap-4">
-				<!-- Branding -->
+				<!-- Branding with accent bar -->
 				<div class="flex items-center gap-3">
-					<h1 class="text-lg font-semibold text-foreground">{title}</h1>
+					<!-- Logo accent bar with glow -->
+					<div class="w-2 h-8 bg-primary rounded-sm shadow-glow" aria-hidden="true"></div>
+					<h1 class="text-xl font-bold uppercase tracking-wider text-foreground">{title}</h1>
 				</div>
 
-				<!-- System status -->
-				<div class="flex items-center gap-2">
-					<StatusIndicator status={systemStatus} size="md" />
-					<span class="text-sm text-muted-foreground capitalize">{systemStatus}</span>
+				<!-- Connection status pill -->
+				<div class="flex items-center gap-2 bg-card px-3 py-1.5 rounded-full border border-border">
+					<!-- Animated pulse dot -->
+					<span
+						class="w-2 h-2 rounded-full bg-primary animate-pulse"
+						aria-hidden="true"
+					></span>
+					<span class="text-[10px] font-bold text-primary uppercase tracking-wider">
+						{systemStatus === 'running' ? 'Connected' : systemStatus === 'error' ? 'Disconnected' : systemStatus}
+					</span>
 				</div>
 			</div>
 		</header>
