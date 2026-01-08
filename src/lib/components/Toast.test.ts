@@ -35,34 +35,47 @@ describe('Toast', () => {
 	});
 
 	describe('Type Variants', () => {
-		it('renders info type by default', () => {
-			render(Toast, { props: { id: 'test-1', message: 'Info message' } });
+		it('renders default type with neutral styling', () => {
+			render(Toast, { props: { id: 'test-1', message: 'Default message' } });
 			const alert = screen.getByRole('alert');
-			expect(alert).toHaveClass('bg-info/90');
+			expect(alert).toHaveClass('bg-background');
+			expect(alert).toHaveClass('border-border');
 		});
 
-		it('renders success type', () => {
+		it('renders info type with primary border', () => {
+			render(Toast, {
+				props: { id: 'test-1', message: 'Info message', type: 'info' }
+			});
+			const alert = screen.getByRole('alert');
+			expect(alert).toHaveClass('bg-background');
+			expect(alert).toHaveClass('border-primary/30');
+		});
+
+		it('renders success type with success border', () => {
 			render(Toast, {
 				props: { id: 'test-1', message: 'Success message', type: 'success' }
 			});
 			const alert = screen.getByRole('alert');
-			expect(alert).toHaveClass('bg-success/90');
+			expect(alert).toHaveClass('bg-background');
+			expect(alert).toHaveClass('border-success/30');
 		});
 
-		it('renders warning type', () => {
+		it('renders warning type with warning border', () => {
 			render(Toast, {
 				props: { id: 'test-1', message: 'Warning message', type: 'warning' }
 			});
 			const alert = screen.getByRole('alert');
-			expect(alert).toHaveClass('bg-warning/90');
+			expect(alert).toHaveClass('bg-background');
+			expect(alert).toHaveClass('border-warning/30');
 		});
 
-		it('renders error type', () => {
+		it('renders error type with destructive background', () => {
 			render(Toast, {
 				props: { id: 'test-1', message: 'Error message', type: 'error' }
 			});
 			const alert = screen.getByRole('alert');
-			expect(alert).toHaveClass('bg-destructive/90');
+			expect(alert).toHaveClass('bg-destructive');
+			expect(alert).toHaveClass('text-destructive-foreground');
 		});
 	});
 
@@ -145,10 +158,11 @@ describe('Toast', () => {
 	});
 
 	describe('Animation', () => {
-		it('has slide-in animation class', () => {
+		it('has slide-in animation classes', () => {
 			render(Toast, { props: { id: 'test-1', message: 'Test' } });
 			const alert = screen.getByRole('alert');
-			expect(alert).toHaveClass('animate-slide-in-down');
+			expect(alert).toHaveClass('animate-in');
+			expect(alert).toHaveClass('slide-in-from-bottom-5');
 		});
 	});
 
