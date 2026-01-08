@@ -46,6 +46,7 @@
 	let selectedIndex = $state(0);
 	let inputRef = $state<HTMLInputElement | null>(null);
 	let dialogRef = $state<HTMLDivElement | null>(null);
+	let triggerRef = $state<HTMLButtonElement | null>(null);
 
 	// Detect OS for keyboard shortcut display
 	let isMac = $state(false);
@@ -273,6 +274,8 @@
 		isOpen = false;
 		query = '';
 		selectedIndex = 0;
+		// Restore focus to trigger button for accessibility
+		requestAnimationFrame(() => triggerRef?.focus());
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -387,6 +390,7 @@
 
 <!-- Search trigger button (for mobile/header) -->
 <button
+	bind:this={triggerRef}
 	type="button"
 	onclick={open}
 	class={cn(
@@ -416,21 +420,20 @@
 
 <!-- Modal overlay -->
 {#if isOpen}
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Global search"
-		tabindex="-1"
-		onclick={handleBackdropClick}
-		onkeydown={(e) => e.key === 'Escape' && close()}
+		aria-labelledby="search-dialog-title"
 	>
-		<!-- Backdrop with fade animation -->
-		<div
-			class="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in"
-			aria-hidden="true"
-		></div>
+		<!-- Backdrop with fade animation - button for accessibility -->
+		<button
+			type="button"
+			class="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in cursor-default"
+			onclick={close}
+			aria-label="Close search"
+			tabindex="-1"
+		></button>
 
 		<!-- Modal content with scale + fade from trigger -->
 		<div

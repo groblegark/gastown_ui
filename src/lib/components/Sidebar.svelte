@@ -315,18 +315,18 @@
 	</div>
 </aside>
 
-<!-- Custom tooltip for collapsed state -->
+<!-- Custom tooltip for collapsed state (visual-only, sr-only text provides accessible name) -->
 {#if tooltipVisible && collapsed}
 	<div
 		class="fixed z-50 px-2.5 py-1.5 text-sm font-medium text-popover-foreground bg-popover border border-border rounded-md shadow-lg pointer-events-none animate-fade-in"
 		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translateY(-50%);"
 		role="tooltip"
+		aria-hidden="true"
 	>
 		{tooltipText}
 		<!-- Arrow pointing left -->
 		<div
 			class="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 border-8 border-transparent border-r-popover"
-			aria-hidden="true"
 		></div>
 	</div>
 {/if}
