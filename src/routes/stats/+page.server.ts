@@ -129,48 +129,39 @@ function generateMockStats(timeRange: string, rig: string | null): StatsData {
 	const verificationChecks: StatsData['performanceVerification']['checks'] = [
 		{
 			id: 'frame-time',
-			name: 'Frame time',
-			target: '<= 16.7ms',
-			current: '14.2ms',
+			name: 'Animation frame time',
+			target: '<= 16ms',
+			current: '15.4ms',
 			status: 'pass',
-			confidence: 94,
-			note: 'steady 60fps'
+			confidence: 91,
+			note: 'smooth 60fps'
 		},
 		{
 			id: 'interaction-feedback',
-			name: 'Interaction feedback',
+			name: 'Interaction latency',
 			target: '<= 100ms',
-			current: '82ms',
-			status: 'pass',
-			confidence: 88,
-			note: 'responsive'
-		},
-		{
-			id: 'animation-duration',
-			name: 'Animation duration',
-			target: '<= 500ms',
-			current: '420ms',
+			current: '96ms',
 			status: 'pass',
 			confidence: 86,
-			note: 'within budget'
+			note: 'fast feedback'
 		},
 		{
-			id: 'long-tasks',
-			name: 'Long tasks',
-			target: '0 > 50ms',
-			current: '1 spike',
+			id: 'paint-time',
+			name: 'Paint budget',
+			target: '<= 8ms',
+			current: '9.1ms',
 			status: 'warn',
-			confidence: 64,
-			note: 'list render'
+			confidence: 63,
+			note: 'heavy glow'
 		},
 		{
-			id: 'layout-shift',
-			name: 'Layout shifts',
-			target: '<= 0.1 CLS',
-			current: '0.06 CLS',
+			id: 'bundle-size',
+			name: 'Bundle size (gzip)',
+			target: '<= 250KB',
+			current: '182KB',
 			status: 'pass',
-			confidence: 90,
-			note: 'stable nav'
+			confidence: 89,
+			note: 'within budget'
 		}
 	];
 	const performanceStatus = verificationChecks.some((check) => check.status === 'fail')

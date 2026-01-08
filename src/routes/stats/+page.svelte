@@ -248,7 +248,12 @@
 				<!-- Performance Verification -->
 				<section>
 					<div class="flex items-center justify-between mb-3">
-						<h2 class="text-lg font-semibold">Performance Verification</h2>
+						<div>
+							<h2 class="text-lg font-semibold">Performance Verification</h2>
+							<p class="text-xs text-muted-foreground">
+								Budgets: 16ms frames, 100ms interactions, 8ms paint, 250KB gzip
+							</p>
+						</div>
 						<p class="text-xs text-muted-foreground">
 							Last run {new Date(data.stats.performanceVerification.lastVerified).toLocaleTimeString()}
 						</p>
