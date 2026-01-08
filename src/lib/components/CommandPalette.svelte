@@ -64,6 +64,7 @@
 	let selectedIndex = $state(0);
 	let inputRef = $state<HTMLInputElement | null>(null);
 	let dialogRef = $state<HTMLDivElement | null>(null);
+	let triggerRef = $state<HTMLButtonElement | null>(null);
 	let activeMode = $state<'search' | 'command' | 'formula'>('search');
 
 	// Detect OS for keyboard shortcut display
@@ -415,6 +416,8 @@
 		isOpen = false;
 		query = '';
 		selectedIndex = 0;
+		// Restore focus to trigger button for accessibility
+		requestAnimationFrame(() => triggerRef?.focus());
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -501,6 +504,7 @@
 
 <!-- Trigger button -->
 <button
+	bind:this={triggerRef}
 	type="button"
 	onclick={open}
 	class={cn(
@@ -525,21 +529,20 @@
 
 <!-- Modal -->
 {#if isOpen}
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Command palette"
-		tabindex="-1"
-		onclick={handleBackdropClick}
-		onkeydown={(e) => e.key === 'Escape' && close()}
+		aria-labelledby="command-palette-title"
 	>
-		<!-- Backdrop -->
-		<div
-			class="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in"
-			aria-hidden="true"
-		></div>
+		<!-- Backdrop - button for accessibility -->
+		<button
+			type="button"
+			class="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in cursor-default"
+			onclick={close}
+			aria-label="Close command palette"
+			tabindex="-1"
+		></button>
 
 		<!-- Modal content -->
 		<div
@@ -552,6 +555,7 @@
 			)}
 		>
 			<!-- Input area -->
+			<h2 id="command-palette-title" class="sr-only">Command Palette</h2>
 			<div class="flex items-center gap-3 px-4 py-3 border-b border-border">
 				<div class={cn('flex-shrink-0', modeConfig.color)}>
 					<modeConfig.icon class="w-5 h-5" />
