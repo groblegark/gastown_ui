@@ -15,6 +15,7 @@ export { default as Input } from './Input.svelte';
 export { default as LogEntry } from './LogEntry.svelte';
 export { default as NumberCounter } from './NumberCounter.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
+export { default as Switch, switchVariants, type SwitchProps, type SwitchVariants } from './Switch.svelte';
 export { default as ShimmerText } from './ShimmerText.svelte';
 export { default as StatusIndicator, statusIndicatorVariants, type StatusIndicatorStatus, type StatusIndicatorSize, type StatusIndicatorProps } from './StatusIndicator.svelte';
 export { default as StatusBadge, statusBadgeVariants, type StatusBadgeProps, type StatusBadgeVariants } from './StatusBadge.svelte';

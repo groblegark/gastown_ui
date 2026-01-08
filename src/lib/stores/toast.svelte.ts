@@ -16,6 +16,8 @@ export interface Toast {
 	duration: number;
 	dismissible: boolean;
 	timestamp: number;
+	/** Set to true when toast is animating out */
+	dismissing?: boolean;
 }
 
 export interface ToastOptions {
@@ -26,6 +28,7 @@ export interface ToastOptions {
 
 const DEFAULT_DURATION = 4000;
 const MAX_TOASTS = 3;
+const EXIT_ANIMATION_DURATION = 200;
 
 class ToastStore {
 	#toasts = $state<Toast[]>([]);
@@ -91,17 +94,25 @@ class ToastStore {
 	}
 
 	/**
-	 * Dismiss a specific toast
+	 * Dismiss a specific toast with exit animation
 	 */
 	dismiss(id: string) {
-		// Clear timeout if exists
+		// Clear auto-dismiss timeout if exists
 		const timeout = this.#timeouts.get(id);
 		if (timeout) {
 			clearTimeout(timeout);
 			this.#timeouts.delete(id);
 		}
 
-		this.#toasts = this.#toasts.filter((t) => t.id !== id);
+		// Mark as dismissing to trigger exit animation
+		this.#toasts = this.#toasts.map((t) =>
+			t.id === id ? { ...t, dismissing: true } : t
+		);
+
+		// Remove after animation completes
+		setTimeout(() => {
+			this.#toasts = this.#toasts.filter((t) => t.id !== id);
+		}, EXIT_ANIMATION_DURATION);
 	}
 
 	/**

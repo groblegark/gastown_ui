@@ -750,6 +750,67 @@
 	}
 }
 
+/* === Link Hover Underline Animation === */
+/* Animated underline effect for links - slides in from left on hover */
+@layer components {
+	.link-underline {
+		@apply relative inline-block text-foreground no-underline;
+		background: linear-gradient(
+			to right,
+			hsl(var(--primary)) 0%,
+			hsl(var(--primary)) 100%
+		);
+		background-size: 0% 2px;
+		background-repeat: no-repeat;
+		background-position: left bottom;
+		transition: background-size var(--duration-normal) var(--ease-out);
+	}
+
+	.link-underline:hover,
+	.link-underline:focus-visible {
+		background-size: 100% 2px;
+	}
+
+	/* Variant: slides in from center */
+	.link-underline-center {
+		@apply relative inline-block text-foreground no-underline;
+		background: linear-gradient(
+			to right,
+			hsl(var(--primary)) 0%,
+			hsl(var(--primary)) 100%
+		);
+		background-size: 0% 2px;
+		background-repeat: no-repeat;
+		background-position: center bottom;
+		transition: background-size var(--duration-normal) var(--ease-out);
+	}
+
+	.link-underline-center:hover,
+	.link-underline-center:focus-visible {
+		background-size: 100% 2px;
+	}
+
+	/* Variant: subtle muted color */
+	.link-underline-muted {
+		@apply relative inline-block text-muted-foreground no-underline;
+		background: linear-gradient(
+			to right,
+			hsl(var(--muted-foreground)) 0%,
+			hsl(var(--muted-foreground)) 100%
+		);
+		background-size: 0% 1px;
+		background-repeat: no-repeat;
+		background-position: left bottom;
+		transition: background-size var(--duration-normal) var(--ease-out), color var(--duration-fast);
+	}
+
+	.link-underline-muted:hover,
+	.link-underline-muted:focus-visible {
+		@apply text-foreground;
+		background-size: 100% 1px;
+	}
+}
+
 /* === Scrollbar Styling === */
 ::-webkit-scrollbar {
 	width: 8px;

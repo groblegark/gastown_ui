@@ -42,6 +42,7 @@
 					type={toast.type}
 					message={toast.message}
 					dismissible={toast.dismissible}
+					dismissing={toast.dismissing}
 					onDismiss={handleDismiss}
 				/>
 			</div>

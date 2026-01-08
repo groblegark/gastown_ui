@@ -63,6 +63,7 @@
 		type?: ToastType;
 		message: string;
 		dismissible?: boolean;
+		dismissing?: boolean;
 		onDismiss?: (id: string) => void;
 		class?: string;
 	}
@@ -72,6 +73,7 @@
 		type = 'default',
 		message,
 		dismissible = true,
+		dismissing = false,
 		onDismiss,
 		class: className = ''
 	}: Props = $props();
@@ -96,7 +98,11 @@
 </script>
 
 <div
-	class={cn(styles.container(), className)}
+	class={cn(
+		styles.container(),
+		dismissing && 'animate-slide-out-right',
+		className
+	)}
 	role="alert"
 	aria-live={type === 'error' ? 'assertive' : 'polite'}
 >
