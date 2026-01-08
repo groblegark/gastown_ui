@@ -100,7 +100,7 @@
 	role="alert"
 	aria-live={type === 'error' ? 'assertive' : 'polite'}
 >
-	<svelte:component this={IconComponent} class={styles.icon()} aria-hidden="true" />
+	<IconComponent class={styles.icon()} aria-hidden="true" />
 
 	<span class={styles.content()}>{message}</span>
 
