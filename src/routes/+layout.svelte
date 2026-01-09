@@ -152,7 +152,18 @@
 	function handleSwipeRight() {
 		history.back();
 	}
+
+	// Handle keyboard events for mobile drawer (Escape to close)
+	function handleKeydown(event: KeyboardEvent) {
+		// Close drawer on Escape key
+		if (event.key === 'Escape' && mobileDrawerOpen) {
+			mobileDrawerOpen = false;
+			event.preventDefault();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <svelte:head>
 	<title>Gas Town</title>
@@ -225,20 +236,25 @@
 				class="fixed inset-0 z-20 bg-black/40 md:hidden transition-opacity duration-300"
 				onclick={() => mobileDrawerOpen = false}
 				aria-hidden="true"
+				role="presentation"
 			></div>
 		{/if}
 
 		<!-- Mobile sidebar drawer -->
-		<div
+		<nav
 			class="fixed inset-y-0 left-0 z-20 w-64 md:hidden transition-transform duration-300 ease-out transform"
 			style:transform={mobileDrawerOpen ? 'translateX(0)' : 'translateX(-100%)'}
+			role="navigation"
+			aria-label="Main navigation"
+			aria-modal={mobileDrawerOpen}
+			tabindex={mobileDrawerOpen ? 0 : -1}
 		>
 			<Sidebar
 				items={navItems}
 				{activeId}
 				class="h-screen"
 			/>
-		</div>
+		</nav>
 
 		<!-- Main content area -->
 		<div
