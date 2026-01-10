@@ -9,7 +9,7 @@
 	 * Filter button variant definitions
 	 */
 	const filterButtonVariants = tv({
-		base: 'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
+		base: 'px-3 py-1.5 text-xs font-medium rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
 		variants: {
 			active: {
 				true: 'bg-accent text-accent-foreground',
@@ -132,7 +132,7 @@
 
 		<!-- Log entries -->
 		<main class="flex-1 container py-4">
-			<div class="panel-glass overflow-hidden h-[calc(100vh-16rem)]">
+			<div class="panel-glass overflow-hidden h-[calc(100dvh-16rem)]">
 				<div class="h-full overflow-y-auto" class:scroll-smooth={autoScroll}>
 					{#if children}
 						{@render children()}

@@ -247,7 +247,7 @@
 <!-- Layout wrapper with responsive sidebar/bottom nav -->
 {#if !hideNav}
 	<!-- Desktop layout with sidebar (hidden on mobile) -->
-	<div class="hidden lg:flex h-screen overflow-hidden">
+	<div class="hidden lg:flex h-dvh overflow-hidden">
 		<!-- Sidebar navigation -->
 		<Sidebar
 			items={navItems}

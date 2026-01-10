@@ -174,12 +174,12 @@
 		}
 	});
 
-	// Recalculate when collapsed changes (affects content height)
+	// Recalculate when collapsed changes (waits for 300ms CSS transition)
 	$effect(() => {
-		// Access collapsed to create dependency
-		const _ = collapsed;
-		// Use setTimeout to wait for transition
-		setTimeout(updateScrollState, 350);
+		if (collapsed !== undefined) {
+			const timeout = setTimeout(updateScrollState, 350);
+			return () => clearTimeout(timeout);
+		}
 	});
 
 	// Flatten items for keyboard navigation

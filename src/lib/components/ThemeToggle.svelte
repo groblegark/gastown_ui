@@ -5,7 +5,7 @@
 	 * Compact theme toggle for sidebar footer.
 	 * Cycles through: dark -> light -> system
 	 */
-	import { themeStore } from '$lib/stores/theme.svelte';
+	import { themeStore } from '$lib/stores';
 	import { cn } from '$lib/utils';
 	import { Moon, Sun, Monitor } from 'lucide-svelte';
 
