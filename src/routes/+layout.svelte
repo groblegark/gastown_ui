@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import { SkipLink, Announcer, BottomNav, Sidebar, GlobalSearch, NavigationLoader } from '$lib/components';
+	import { SkipLink, Announcer, BottomNav, Sidebar, GlobalSearch, NavigationLoader, KeyboardHelpDialog } from '$lib/components';
+	import { initializeKeyboardShortcuts, keyboardManager } from '$lib/utils/keyboard';
 	import { preloadRoute } from '$lib/preload';
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
@@ -146,6 +147,36 @@
 			}
 		};
 		mediaQuery.addEventListener('change', handleThemeChange);
+		
+		// Initialize keyboard shortcuts
+		const manager = initializeKeyboardShortcuts();
+		if (manager) {
+			// Navigation shortcuts
+			manager.register('goto-inbox', {
+				keys: ['cmd', 'j'],
+				description: 'Go to Mail',
+				action: () => goto('/mail'),
+				category: 'navigation'
+			});
+			
+			manager.register('goto-work', {
+				keys: ['cmd', 'l'],
+				description: 'Go to Work',
+				action: () => goto('/work'),
+				category: 'navigation'
+			});
+			
+			// Action shortcuts (global)
+			manager.register('toggle-search', {
+				keys: ['cmd', 'k'],
+				description: 'Toggle Search',
+				action: () => {
+					// Dispatch event to GlobalSearch component
+					window.dispatchEvent(new CustomEvent('open-search'));
+				},
+				category: 'action'
+			});
+		}
 		
 		fetchBadgeCounts();
 		const interval = setInterval(fetchBadgeCounts, 30000); // Poll every 30s
@@ -319,7 +350,10 @@
 			{/each}
 		</nav>
 		<BottomNav items={navItems} {activeId} />
-	</div>
+		
+		<!-- Keyboard shortcuts help dialog -->
+		<KeyboardHelpDialog />
+		</div>
 {:else}
 	<!-- Login page - no navigation -->
 	<div
