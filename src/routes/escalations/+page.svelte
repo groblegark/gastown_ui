@@ -1,45 +1,14 @@
 <script lang="ts">
-	import { cn, formatRelativeTime } from '$lib/utils';
+	import {
+		cn,
+		formatRelativeTime,
+		escalationSeverityConfig,
+		type EscalationSeverity
+	} from '$lib/utils';
 	import { GridPattern } from '$lib/components';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-
-	const severityConfig: Record<
-		Severity,
-		{ bg: string; text: string; badge: string; border: string; icon: string }
-	> = {
-		CRITICAL: {
-			bg: 'bg-destructive/10',
-			text: 'text-destructive',
-			badge: 'bg-destructive text-destructive-foreground',
-			border: 'border-destructive/30',
-			icon: '!!'
-		},
-		HIGH: {
-			bg: 'bg-warning/10',
-			text: 'text-warning',
-			badge: 'bg-warning text-warning-foreground',
-			border: 'border-warning/30',
-			icon: '!'
-		},
-		MEDIUM: {
-			bg: 'bg-status-pending/10',
-			text: 'text-status-pending',
-			badge: 'bg-status-pending text-black',
-			border: 'border-status-pending/30',
-			icon: '?'
-		},
-		LOW: {
-			bg: 'bg-muted/20',
-			text: 'text-muted-foreground',
-			badge: 'bg-muted text-muted-foreground',
-			border: 'border-muted',
-			icon: '-'
-		}
-	};
 
 	function getBeadUrl(id: string): string {
 		return `bd://show/${id}`;
@@ -111,7 +80,7 @@
 			{:else}
 				<div class="space-y-4">
 					{#each data.escalations as escalation, i}
-						{@const config = severityConfig[escalation.severity]}
+						{@const config = escalationSeverityConfig[escalation.severity as EscalationSeverity]}
 						<article
 							class={cn(
 								'panel-glass overflow-hidden animate-blur-fade-up',

@@ -1,76 +1,18 @@
 <script lang="ts">
 	import { GridPattern, ProgressBar, StatusIndicator } from '$lib/components';
-	import { formatDate } from '$lib/utils';
+	import {
+		formatDate,
+		convoyStatusConfig,
+		getIssueStatusColor,
+		getIssueStatusBgSimple,
+		formatWorkerName,
+		type ConvoyStatus
+	} from '$lib/utils';
 	import type { ConvoyDetail } from './+page.server';
 
 	const { data } = $props();
 	const convoy: ConvoyDetail = $derived(data.convoy);
-
-	const statusConfig = {
-		active: {
-			color: 'success' as const,
-			indicatorStatus: 'running' as const,
-			label: 'Active',
-			borderClass: 'border-success/30',
-			bgClass: 'bg-success/10 text-success'
-		},
-		stale: {
-			color: 'warning' as const,
-			indicatorStatus: 'idle' as const,
-			label: 'Stale',
-			borderClass: 'border-warning/30',
-			bgClass: 'bg-warning/10 text-warning'
-		},
-		stuck: {
-			color: 'error' as const,
-			indicatorStatus: 'error' as const,
-			label: 'Stuck',
-			borderClass: 'border-destructive/30',
-			bgClass: 'bg-destructive/10 text-destructive'
-		},
-		complete: {
-			color: 'success' as const,
-			indicatorStatus: 'complete' as const,
-			label: 'Complete',
-			borderClass: 'border-success/30',
-			bgClass: 'bg-success/10 text-success'
-		}
-	};
-
-	const config = $derived(statusConfig[convoy.status]);
-
-	function getIssueStatusColor(status: string): string {
-		switch (status) {
-			case 'in_progress':
-				return 'text-status-online';
-			case 'closed':
-				return 'text-muted-foreground';
-			case 'blocked':
-				return 'text-status-offline';
-			case 'unknown':
-				return 'text-muted-foreground/50';
-			default:
-				return 'text-status-idle';
-		}
-	}
-
-	function getIssueStatusBg(status: string): string {
-		switch (status) {
-			case 'in_progress':
-				return 'bg-success/10';
-			case 'closed':
-				return 'bg-muted/50';
-			case 'blocked':
-				return 'bg-destructive/10';
-			default:
-				return 'bg-warning/10';
-		}
-	}
-
-	function formatWorkerName(worker: string): string {
-		const parts = worker.split('/');
-		return parts[parts.length - 1];
-	}
+	const config = $derived(convoyStatusConfig[convoy.status as ConvoyStatus]);
 </script>
 
 <svelte:head>
@@ -175,7 +117,7 @@
 						<div class="space-y-2">
 							{#each convoy.tracked as issue (issue.id)}
 								<div
-									class="flex items-center justify-between gap-3 p-3 rounded-lg {getIssueStatusBg(
+									class="flex items-center justify-between gap-3 p-3 rounded-lg {getIssueStatusBgSimple(
 										issue.status
 									)}"
 								>

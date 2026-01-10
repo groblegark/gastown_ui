@@ -1,54 +1,20 @@
 <script lang="ts">
 	import { GridPattern, StatusIndicator } from '$lib/components';
-	import { formatDate, formatRelativeTime } from '$lib/utils';
-	import type { IssueDetail, IssueStatus, ActivityEvent } from './+page.server';
+	import {
+		formatDate,
+		formatRelativeTime,
+		issueStatusConfig,
+		getIssueStatusBg,
+		priorityLabels,
+		formatAgent,
+		type IssueStatus
+	} from '$lib/utils';
+	import type { IssueDetail, ActivityEvent } from './+page.server';
 
 	const { data } = $props();
 	const issue: IssueDetail = $derived(data.issue);
 
-	// Status configuration
-	const statusConfig: Record<IssueStatus, {
-		indicatorStatus: 'running' | 'idle' | 'error' | 'warning' | 'complete';
-		label: string;
-		bgClass: string;
-		borderClass: string;
-	}> = {
-		open: {
-			indicatorStatus: 'warning',
-			label: 'Open',
-			bgClass: 'bg-warning/10 text-warning',
-			borderClass: 'border-warning/30'
-		},
-		in_progress: {
-			indicatorStatus: 'running',
-			label: 'In Progress',
-			bgClass: 'bg-info/10 text-info',
-			borderClass: 'border-info/30'
-		},
-		blocked: {
-			indicatorStatus: 'error',
-			label: 'Blocked',
-			bgClass: 'bg-destructive/10 text-destructive',
-			borderClass: 'border-destructive/30'
-		},
-		completed: {
-			indicatorStatus: 'complete',
-			label: 'Completed',
-			bgClass: 'bg-success/10 text-success',
-			borderClass: 'border-success/30'
-		}
-	};
-
-	const config = $derived(statusConfig[issue.status]);
-
-	// Priority labels
-	const priorityLabels: Record<number, { label: string; class: string }> = {
-		0: { label: 'P0 Critical', class: 'text-destructive bg-destructive/10' },
-		1: { label: 'P1 High', class: 'text-warning bg-warning/10' },
-		2: { label: 'P2 Medium', class: 'text-warning/80 bg-warning/10' },
-		3: { label: 'P3 Low', class: 'text-info bg-info/10' },
-		4: { label: 'P4 Backlog', class: 'text-muted-foreground bg-muted' }
-	};
+	const config = $derived(issueStatusConfig[issue.status as IssueStatus]);
 
 	// Activity event icons
 	function getActivityIcon(type: ActivityEvent['type']): string {
@@ -92,14 +58,6 @@
 		}
 	}
 
-	function formatAgent(agent: string): string {
-		const parts = agent.split('/');
-		return parts[parts.length - 1];
-	}
-
-	function getIssueStatusBg(status: IssueStatus): string {
-		return statusConfig[status].bgClass;
-	}
 </script>
 
 <svelte:head>

@@ -1,49 +1,19 @@
 <script lang="ts">
-	import { cn, formatTimestamp, formatRelativeTime } from '$lib/utils';
+	import {
+		cn,
+		formatTimestamp,
+		formatRelativeTime,
+		escalationSeverityConfig,
+		type EscalationSeverity
+	} from '$lib/utils';
 	import { GridPattern } from '$lib/components';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-
-	const severityConfig: Record<
-		Severity,
-		{ bg: string; text: string; badge: string; border: string; icon: string }
-	> = {
-		CRITICAL: {
-			bg: 'bg-destructive/10',
-			text: 'text-destructive',
-			badge: 'bg-destructive text-destructive-foreground',
-			border: 'border-destructive/30',
-			icon: '!!'
-		},
-		HIGH: {
-			bg: 'bg-warning/10',
-			text: 'text-warning',
-			badge: 'bg-warning text-warning-foreground',
-			border: 'border-warning/30',
-			icon: '!'
-		},
-		MEDIUM: {
-			bg: 'bg-status-pending/10',
-			text: 'text-status-pending',
-			badge: 'bg-status-pending text-black',
-			border: 'border-status-pending/30',
-			icon: '?'
-		},
-		LOW: {
-			bg: 'bg-muted/20',
-			text: 'text-muted-foreground',
-			badge: 'bg-muted text-muted-foreground',
-			border: 'border-muted',
-			icon: '-'
-		}
-	};
-
 	// Derived values for escalation and config
 	const escalation = $derived(data.escalation);
-	const config = $derived(severityConfig[escalation.severity]);
+	const config = $derived(escalationSeverityConfig[escalation.severity as EscalationSeverity]);
 
 	let selectedOption = $state<number | null>(null);
 	let resolutionNote = $state('');

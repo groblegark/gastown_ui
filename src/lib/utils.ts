@@ -25,3 +25,32 @@ export {
 	isToday,
 	isPast
 } from './utils/date';
+
+// Re-export status utilities for convenient access
+export {
+	// Convoy status
+	type ConvoyStatus,
+	type ConvoyStatusConfig,
+	convoyStatusConfig,
+	getConvoyStatusConfig,
+	// Issue status
+	type IssueStatus,
+	type IssueStatusConfig,
+	issueStatusConfig,
+	getIssueStatusConfig,
+	getIssueStatusBg,
+	getIssueStatusColor,
+	getIssueStatusBgSimple,
+	// Escalation severity
+	type EscalationSeverity,
+	type EscalationSeverityConfig,
+	escalationSeverityConfig,
+	getEscalationSeverityConfig,
+	// Priority
+	type PriorityConfig,
+	priorityLabels,
+	getPriorityConfig,
+	// Worker/Agent formatting
+	formatWorkerName,
+	formatAgent
+} from './utils/status';
