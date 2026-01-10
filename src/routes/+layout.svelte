@@ -157,7 +157,7 @@
 	});
 
 	// Focus management and route announcements on navigation
-	afterNavigate(({ to }) => {
+	afterNavigate(({ to, from }) => {
 		// Close mobile drawer on navigation
 		mobileDrawerOpen = false;
 		
@@ -290,7 +290,7 @@
 			/>
 		</nav>
 
-		<!-- Main content area -->
+		<!-- Main content area with page transitions -->
 		<div
 			bind:this={mainContentRef}
 			id="main-content"
@@ -301,7 +301,9 @@
 				minDistance: 40
 			}}
 		>
-			{@render children()}
+			<div class="animate-fade-in">
+				{@render children()}
+			</div>
 		</div>
 
 		<!-- Bottom navigation with preload on hover -->
