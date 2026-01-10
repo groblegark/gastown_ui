@@ -3,6 +3,7 @@
 	import { ClipboardList, PenLine, Target, Truck, ChevronDown, CheckSquare, Bug, Lightbulb, BookOpen, Plus } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { hapticMedium, hapticSuccess, hapticError } from '$lib/utils/haptics';
+	import { cn } from '$lib/utils';
 	import { z } from 'zod';
 
 	let { data } = $props();
@@ -55,6 +56,48 @@
 
 	// Local copy of issues that updates after creation
 	let localIssues = $state<typeof data.issues>([]);
+
+	// Filter and sort state
+	let filters = $state({
+		type: 'all' as 'all' | 'task' | 'bug' | 'feature' | 'epic',
+		priority: 'all' as 'all' | 0 | 1 | 2 | 3 | 4,
+		status: 'all' as 'all' | 'open' | 'in_progress' | 'done'
+	});
+	let sortBy = $state('date' as 'date' | 'priority' | 'type');
+	let sortOrder = $state('desc' as 'asc' | 'desc');
+
+	// Filtered and sorted issues
+	const filteredIssues = $derived.by(() => {
+		let result = [...localIssues];
+
+		// Apply filters
+		if (filters.type !== 'all') {
+			result = result.filter(i => i.type === filters.type);
+		}
+		if (filters.priority !== 'all') {
+			result = result.filter(i => i.priority === filters.priority);
+		}
+		if (filters.status !== 'all') {
+			result = result.filter(i => i.status === filters.status);
+		}
+
+		// Apply sorting
+		result.sort((a, b) => {
+			let aVal: any = a[sortBy === 'date' ? 'created_at' : sortBy];
+			let bVal: any = b[sortBy === 'date' ? 'created_at' : sortBy];
+			
+			if (sortBy === 'priority') {
+				aVal = a.priority;
+				bVal = b.priority;
+			}
+
+			if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+			if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+			return 0;
+		});
+
+		return result;
+	});
 
 	// Sync with server data
 	$effect(() => {
@@ -519,10 +562,26 @@
 
 			<!-- Current Issues List -->
 			<section class="panel-glass p-6 mx-auto mb-8 max-w-lg">
-				<h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-					<ClipboardList class="w-5 h-5 text-foreground" strokeWidth={2} />
-					Open Issues ({localIssues.length})
-				</h2>
+				<div class="flex items-center justify-between mb-4">
+					<h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+						<ClipboardList class="w-5 h-5 text-foreground" strokeWidth={2} />
+						Issues ({filteredIssues.length})
+					</h2>
+					<!-- Sort dropdown -->
+					<div class="relative inline-block">
+						<select
+							bind:value={sortBy}
+							class="px-3 py-1 text-xs bg-muted text-muted-foreground rounded border border-border
+								   appearance-none pr-8 cursor-pointer
+								   focus:outline-none focus:ring-2 focus:ring-ring"
+						>
+							<option value="date">Date</option>
+							<option value="priority">Priority</option>
+							<option value="type">Type</option>
+						</select>
+						<ChevronDown class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
+					</div>
+				</div>
 
 				{#if isLoading}
 					<!-- Show skeleton loaders while loading -->
@@ -544,9 +603,60 @@
 						size="sm"
 					/>
 				{:else}
+					<!-- Filter chips -->
+					<div class="flex flex-wrap gap-2 mb-4">
+						{#each [
+							{ label: 'All Types', value: 'all', key: 'type' },
+							{ label: 'Tasks', value: 'task', key: 'type' },
+							{ label: 'Bugs', value: 'bug', key: 'type' },
+							{ label: 'Features', value: 'feature', key: 'type' },
+							{ label: 'Epics', value: 'epic', key: 'type' }
+						] as chip}
+							<button
+								type="button"
+								class={cn(
+									'px-3 py-1 text-xs font-medium rounded-full transition-colors',
+									filters.type === chip.value
+										? 'bg-primary text-primary-foreground'
+										: 'bg-muted text-muted-foreground hover:bg-muted/80'
+								)}
+								onclick={() => filters.type = chip.value as any}
+								aria-pressed={filters.type === chip.value}
+							>
+								{chip.label}
+							</button>
+						{/each}
+					</div>
+
+					<!-- Priority filter -->
+					<div class="flex flex-wrap gap-2 mb-4">
+						{#each [
+							{ label: 'All Priorities', value: 'all', key: 'priority' },
+							{ label: 'P0 - Critical', value: 0, key: 'priority' },
+							{ label: 'P1 - High', value: 1, key: 'priority' },
+							{ label: 'P2 - Medium', value: 2, key: 'priority' },
+							{ label: 'P3 - Low', value: 3, key: 'priority' }
+						] as chip}
+							<button
+								type="button"
+								class={cn(
+									'px-3 py-1 text-xs font-medium rounded-full transition-colors',
+									filters.priority === chip.value
+										? 'bg-primary text-primary-foreground'
+										: 'bg-muted text-muted-foreground hover:bg-muted/80'
+								)}
+								onclick={() => filters.priority = chip.value as any}
+								aria-pressed={filters.priority === chip.value}
+							>
+								{chip.label}
+							</button>
+						{/each}
+					</div>
+
+					<!-- Issues list -->
 					<div class="space-y-2">
-						{#each localIssues as issue}
-							<div class="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+						{#each filteredIssues as issue}
+							<div class="flex items-center gap-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
 								<span class="font-mono text-sm text-primary">{issue.id}</span>
 								<span class="flex-1 text-sm text-foreground truncate">{issue.title}</span>
 								<span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
@@ -558,6 +668,12 @@
 							</div>
 						{/each}
 					</div>
+
+					{#if filteredIssues.length === 0 && localIssues.length > 0}
+						<div class="text-center py-6 text-muted-foreground">
+							<p class="text-sm">No issues match your filters</p>
+						</div>
+					{/if}
 				{/if}
 			</section>
 		</main>
