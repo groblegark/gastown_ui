@@ -9,11 +9,6 @@
 	 * - Formula triggers (bd/gt commands)
 	 * - Quick navigation
 	 * - Keyboard shortcuts display
-	 *
-	 * Design tokens used:
-	 * - Animation: animate-scale-in, ease-out-expo
-	 * - Typography: label-sm for hints, body-sm for descriptions
-	 * - Shadows: shadow-2xl for modal elevation
 	 */
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
@@ -21,36 +16,28 @@
 	import {
 		Search,
 		Command,
-		Home,
 		Bot,
-		Target,
-		Truck,
-		ClipboardList,
-		Mail,
-		Bell,
-		ScrollText,
-		Settings,
-		Users,
-		Dog,
-		Zap,
 		FileText,
-		FolderOpen,
 		Clock,
 		Sparkles,
 		ArrowUp,
 		ArrowDown,
 		CornerDownLeft,
-		Plus,
-		Play,
-		Square,
-		RefreshCw,
 		Terminal,
-		Hash,
-		GitBranch,
-		Send,
-		Keyboard
+		Zap
 	} from 'lucide-svelte';
-	import type { ComponentType } from 'svelte';
+
+	import type { PaletteMode, PaletteResult, ModeConfig } from './types';
+	import {
+		routes,
+		commands,
+		formulas,
+		mockAgents,
+		mockIssues,
+		recentItems,
+		searchSuggestions,
+		groupLabels
+	} from './data';
 
 	interface Props {
 		class?: string;
@@ -65,7 +52,7 @@
 	let inputRef = $state<HTMLInputElement | null>(null);
 	let dialogRef = $state<HTMLDivElement | null>(null);
 	let triggerRef = $state<HTMLButtonElement | null>(null);
-	let activeMode = $state<'search' | 'command' | 'formula'>('search');
+	let activeMode = $state<PaletteMode>('search');
 
 	// Detect OS for keyboard shortcut display
 	let isMac = $state(false);
@@ -93,150 +80,71 @@
 		return trimmed;
 	});
 
-	// Mock data for search results
-	const mockAgents = [
-		{ id: 'mayor', name: 'Mayor', status: 'running', task: 'Coordinating work', type: 'coordinator' },
-		{ id: 'witness-1', name: 'Witness (gastown_ui)', status: 'running', task: 'Monitoring polecats', type: 'monitor' },
-		{ id: 'refinery-1', name: 'Refinery (gastown_ui)', status: 'idle', task: 'Waiting for merges', type: 'processor' },
-		{ id: 'polecat-morsov', name: 'Polecat Morsov', status: 'running', task: 'Building features', type: 'worker' },
-		{ id: 'polecat-rictus', name: 'Polecat Rictus', status: 'idle', task: 'Awaiting work', type: 'worker' },
-		{ id: 'polecat-furiosa', name: 'Polecat Furiosa', status: 'running', task: 'UI polish', type: 'worker' }
-	];
-
-	const mockIssues = [
-		{ id: 'gt-d3a', title: 'Authentication', type: 'epic', priority: 1 },
-		{ id: 'gt-2hs', title: 'UI Components', type: 'epic', priority: 2 },
-		{ id: 'gt-be4', title: 'Auth Token Refresh', type: 'task', priority: 2 },
-		{ id: 'gt-931', title: 'CSRF Protection', type: 'task', priority: 2 },
-		{ id: 'gt-3v5', title: 'Command Palette', type: 'task', priority: 2 },
-		{ id: 'hq-7vsv', title: 'Global Search', type: 'task', priority: 1 }
-	];
-
-	const routes: Array<{ path: string; label: string; icon: ComponentType; description: string }> = [
-		{ path: '/', label: 'Dashboard', icon: Home, description: 'Overview and stats' },
-		{ path: '/agents', label: 'Agents', icon: Bot, description: 'View all agents' },
-		{ path: '/work', label: 'Work', icon: Target, description: 'Issues and tasks' },
-		{ path: '/convoys', label: 'Convoys', icon: Truck, description: 'Batch operations' },
-		{ path: '/queue', label: 'Queue', icon: ClipboardList, description: 'Merge queue' },
-		{ path: '/mail', label: 'Mail', icon: Mail, description: 'Messages' },
-		{ path: '/escalations', label: 'Escalations', icon: Bell, description: 'Alerts and issues' },
-		{ path: '/logs', label: 'Logs', icon: ScrollText, description: 'System logs' },
-		{ path: '/settings', label: 'Settings', icon: Settings, description: 'Configuration' },
-		{ path: '/crew', label: 'Crew', icon: Users, description: 'Team members' },
-		{ path: '/watchdog', label: 'Watchdog', icon: Dog, description: 'Health monitoring' }
-	];
-
-	// Commands (> prefix)
-	const commands = [
-		{ id: 'spawn-polecat', label: 'Spawn Polecat', description: 'Create new worker agent', icon: Plus, category: 'agents' },
-		{ id: 'stop-agent', label: 'Stop Agent', description: 'Gracefully stop an agent', icon: Square, category: 'agents' },
-		{ id: 'restart-agent', label: 'Restart Agent', description: 'Restart selected agent', icon: RefreshCw, category: 'agents' },
-		{ id: 'new-issue', label: 'New Issue', description: 'Create a new issue', icon: FileText, category: 'work' },
-		{ id: 'new-convoy', label: 'New Convoy', description: 'Create batch operation', icon: Truck, category: 'work' },
-		{ id: 'compose-mail', label: 'Compose Mail', description: 'Write a new message', icon: Send, category: 'communication' },
-		{ id: 'refresh', label: 'Refresh', description: 'Reload current page', icon: RefreshCw, category: 'system' },
-		{ id: 'shortcuts', label: 'Keyboard Shortcuts', description: 'View all shortcuts', icon: Keyboard, category: 'help' }
-	];
-
-	// Formula triggers (: prefix) - bd/gt commands
-	const formulas = [
-		{ id: 'bd-ready', label: 'bd ready', description: 'Show issues ready to work', icon: Terminal, category: 'beads' },
-		{ id: 'bd-list', label: 'bd list', description: 'List all issues', icon: Terminal, category: 'beads' },
-		{ id: 'bd-create', label: 'bd create', description: 'Create new issue', icon: Terminal, category: 'beads' },
-		{ id: 'bd-close', label: 'bd close <id>', description: 'Close an issue', icon: Terminal, category: 'beads' },
-		{ id: 'gt-status', label: 'gt status', description: 'Show town status', icon: Terminal, category: 'gasstown' },
-		{ id: 'gt-mail', label: 'gt mail inbox', description: 'Check mail inbox', icon: Terminal, category: 'gasstown' },
-		{ id: 'gt-hook', label: 'gt hook', description: 'Check hooked work', icon: Terminal, category: 'gasstown' },
-		{ id: 'gt-done', label: 'gt done', description: 'Submit work to MQ', icon: Terminal, category: 'gasstown' },
-		{ id: 'git-status', label: 'git status', description: 'Show git status', icon: GitBranch, category: 'git' },
-		{ id: 'git-diff', label: 'git diff', description: 'Show uncommitted changes', icon: GitBranch, category: 'git' }
-	];
-
-	// Recent items
-	const recentItems = [
-		{ type: 'agent', id: 'polecat-furiosa', label: 'Polecat Furiosa', path: '/agents/polecat-furiosa' },
-		{ type: 'issue', id: 'gt-3v5', label: 'Command Palette', path: '/work' },
-		{ type: 'route', id: 'convoys', label: 'Convoys', path: '/convoys' }
-	];
-
-	// Search suggestions for empty state
-	const searchSuggestions = [
-		{ query: 'running agents', description: 'Find active agents' },
-		{ query: 'P1 issues', description: 'High priority issues' },
-		{ query: '>spawn', description: 'Spawn new agent' },
-		{ query: ':bd ready', description: 'Check ready work' }
-	];
-
 	// Filter results based on query and mode
 	const filteredAgents = $derived(
 		activeMode === 'search' && searchQuery
-			? mockAgents.filter(a =>
-				a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				a.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				a.type.toLowerCase().includes(searchQuery.toLowerCase())
-			)
+			? mockAgents.filter(
+					(a) =>
+						a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						a.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						a.type.toLowerCase().includes(searchQuery.toLowerCase())
+				)
 			: []
 	);
 
 	const filteredIssues = $derived(
 		activeMode === 'search' && searchQuery
-			? mockIssues.filter(i =>
-				i.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				i.id.toLowerCase().includes(searchQuery.toLowerCase())
-			)
+			? mockIssues.filter(
+					(i) =>
+						i.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						i.id.toLowerCase().includes(searchQuery.toLowerCase())
+				)
 			: []
 	);
 
 	const filteredRoutes = $derived(
 		activeMode === 'search' && searchQuery
-			? routes.filter(r =>
-				r.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				r.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				r.description.toLowerCase().includes(searchQuery.toLowerCase())
-			)
+			? routes.filter(
+					(r) =>
+						r.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						r.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						r.description.toLowerCase().includes(searchQuery.toLowerCase())
+				)
 			: []
 	);
 
 	const filteredCommands = $derived(
 		activeMode === 'command'
-			? (searchQuery
-				? commands.filter(c =>
-					c.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					c.category.toLowerCase().includes(searchQuery.toLowerCase())
-				)
-				: commands)
+			? searchQuery
+				? commands.filter(
+						(c) =>
+							c.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							c.category.toLowerCase().includes(searchQuery.toLowerCase())
+					)
+				: commands
 			: []
 	);
 
 	const filteredFormulas = $derived(
 		activeMode === 'formula'
-			? (searchQuery
-				? formulas.filter(f =>
-					f.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					f.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					f.category.toLowerCase().includes(searchQuery.toLowerCase())
-				)
-				: formulas)
+			? searchQuery
+				? formulas.filter(
+						(f) =>
+							f.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							f.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							f.category.toLowerCase().includes(searchQuery.toLowerCase())
+					)
+				: formulas
 			: []
 	);
 
 	// Build flat list of all results for keyboard navigation
-	interface PaletteResult {
-		type: 'agent' | 'issue' | 'route' | 'command' | 'formula' | 'recent';
-		id: string;
-		label: string;
-		sublabel?: string;
-		icon?: ComponentType;
-		category?: string;
-		action: () => void;
-	}
-
 	const allResults = $derived.by((): PaletteResult[] => {
 		const results: PaletteResult[] = [];
 
 		if (activeMode === 'command') {
-			filteredCommands.forEach(c => {
+			filteredCommands.forEach((c) => {
 				results.push({
 					type: 'command',
 					id: c.id,
@@ -244,14 +152,17 @@
 					sublabel: c.description,
 					icon: c.icon,
 					category: c.category,
-					action: () => { executeCommand(c.id); close(); }
+					action: () => {
+						executeCommand(c.id);
+						close();
+					}
 				});
 			});
 			return results;
 		}
 
 		if (activeMode === 'formula') {
-			filteredFormulas.forEach(f => {
+			filteredFormulas.forEach((f) => {
 				results.push({
 					type: 'formula',
 					id: f.id,
@@ -259,7 +170,10 @@
 					sublabel: f.description,
 					icon: f.icon,
 					category: f.category,
-					action: () => { executeFormula(f.id); close(); }
+					action: () => {
+						executeFormula(f.id);
+						close();
+					}
 				});
 			});
 			return results;
@@ -268,52 +182,64 @@
 		// Search mode
 		if (!searchQuery) {
 			// Show recent items when no query
-			recentItems.forEach(item => {
+			recentItems.forEach((item) => {
 				results.push({
 					type: 'recent',
 					id: item.id,
 					label: item.label,
 					sublabel: `Recent ${item.type}`,
 					icon: Clock,
-					action: () => { goto(item.path); close(); }
+					action: () => {
+						goto(item.path);
+						close();
+					}
 				});
 			});
 			return results;
 		}
 
 		// Agents
-		filteredAgents.forEach(a => {
+		filteredAgents.forEach((a) => {
 			results.push({
 				type: 'agent',
 				id: a.id,
 				label: a.name,
 				sublabel: `${a.status} · ${a.task}`,
 				icon: Bot,
-				action: () => { goto(`/agents/${a.id}`); close(); }
+				action: () => {
+					goto(`/agents/${a.id}`);
+					close();
+				}
 			});
 		});
 
 		// Issues
-		filteredIssues.forEach(i => {
+		filteredIssues.forEach((i) => {
 			results.push({
 				type: 'issue',
 				id: i.id,
 				label: i.title,
 				sublabel: `${i.id} · ${i.type} · P${i.priority}`,
 				icon: FileText,
-				action: () => { goto('/work'); close(); }
+				action: () => {
+					goto('/work');
+					close();
+				}
 			});
 		});
 
 		// Routes
-		filteredRoutes.forEach(r => {
+		filteredRoutes.forEach((r) => {
 			results.push({
 				type: 'route',
 				id: r.path,
 				label: r.label,
 				sublabel: r.description,
 				icon: r.icon,
-				action: () => { goto(r.path); close(); }
+				action: () => {
+					goto(r.path);
+					close();
+				}
 			});
 		});
 
@@ -342,7 +268,7 @@
 				// TODO: Open shortcuts modal
 				break;
 			default:
-				// Unknown command - no action
+			// Unknown command - no action
 		}
 	}
 
@@ -365,23 +291,6 @@
 
 		return groups;
 	});
-
-	const groupLabels: Record<string, string> = {
-		recent: 'Recent',
-		agent: 'Agents',
-		issue: 'Issues',
-		route: 'Navigation',
-		command: 'Commands',
-		formula: 'Formulas',
-		agents: 'Agent Commands',
-		work: 'Work Commands',
-		communication: 'Communication',
-		system: 'System',
-		help: 'Help',
-		beads: 'Beads (bd)',
-		gasstown: 'Gas Town (gt)',
-		git: 'Git'
-	};
 
 	// Calculate flat index for a grouped item
 	function getFlatIndex(groupKey: string, itemIndex: number): number {
@@ -478,14 +387,8 @@
 		}
 	}
 
-	function handleBackdropClick(e: MouseEvent) {
-		if (e.target === e.currentTarget) {
-			close();
-		}
-	}
-
 	// Mode indicator
-	const modeConfig = $derived.by(() => {
+	const modeConfig = $derived.by((): ModeConfig => {
 		switch (activeMode) {
 			case 'command':
 				return { icon: Zap, label: 'Commands', color: 'text-amber-500' };
@@ -519,7 +422,9 @@
 >
 	<Command class="w-4 h-4 flex-shrink-0" />
 	<span class="hidden sm:inline text-sm font-medium">Command...</span>
-	<kbd class="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono font-medium bg-muted/80 text-muted-foreground rounded border border-border/80 shadow-sm">
+	<kbd
+		class="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono font-medium bg-muted/80 text-muted-foreground rounded border border-border/80 shadow-sm"
+	>
 		{isMac ? '⌘' : 'Ctrl'}K
 	</kbd>
 </button>
@@ -558,7 +463,11 @@
 					<modeConfig.icon class="w-5 h-5" />
 				</div>
 				<label for="command-palette-input" class="sr-only">
-					{activeMode === 'command' ? 'Type a command' : activeMode === 'formula' ? 'Type a formula' : 'Search or type > for commands, : for formulas'}
+					{activeMode === 'command'
+						? 'Type a command'
+						: activeMode === 'formula'
+							? 'Type a formula'
+							: 'Search or type > for commands, : for formulas'}
 				</label>
 				<input
 					bind:this={inputRef}
@@ -568,8 +477,8 @@
 					placeholder={activeMode === 'command'
 						? 'Type a command...'
 						: activeMode === 'formula'
-						? 'Type a formula (bd, gt, git)...'
-						: 'Search or type > for commands, : for formulas...'}
+							? 'Type a formula (bd, gt, git)...'
+							: 'Search or type > for commands, : for formulas...'}
 					class="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-base"
 					autocomplete="off"
 					autocorrect="off"
@@ -581,7 +490,9 @@
 						{modeConfig.label}
 					</span>
 				{/if}
-				<kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs font-mono text-muted-foreground bg-muted rounded border border-border">
+				<kbd
+					class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs font-mono text-muted-foreground bg-muted rounded border border-border"
+				>
 					ESC
 				</kbd>
 			</div>
@@ -596,7 +507,8 @@
 								<p class="font-medium">No results for "{searchQuery}"</p>
 								<p class="text-body-sm mt-1">
 									{#if activeMode === 'search'}
-										Try <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">&gt;</kbd> for commands or <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">:</kbd> for formulas
+										Try <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">&gt;</kbd> for commands
+										or <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">:</kbd> for formulas
 									{:else}
 										Try a different search term
 									{/if}
@@ -614,7 +526,7 @@
 										<button
 											type="button"
 											class="inline-flex items-center gap-1.5 px-3 py-1.5 text-body-sm text-muted-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors duration-fast"
-											onclick={() => query = suggestion.query}
+											onclick={() => (query = suggestion.query)}
 										>
 											<Search class="w-3 h-3" />
 											{suggestion.query}
@@ -629,7 +541,9 @@
 						{#each Object.entries(groupedResults) as [groupKey, items]}
 							<div class="px-2">
 								<!-- Group header -->
-								<div class="flex items-center gap-2 px-2 py-1.5 text-label-sm text-muted-foreground/60 uppercase tracking-[0.1em]">
+								<div
+									class="flex items-center gap-2 px-2 py-1.5 text-label-sm text-muted-foreground/60 uppercase tracking-[0.1em]"
+								>
 									{#if groupKey === 'recent'}
 										<Clock class="w-3.5 h-3.5" />
 									{:else if groupKey === 'beads' || groupKey === 'gasstown' || groupKey === 'git'}
@@ -651,14 +565,16 @@
 											isRecent && flatIndex !== selectedIndex && 'opacity-60'
 										)}
 										onclick={() => item.action()}
-										onmouseenter={() => selectedIndex = flatIndex}
+										onmouseenter={() => (selectedIndex = flatIndex)}
 									>
-										<span class={cn(
-											'w-8 h-8 flex items-center justify-center flex-shrink-0 rounded-lg',
-											flatIndex === selectedIndex
-												? 'bg-accent-foreground/10 text-accent-foreground'
-												: 'bg-muted/50 text-muted-foreground'
-										)}>
+										<span
+											class={cn(
+												'w-8 h-8 flex items-center justify-center flex-shrink-0 rounded-lg',
+												flatIndex === selectedIndex
+													? 'bg-accent-foreground/10 text-accent-foreground'
+													: 'bg-muted/50 text-muted-foreground'
+											)}
+										>
 											{#if item.icon}
 												<item.icon size={18} strokeWidth={2} />
 											{/if}
@@ -683,7 +599,9 @@
 			</div>
 
 			<!-- Footer with keyboard hints -->
-			<div class="flex items-center justify-between gap-4 px-4 py-2.5 border-t border-border text-xs text-muted-foreground bg-muted/30">
+			<div
+				class="flex items-center justify-between gap-4 px-4 py-2.5 border-t border-border text-xs text-muted-foreground bg-muted/30"
+			>
 				<div class="flex items-center gap-4">
 					<span class="flex items-center gap-1.5">
 						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm">
@@ -695,17 +613,23 @@
 						<span class="text-muted-foreground/80">navigate</span>
 					</span>
 					<span class="flex items-center gap-1.5">
-						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm">↵</kbd>
+						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm"
+							>↵</kbd
+						>
 						<span class="text-muted-foreground/80">select</span>
 					</span>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="flex items-center gap-1.5">
-						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm">&gt;</kbd>
+						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm"
+							>&gt;</kbd
+						>
 						<span class="text-muted-foreground/80">commands</span>
 					</span>
 					<span class="flex items-center gap-1.5">
-						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm">:</kbd>
+						<kbd class="px-1.5 py-0.5 font-mono bg-background rounded border border-border shadow-sm"
+							>:</kbd
+						>
 						<span class="text-muted-foreground/80">formulas</span>
 					</span>
 				</div>

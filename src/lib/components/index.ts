@@ -64,7 +64,7 @@ export { default as ConnectionLost } from './ConnectionLost.svelte';
 
 // Search components
 export { default as GlobalSearch } from './GlobalSearch.svelte';
-export { default as CommandPalette } from './CommandPalette.svelte';
+export { CommandPalette } from './command-palette';
 
 // Keyboard shortcuts components
 export { default as KeyboardHelpDialog } from './KeyboardHelpDialog.svelte';
