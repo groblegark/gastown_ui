@@ -54,3 +54,16 @@ export {
 	formatWorkerName,
 	formatAgent
 } from './utils/status';
+
+// Re-export logger utilities for convenient access
+export {
+	createLogger,
+	configureLogger,
+	enableNamespaces,
+	disableNamespaces,
+	enableAllLogs,
+	disableAllLogs,
+	getEnabledNamespaces,
+	log,
+	type LogLevel
+} from './utils/logger';
