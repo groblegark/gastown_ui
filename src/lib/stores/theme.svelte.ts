@@ -77,8 +77,9 @@ class ThemeStore {
 
 	#initialize() {
 		// Load from localStorage (graceful degradation for incognito)
-		const stored = safeGetItem(STORAGE_KEY) as Theme | null;
-		this.#theme = stored ?? 'system';
+		const stored = safeGetItem(STORAGE_KEY);
+		// Validate stored value is one of allowed themes
+		this.#theme = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'system';
 
 		// Calculate effective theme
 		this.#updateEffectiveTheme();

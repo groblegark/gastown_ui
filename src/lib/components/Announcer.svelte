@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	interface Props {
 		/** Current message to announce */
@@ -23,6 +23,9 @@
 	// Track displayed message for clearing (effect updates it when message changes)
 	let displayedMessage = $state('');
 	let currentPoliteness = $state<'polite' | 'assertive'>(politeness);
+
+	// Track event-driven timeout for cleanup
+	let eventTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 	// Update displayed message when message prop changes
 	$effect(() => {
@@ -48,15 +51,28 @@
 				displayedMessage = newMessage;
 				currentPoliteness = priority;
 
+				// Clear any existing timeout before setting new one
+				if (eventTimeoutId) {
+					clearTimeout(eventTimeoutId);
+				}
+
 				// Auto-clear after 3 seconds for event-based announcements
-				setTimeout(() => {
+				eventTimeoutId = setTimeout(() => {
 					displayedMessage = '';
+					eventTimeoutId = null;
 				}, 3000);
 			}
 		}
 
 		window.addEventListener('announce', handleAnnounce as EventListener);
 		return () => window.removeEventListener('announce', handleAnnounce as EventListener);
+	});
+
+	// Clean up timeout on component destroy
+	onDestroy(() => {
+		if (eventTimeoutId) {
+			clearTimeout(eventTimeoutId);
+		}
 	});
 </script>
 

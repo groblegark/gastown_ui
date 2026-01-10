@@ -22,13 +22,16 @@
 		<script>
 			(function() {
 				try {
-					var theme = localStorage.getItem('gastown-theme') || 'system';
+					var stored = localStorage.getItem('gastown-theme');
+					// Validate stored value is one of allowed themes
+					var theme = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'system';
 					var effectiveTheme;
 					if (theme === 'system') {
 						effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 					} else {
 						effectiveTheme = theme;
 					}
+					// Only add validated class names
 					document.documentElement.classList.add(effectiveTheme);
 				} catch (e) {
 					// Fallback to dark theme if localStorage unavailable

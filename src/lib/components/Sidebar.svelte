@@ -224,15 +224,23 @@
 
 	// Load collapse state from localStorage
 	onMount(() => {
-		const stored = localStorage.getItem('sidebar-collapsed');
-		if (stored !== null) {
-			collapsed = stored === 'true';
+		try {
+			const stored = localStorage.getItem('sidebar-collapsed');
+			if (stored !== null) {
+				collapsed = stored === 'true';
+			}
+		} catch {
+			// Ignore storage errors (e.g., private browsing)
 		}
 	});
 
 	// Persist collapse state
 	$effect(() => {
-		localStorage.setItem('sidebar-collapsed', String(collapsed));
+		try {
+			localStorage.setItem('sidebar-collapsed', String(collapsed));
+		} catch {
+			// Ignore storage errors (e.g., private browsing)
+		}
 	});
 </script>
 
