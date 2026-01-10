@@ -72,9 +72,8 @@
 		goto(`/agents/${agentId}`);
 	}
 
-	function handleReboot(agentId: string) {
+	function handleReboot(_agentId: string) {
 		// TODO: Implement reboot API call
-		console.log('Rebooting agent:', agentId);
 	}
 </script>
 

@@ -339,19 +339,16 @@
 				window.location.reload();
 				break;
 			case 'shortcuts':
-				// Could open a shortcuts modal
-				console.log('Show shortcuts');
+				// TODO: Open shortcuts modal
 				break;
 			default:
-				console.log('Command:', commandId);
+				// Unknown command - no action
 		}
 	}
 
 	// Formula execution
-	function executeFormula(formulaId: string) {
-		// In a real app, these would execute actual commands or open terminals
-		console.log('Execute formula:', formulaId);
-		// For now, just show a message
+	function executeFormula(_formulaId: string) {
+		// TODO: Execute formula via bd mol pour or similar
 	}
 
 	// Group results by type/category for display

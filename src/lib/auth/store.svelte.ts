@@ -354,7 +354,6 @@ function setupVisibilityListener(): void {
 
 			// If token is expired or will expire within the refresh margin, refresh immediately
 			if (timeUntilExpiry <= REFRESH_MARGIN_MS) {
-				console.log('Tab became visible with token near/past expiry, refreshing...');
 				refreshToken();
 			} else if (timeUntilExpiry <= REFRESH_MARGIN_MS * 2) {
 				// If within 2x the margin, reschedule refresh (timer might have drifted while tab was hidden)

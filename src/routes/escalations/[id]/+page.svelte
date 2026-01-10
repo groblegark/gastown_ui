@@ -80,14 +80,8 @@
 			return;
 		}
 		isSubmitting = true;
-		// Resolution would be handled via form action or API call
-		// For now, just show the selection was made
-		console.log('Resolving:', {
-			id: data.escalation.id,
-			selectedOption: selectedOption !== null ? data.escalation.options?.[selectedOption] : null,
-			note: resolutionNote
-		});
-		// Would call bd close or similar
+		// TODO: Call bd close or API to resolve escalation
+		// Resolution would include: id, selectedOption, resolutionNote
 		isSubmitting = false;
 	}
 </script>

@@ -49,17 +49,14 @@
 	}
 
 	function handleInspect() {
-		console.log('Inspecting agent:', agent.id);
 		// TODO: Implement inspect functionality
 	}
 
 	function handleViewLogs() {
-		console.log('Viewing logs for agent:', agent.id);
 		// TODO: Implement logs view
 	}
 
 	function handleReboot() {
-		console.log('Rebooting agent:', agent.id);
 		// TODO: Implement reboot functionality
 	}
 </script>

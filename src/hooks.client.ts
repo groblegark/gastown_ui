@@ -68,24 +68,7 @@ function logError(
 	category: ErrorCategory,
 	context?: { status?: number; url?: string }
 ) {
-	const timestamp = new Date().toISOString();
-
-	console.group(`[Gas Town Error] ${errorId}`);
-	console.log('Timestamp:', timestamp);
-	console.log('Category:', category);
-	if (context?.status) console.log('Status:', context.status);
-	if (context?.url) console.log('URL:', context.url);
-	console.error('Error:', error);
-	if (error instanceof Error && error.stack) {
-		console.log('Stack:', error.stack);
-	}
-	console.groupEnd();
-
-	// In production, you would send this to an error tracking service
-	// Example: Sentry, LogRocket, etc.
-	// if (import.meta.env.PROD) {
-	//   sendToErrorTracker({ errorId, category, error, context, timestamp });
-	// }
+	console.error(`[Gas Town Error] ${errorId} [${category}]`, error, context);
 }
 
 /**
