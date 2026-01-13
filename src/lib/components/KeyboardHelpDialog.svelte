@@ -89,7 +89,7 @@
 			<h2 id="help-title" class="text-lg font-semibold text-foreground">Keyboard Shortcuts</h2>
 			<button
 				onclick={closeDialog}
-				class="p-1 rounded-md hover:bg-muted transition-colors"
+				class="p-2.5 -m-1 rounded-md hover:bg-muted transition-colors touch-target-interactive"
 				aria-label="Close help"
 			>
 				<X class="w-5 h-5 text-muted-foreground" />

@@ -29,7 +29,8 @@
 				'cursor-pointer',
 				'transition-all duration-200',
 				'border-l-4 border-l-transparent',
-				'hover:bg-muted/50'
+				'hover:bg-muted/50',
+				'min-h-touch touch-target-interactive'
 			],
 			itemSelected: [
 				'bg-orange-50 dark:bg-orange-950/30',

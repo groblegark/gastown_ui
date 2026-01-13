@@ -52,6 +52,7 @@ export { default as NavigationLoader } from './NavigationLoader.svelte';
 export { default as SwipeableItem } from './SwipeableItem.svelte';
 export { default as PullToRefresh } from './PullToRefresh.svelte';
 export { default as FloatingActionButton } from './FloatingActionButton.svelte';
+export { default as TouchTarget } from './TouchTarget.svelte';
 
 // PWA components
 export { default as UpdatePrompt } from './UpdatePrompt.svelte';

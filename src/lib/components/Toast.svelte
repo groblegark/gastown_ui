@@ -21,7 +21,7 @@
 			icon: 'w-5 h-5 flex-shrink-0',
 			content: 'flex-1 text-sm font-medium',
 			dismiss: [
-				'p-1 rounded-md transition-colors',
+				'p-2.5 -m-1 rounded-md transition-colors',
 				'hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 				'touch-target-interactive'
 			]

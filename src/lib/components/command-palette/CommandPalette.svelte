@@ -525,7 +525,7 @@
 									{#each searchSuggestions as suggestion}
 										<button
 											type="button"
-											class="inline-flex items-center gap-1.5 px-3 py-1.5 text-body-sm text-muted-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors duration-fast"
+											class="inline-flex items-center gap-1.5 px-4 py-2.5 min-h-touch text-body-sm text-muted-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors duration-fast"
 											onclick={() => (query = suggestion.query)}
 										>
 											<Search class="w-3 h-3" />

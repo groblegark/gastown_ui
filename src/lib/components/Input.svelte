@@ -307,7 +307,7 @@
 				<button
 					type="button"
 					class={cn(
-						'p-1.5 rounded-md text-muted-foreground',
+						'p-2.5 rounded-md text-muted-foreground touch-target-interactive',
 						'hover:text-foreground hover:bg-muted/50',
 						'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 						'transition-colors duration-150'
