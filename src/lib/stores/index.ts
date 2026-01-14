@@ -23,3 +23,13 @@ export {
 	type SyncEvent,
 	type ConflictStrategy
 } from './sync.svelte';
+export {
+	pollingManager,
+	usePolling,
+	getPolling,
+	removePolling,
+	createMultiTierPolling,
+	POLLING_TIERS,
+	type ResourceState,
+	type PollingConfig
+} from './polling.svelte';
