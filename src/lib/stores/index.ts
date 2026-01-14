@@ -24,14 +24,6 @@ export {
 	type ConflictStrategy
 } from './sync.svelte';
 export {
-	operationsStore,
-	type OperationStatus,
-	type QuickAction,
-	type SystemMetric,
-	type ActivityItem,
-	type SystemStatus
-} from './operations.svelte';
-export {
 	pollingManager,
 	usePolling,
 	getPolling,
@@ -41,3 +33,15 @@ export {
 	type ResourceState,
 	type PollingConfig
 } from './polling.svelte';
+export {
+	operationsStore,
+	trackOperation,
+	trackBatchOperation,
+	type Operation,
+	type OperationStatus,
+	type OperationPriority,
+	type OperationType,
+	type OperationGroup,
+	type CreateOperationConfig,
+	type UpdateOperationOptions
+} from './operations.svelte';
