@@ -10,6 +10,7 @@ export { default as Badge, badgeVariants, type BadgeVariant, type BadgeSize, typ
 export { default as BottomNav } from './BottomNav.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as Button, buttonVariants, type ButtonProps, type ButtonVariants } from './Button.svelte';
+export { default as CopyCliButton, copyCliButtonVariants, type CopyCliButtonProps, type CopyCliButtonVariants } from './CopyCliButton.svelte';
 export { default as IssueTypeSelector, issueTypeSelectorVariants, type IssueTypeOption } from './IssueTypeSelector.svelte';
 export { default as CircularProgress, circularProgressVariants, type CircularProgressProps } from './CircularProgress.svelte';
 export { default as GridPattern } from './GridPattern.svelte';
