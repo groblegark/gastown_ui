@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { onMount, onDestroy } from 'svelte';
+	import { ActivityStream, type StreamEvent } from '$lib/api/activity-stream';
 
 	export interface ActivityEvent {
 		id: string;
@@ -12,9 +14,16 @@
 		icon?: string;
 	}
 
+	type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
+
 	interface Props {
-		events: ActivityEvent[];
-		/** Maximum number of events to display */
+		/** Events to display (ignored when useSSE is true) */
+		events?: ActivityEvent[];
+		/** Enable SSE streaming from /api/gastown/feed/stream */
+		useSSE?: boolean;
+		/** Custom SSE endpoint URL */
+		sseUrl?: string;
+		/** Maximum number of events to display (default 50 for SSE mode) */
 		limit?: number;
 		/** Show date headers */
 		showDateHeaders?: boolean;
@@ -24,19 +33,61 @@
 		compact?: boolean;
 		/** Custom empty state message */
 		emptyMessage?: string;
+		/** Show connection status indicator */
+		showConnectionStatus?: boolean;
 		/** Custom class for the container */
 		class?: string;
 	}
 
 	let {
-		events,
+		events: propEvents = [],
+		useSSE = false,
+		sseUrl = '/api/gastown/feed/stream',
 		limit,
 		showDateHeaders = true,
 		showFullTimestamp = false,
 		compact = false,
 		emptyMessage = 'No activity yet',
+		showConnectionStatus = true,
 		class: className
 	}: Props = $props();
+
+	// SSE state
+	let sseEvents = $state<ActivityEvent[]>([]);
+	let connectionStatus = $state<ConnectionStatus>('disconnected');
+	let stream: ActivityStream | null = null;
+
+	// Auto-scroll state
+	let containerRef = $state<HTMLElement | null>(null);
+	let userScrolled = $state(false);
+	let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	// Use SSE events when in SSE mode, otherwise use prop events
+	const events = $derived(useSSE ? sseEvents : propEvents);
+
+	// Event type to icon mapping
+	const eventTypeIcons: Record<string, string> = {
+		agent_status: 'user',
+		merge: 'git-merge',
+		mail: 'send',
+		mail_sent: 'send',
+		mail_received: 'inbox',
+		convoy: 'package',
+		convoy_created: 'package',
+		convoy_completed: 'check-circle',
+		error: 'alert-triangle',
+		system: 'activity',
+		session_start: 'play-circle',
+		session_end: 'stop',
+		spawn: 'rocket',
+		nudge: 'bell',
+		work_started: 'play-circle',
+		work_completed: 'check-circle',
+		test_pass: 'check',
+		test_fail: 'x',
+		issue_created: 'inbox',
+		issue_closed: 'check-circle'
+	};
 
 	// Icon SVG paths
 	const iconSvgs: Record<string, string> = {
@@ -129,111 +180,264 @@
 		return groups;
 	}
 
-	const limitedEvents = $derived(limit ? events.slice(0, limit) : events);
+	// Limit events (default 50 for SSE mode)
+	const effectiveLimit = $derived(limit ?? (useSSE ? 50 : undefined));
+	const limitedEvents = $derived(effectiveLimit ? events.slice(0, effectiveLimit) : events);
 	const groupedEvents = $derived(
 		showDateHeaders ? groupByDate(limitedEvents) : new Map([['', limitedEvents]])
 	);
+
+	// Convert StreamEvent to ActivityEvent
+	function streamEventToActivityEvent(streamEvent: StreamEvent): ActivityEvent {
+		const data = streamEvent.data as Record<string, unknown>;
+		return {
+			id: (data.id as string) || `${streamEvent.type}-${streamEvent.timestamp}`,
+			timestamp: streamEvent.timestamp,
+			type: streamEvent.type,
+			actor: (data.actor as string) || 'system',
+			actorDisplay: (data.actorDisplay as string) || (data.actor as string) || 'System',
+			description: (data.description as string) || (data.message as string) || '',
+			payload: data,
+			icon: eventTypeIcons[streamEvent.type] || 'activity'
+		};
+	}
+
+	// Scroll handling
+	function handleScroll() {
+		if (!containerRef) return;
+
+		const { scrollTop, scrollHeight, clientHeight } = containerRef;
+		const atBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+		if (atBottom) {
+			userScrolled = false;
+		} else {
+			userScrolled = true;
+		}
+
+		// Reset userScrolled after 10 seconds of no scrolling
+		if (scrollTimeout) clearTimeout(scrollTimeout);
+		if (userScrolled) {
+			scrollTimeout = setTimeout(() => {
+				userScrolled = false;
+			}, 10000);
+		}
+	}
+
+	function scrollToBottom() {
+		if (containerRef && !userScrolled) {
+			containerRef.scrollTop = containerRef.scrollHeight;
+		}
+	}
+
+	// SSE lifecycle
+	function connectSSE() {
+		if (!useSSE || stream) return;
+
+		connectionStatus = 'connecting';
+		stream = new ActivityStream(sseUrl);
+
+		stream.onConnect(() => {
+			connectionStatus = 'connected';
+		});
+
+		stream.onDisconnect(() => {
+			connectionStatus = 'connecting'; // Will auto-reconnect
+		});
+
+		stream.on('*', (event) => {
+			const activityEvent = streamEventToActivityEvent(event);
+			sseEvents = [activityEvent, ...sseEvents].slice(0, effectiveLimit || 50);
+			// Auto-scroll after new event
+			requestAnimationFrame(scrollToBottom);
+		});
+
+		stream.connect();
+	}
+
+	function disconnectSSE() {
+		if (stream) {
+			stream.disconnect();
+			stream.removeAllListeners();
+			stream = null;
+		}
+		connectionStatus = 'disconnected';
+	}
+
+	onMount(() => {
+		if (useSSE) {
+			connectSSE();
+		}
+	});
+
+	onDestroy(() => {
+		if (scrollTimeout) clearTimeout(scrollTimeout);
+		disconnectSSE();
+	});
+
+	// Reconnect if useSSE changes
+	$effect(() => {
+		if (useSSE) {
+			connectSSE();
+		} else {
+			disconnectSSE();
+		}
+	});
 </script>
 
-{#if limitedEvents.length === 0}
-	<div class={cn('flex flex-col items-center justify-center py-8 text-center', className)}>
-		<svg
-			class="w-12 h-12 text-muted-foreground mb-3"
-			fill="none"
-			stroke="currentColor"
-			viewBox="0 0 24 24"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-		>
-			{@html iconSvgs.activity}
-		</svg>
-		<p class="text-sm text-muted-foreground">{emptyMessage}</p>
-	</div>
-{:else}
-	<div class={cn('space-y-4', className)}>
-		{#each groupedEvents as [date, events]}
-			<div>
-				{#if showDateHeaders && date}
-					<!-- Date header -->
-					<div class="flex items-center gap-3 mb-2">
-						<span
-							class={cn(
-								'text-xs font-medium text-muted-foreground uppercase tracking-wide',
-								compact && 'text-2xs'
-							)}
-						>
-							{date}
-						</span>
-						<div class="flex-1 h-px bg-border"></div>
-					</div>
-				{/if}
-
-				<!-- Events for this date/group -->
-				<div class="space-y-1">
-					{#each events as event, i}
-						<div
-							class={cn(
-								'flex items-start gap-3 rounded-lg transition-colors hover:bg-muted/30',
-								compact ? 'p-2' : 'p-3'
-							)}
-						>
-							<!-- Icon -->
-							<div
-								class={cn(
-									'flex-shrink-0 rounded-full flex items-center justify-center bg-muted/50',
-									compact ? 'w-6 h-6' : 'w-8 h-8',
-									getEventColor(event.type)
-								)}
-							>
-								<svg
-									class={cn('', compact ? 'w-3 h-3' : 'w-4 h-4')}
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									{@html iconSvgs[event.icon || 'activity']}
-								</svg>
-							</div>
-
-							<!-- Content -->
-							<div class="flex-1 min-w-0">
-								<div class="flex items-center gap-2 mb-0.5 flex-wrap">
-									{#if event.actorDisplay || event.actor}
-										<span class={cn('font-medium text-foreground', compact ? 'text-xs' : 'text-sm')}>
-											{event.actorDisplay || event.actor}
-										</span>
-									{/if}
-									<span
-										class={cn(
-											'px-1.5 py-0.5 font-mono bg-muted rounded text-muted-foreground',
-											compact ? 'text-3xs' : 'text-2xs'
-										)}
-									>
-										{event.type.replace(/_/g, ' ')}
-									</span>
-								</div>
-								<p class={cn('text-muted-foreground break-words', compact ? 'text-xs' : 'text-sm')}>
-									{event.description}
-								</p>
-							</div>
-
-							<!-- Timestamp -->
-							<time
-								class={cn(
-									'flex-shrink-0 text-muted-foreground font-mono',
-									compact ? 'text-2xs' : 'text-xs'
-								)}
-							>
-								{formatTime(event.timestamp)}
-							</time>
-						</div>
-					{/each}
+<div class={cn('flex flex-col', className)}>
+	<!-- Header with connection status -->
+	{#if useSSE && showConnectionStatus}
+		<div class="flex items-center justify-between mb-3 px-1">
+			<div class="flex items-center gap-2">
+				<span class={cn('text-sm font-medium', compact && 'text-xs')}>Activity</span>
+				<div class="flex items-center gap-1.5">
+					<span
+						class={cn(
+							'w-2 h-2 rounded-full transition-colors',
+							connectionStatus === 'connected' && 'bg-success animate-pulse',
+							connectionStatus === 'connecting' && 'bg-warning animate-pulse',
+							connectionStatus === 'disconnected' && 'bg-destructive'
+						)}
+						aria-hidden="true"
+					></span>
+					<span
+						class={cn(
+							'text-xs',
+							connectionStatus === 'connected' && 'text-success',
+							connectionStatus === 'connecting' && 'text-warning',
+							connectionStatus === 'disconnected' && 'text-destructive'
+						)}
+					>
+						{connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ? 'Reconnecting...' : 'Disconnected'}
+					</span>
 				</div>
 			</div>
-		{/each}
+			{#if userScrolled}
+				<button
+					type="button"
+					onclick={() => { userScrolled = false; scrollToBottom(); }}
+					class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+				>
+					Resume auto-scroll
+				</button>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Events container -->
+	<div
+		bind:this={containerRef}
+		onscroll={handleScroll}
+		class={cn(
+			'flex-1 overflow-y-auto',
+			useSSE && 'max-h-[400px]'
+		)}
+	>
+		{#if limitedEvents.length === 0}
+			<div class="flex flex-col items-center justify-center py-8 text-center">
+				<svg
+					class="w-12 h-12 text-muted-foreground mb-3"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					{@html iconSvgs.activity}
+				</svg>
+				<p class="text-sm text-muted-foreground">{emptyMessage}</p>
+				{#if useSSE && connectionStatus === 'connected'}
+					<p class="text-xs text-muted-foreground mt-1">Waiting for events...</p>
+				{/if}
+			</div>
+		{:else}
+			<div class="space-y-4">
+				{#each groupedEvents as [date, dateEvents]}
+					<div>
+						{#if showDateHeaders && date}
+							<!-- Date header -->
+							<div class="flex items-center gap-3 mb-2">
+								<span
+									class={cn(
+										'text-xs font-medium text-muted-foreground uppercase tracking-wide',
+										compact && 'text-2xs'
+									)}
+								>
+									{date}
+								</span>
+								<div class="flex-1 h-px bg-border"></div>
+							</div>
+						{/if}
+
+						<!-- Events for this date/group -->
+						<div class="space-y-1">
+							{#each dateEvents as event, i (event.id)}
+								<div
+									class={cn(
+										'flex items-start gap-3 rounded-lg transition-colors hover:bg-muted/30',
+										compact ? 'p-2' : 'p-3'
+									)}
+								>
+									<!-- Icon -->
+									<div
+										class={cn(
+											'flex-shrink-0 rounded-full flex items-center justify-center bg-muted/50',
+											compact ? 'w-6 h-6' : 'w-8 h-8',
+											getEventColor(event.type)
+										)}
+									>
+										<svg
+											class={cn('', compact ? 'w-3 h-3' : 'w-4 h-4')}
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											{@html iconSvgs[event.icon || eventTypeIcons[event.type] || 'activity']}
+										</svg>
+									</div>
+
+									<!-- Content -->
+									<div class="flex-1 min-w-0">
+										<div class="flex items-center gap-2 mb-0.5 flex-wrap">
+											{#if event.actorDisplay || event.actor}
+												<span class={cn('font-medium text-foreground', compact ? 'text-xs' : 'text-sm')}>
+													{event.actorDisplay || event.actor}
+												</span>
+											{/if}
+											<span
+												class={cn(
+													'px-1.5 py-0.5 font-mono bg-muted rounded text-muted-foreground',
+													compact ? 'text-3xs' : 'text-2xs'
+												)}
+											>
+												{event.type.replace(/_/g, ' ')}
+											</span>
+										</div>
+										<p class={cn('text-muted-foreground break-words', compact ? 'text-xs' : 'text-sm')}>
+											{event.description}
+										</p>
+									</div>
+
+									<!-- Timestamp -->
+									<time
+										class={cn(
+											'flex-shrink-0 text-muted-foreground font-mono',
+											compact ? 'text-2xs' : 'text-xs'
+										)}
+									>
+										{formatTime(event.timestamp)}
+									</time>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
-{/if}
+</div>
