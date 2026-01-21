@@ -1,15 +1,12 @@
 /**
  * Mail Detail Page Server Load
  *
- * Fetches a single mail message by ID using gt mail read command.
+ * Fetches a single mail message by ID using ProcessSupervisor (secure, no shell).
  */
 
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-
-const execAsync = promisify(exec);
+import { getProcessSupervisor } from '$lib/server/cli/process-supervisor';
 
 interface GtMailMessage {
 	id: string;
@@ -77,22 +74,24 @@ function transformMessage(msg: GtMailMessage): MailMessage {
 export const load: PageServerLoad = async ({ params }) => {
 	const { id } = params;
 
-	try {
-		const { stdout } = await execAsync(`gt mail read ${id} --json`, {
-			timeout: 5000
-		});
+	// SECURITY: Using ProcessSupervisor with args array prevents shell injection
+	// The 'id' is passed as a separate argument, never interpolated into a shell command
+	const supervisor = getProcessSupervisor();
+	const result = await supervisor.gt<GtMailMessage>(['mail', 'read', id, '--json'], {
+		timeout: 5000
+	});
 
-		const rawMessage: GtMailMessage = JSON.parse(stdout);
-		const message = transformMessage(rawMessage);
-
-		return {
-			message,
-			error: null
-		};
-	} catch (err) {
-		console.error(`Failed to fetch mail message ${id}:`, err);
+	if (!result.success || !result.data) {
+		console.error(`Failed to fetch mail message ${id}:`, result.error);
 		throw error(404, {
 			message: `Message ${id} not found`
 		});
 	}
+
+	const message = transformMessage(result.data);
+
+	return {
+		message,
+		error: null
+	};
 };

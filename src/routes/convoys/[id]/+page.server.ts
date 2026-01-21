@@ -1,10 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
 import { resolve } from 'node:path';
 import type { PageServerLoad } from './$types';
-
-const execAsync = promisify(exec);
+import { getProcessSupervisor } from '$lib/server/cli/process-supervisor';
 
 function getGtRoot(): string {
 	if (process.env.GT_TOWN_ROOT) {
@@ -87,23 +84,33 @@ export const load: PageServerLoad = async ({ params }) => {
 	const gtRoot = getGtRoot();
 
 	try {
-		const { stdout } = await execAsync(`gt convoy status ${id} --json`, {
+		const supervisor = getProcessSupervisor();
+		const result = await supervisor.gt<ConvoyRaw>(['convoy', 'status', id, '--json'], {
 			cwd: gtRoot
 		});
 
-		const raw: ConvoyRaw = JSON.parse(stdout);
+		if (!result.success || !result.data) {
+			const message = result.error || 'Failed to fetch convoy';
+			if (message.includes('not found') || message.includes('No convoy')) {
+				error(404, { message: `Convoy not found: ${id}` });
+			}
+			error(500, { message });
+		}
+
+		const raw: ConvoyRaw = result.data;
 
 		// Try to get created_at from convoy list
 		let createdAt = raw.created_at || '';
 		if (!createdAt) {
 			try {
-				const { stdout: listJson } = await execAsync('gt convoy list --json', {
+				const listResult = await supervisor.gt<Array<{ id: string; created_at?: string }>>(['convoy', 'list', '--json'], {
 					cwd: gtRoot
 				});
-				const summaries = JSON.parse(listJson);
-				const summary = summaries.find((s: { id: string }) => s.id === id);
-				if (summary?.created_at) {
-					createdAt = summary.created_at;
+				if (listResult.success && listResult.data) {
+					const summary = listResult.data.find((s) => s.id === id);
+					if (summary?.created_at) {
+						createdAt = summary.created_at;
+					}
 				}
 			} catch {
 				// Ignore - created_at is optional

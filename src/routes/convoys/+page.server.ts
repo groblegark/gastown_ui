@@ -1,8 +1,5 @@
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
 import type { PageServerLoad } from './$types';
-
-const execAsync = promisify(exec);
+import { getProcessSupervisor } from '$lib/server/cli/process-supervisor';
 
 type ConvoyStatus = 'active' | 'stale' | 'stuck' | 'complete';
 type IssueStatus = 'open' | 'in_progress' | 'closed' | 'blocked';
@@ -69,19 +66,26 @@ function determineConvoyStatus(detail: ConvoyDetail): ConvoyStatus {
 }
 
 async function getConvoyDetail(id: string): Promise<ConvoyDetail | null> {
-	try {
-		const { stdout } = await execAsync(`gt convoy status ${id} --json`);
-		return JSON.parse(stdout);
-	} catch {
-		return null;
+	const supervisor = getProcessSupervisor();
+	// SECURITY: Using args array prevents shell injection - id passed as separate argument
+	const result = await supervisor.gt<ConvoyDetail>(['convoy', 'status', id, '--json']);
+	if (result.success && result.data) {
+		return result.data;
 	}
+	return null;
 }
 
 export const load: PageServerLoad = async () => {
 	try {
-		// Fetch convoy list
-		const { stdout } = await execAsync('gt convoy list --json');
-		const summaries: ConvoySummary[] = JSON.parse(stdout);
+		// Fetch convoy list using ProcessSupervisor (secure, no shell)
+		const supervisor = getProcessSupervisor();
+		const result = await supervisor.gt<ConvoySummary[]>(['convoy', 'list', '--json']);
+
+		if (!result.success || !result.data) {
+			return { convoys: [], error: result.error || 'Failed to fetch convoys' };
+		}
+
+		const summaries: ConvoySummary[] = result.data;
 
 		// Fetch details for each convoy in parallel
 		const detailPromises = summaries.map((s) => getConvoyDetail(s.id));

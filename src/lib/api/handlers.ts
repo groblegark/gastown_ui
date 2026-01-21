@@ -21,10 +21,11 @@ import {
 const browser = typeof window !== 'undefined';
 
 // State types for stores
+// NOTE: No 'idle' status - agents are working, blocked, error, or offline
 export interface Agent {
 	id: string;
 	name: string;
-	status: 'idle' | 'working' | 'error' | 'offline';
+	status: 'working' | 'blocked' | 'error' | 'offline';
 	currentTask?: string;
 	lastSeen: number;
 }

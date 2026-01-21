@@ -8,12 +8,14 @@ import type { WorkItem } from '$lib/stores/work.svelte';
 import type { Convoy } from '$lib/stores/convoys.svelte';
 
 // Mock data for tests
+// Note: No 'idle' status - agents are working, blocked, error, or offline
+// Polecats especially NEVER idle - they spawn, work, and get nuked
 const mockAgents: Agent[] = [
 	{ id: 'mayor', name: 'Mayor', status: 'working', currentWork: 'Coordinating work' },
 	{ id: 'witness-1', name: 'Witness (gastown_ui)', status: 'working', currentWork: 'Monitoring polecats' },
-	{ id: 'refinery-1', name: 'Refinery (gastown_ui)', status: 'idle', currentWork: 'Waiting for merges' },
-	{ id: 'polecat-morsov', name: 'Polecat Morsov', status: 'working', currentWork: 'Building features' },
-	{ id: 'polecat-rictus', name: 'Polecat Rictus', status: 'idle', currentWork: 'Awaiting work' }
+	{ id: 'refinery-1', name: 'Refinery (gastown_ui)', status: 'working', currentWork: 'Processing merge queue' },
+	{ id: 'polecat-morsov', name: 'Polecat Morsov', status: 'working', currentWork: 'Building features' }
+	// Note: No idle polecat - if not working, it would be nuked
 ];
 
 const mockWork: WorkItem[] = [

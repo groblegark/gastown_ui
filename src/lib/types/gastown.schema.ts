@@ -34,9 +34,28 @@ export const GtDaemonStatusSchema = z
 	})
 	.passthrough();
 
-/** Agent status enum */
+/**
+ * Polecat operational state - from gastown (internal/polecat/types.go)
+ * IMPORTANT: There is NO idle state. Polecats spawn, work, and get nuked.
+ */
+export const PolecatStateSchema = z.enum(['working', 'done', 'stuck']);
+
+/** Agent display status - for UI rendering */
+export const AgentDisplayStatusSchema = z.enum(['running', 'completing', 'stuck', 'exited']);
+
+/** Cleanup status - for worktree management */
+export const CleanupStatusSchema = z.enum([
+	'clean',
+	'has_uncommitted',
+	'has_stash',
+	'has_unpushed',
+	'unknown'
+]);
+
+/**
+ * @deprecated Use PolecatStateSchema. Removed 'idle' - there is no idle state.
+ */
 export const GtAgentStatusSchema = z.enum([
-	'idle',
 	'active',
 	'busy',
 	'parked',
@@ -192,8 +211,34 @@ export const GtConvoySchema = z
 // Bead Schemas
 // =============================================================================
 
-/** Bead status enum */
-export const BdBeadStatusSchema = z.enum(['open', 'in_progress', 'closed', 'hooked']);
+/**
+ * Bead STORAGE status - what gastown actually returns
+ * Only 'open' or 'closed' - other statuses are DERIVED for UI display
+ */
+export const BdBeadStorageStatusSchema = z.enum(['open', 'closed']);
+
+/**
+ * Bead DISPLAY status - for UI presentation (derived from storage + context)
+ */
+export const BdBeadDisplayStatusSchema = z.enum([
+	'open',
+	'in_progress',
+	'blocked',
+	'closed',
+	'hooked'
+]);
+
+/**
+ * @deprecated Use BdBeadStorageStatusSchema for API validation
+ * Accepts both storage AND display values for backward compatibility
+ */
+export const BdBeadStatusSchema = z.enum([
+	'open',
+	'in_progress',
+	'blocked',
+	'closed',
+	'hooked'
+]);
 
 /** Bead schema */
 export const BdBeadSchema = z
@@ -521,8 +566,11 @@ export const RigSnapshotSchema = z
 	})
 	.passthrough();
 
-/** Polecat snapshot status enum */
-export const PolecatSnapshotStatusSchema = z.enum(['running', 'idle']);
+/**
+ * @deprecated Use PolecatStateSchema. There is NO idle state.
+ * 'running' = working, 'exited' = no session
+ */
+export const PolecatSnapshotStatusSchema = z.enum(['running', 'exited']);
 
 /** Polecat snapshot for dashboard */
 export const PolecatSnapshotSchema = z

@@ -35,9 +35,10 @@ export interface WSMessage {
 }
 
 // Typed message payloads
+// Note: No 'idle' status - agents are working, blocked, error, or offline
 export interface AgentStatusPayload {
 	agentId: string;
-	status: 'idle' | 'working' | 'error' | 'offline';
+	status: 'working' | 'blocked' | 'error' | 'offline';
 	currentTask?: string;
 }
 

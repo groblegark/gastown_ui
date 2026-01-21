@@ -17,7 +17,11 @@ export type {
 	GtStatus,
 	GtOverseer,
 	GtDaemonStatus,
-	GtAgentStatus,
+	// Polecat state types
+	PolecatState,
+	AgentDisplayStatus,
+	CleanupStatus,
+	GtAgentStatus, // @deprecated - use PolecatState
 	GtAgentHealth,
 	GtAgentSummary,
 	GtAgent,
@@ -32,7 +36,9 @@ export type {
 	GtConvoy,
 	GtTrackedIssue,
 	// Bead types
-	BdBeadStatus,
+	BdBeadStorageStatus,
+	BdBeadDisplayStatus,
+	BdBeadStatus, // @deprecated - use BdBeadStorageStatus or BdBeadDisplayStatus
 	BdBead,
 	// Mail types
 	GtMailPriority,
@@ -94,7 +100,11 @@ export {
 	// Status schemas
 	GtOverseerSchema,
 	GtDaemonStatusSchema,
-	GtAgentStatusSchema,
+	// Polecat state schemas
+	PolecatStateSchema,
+	AgentDisplayStatusSchema,
+	CleanupStatusSchema,
+	GtAgentStatusSchema, // @deprecated - use PolecatStateSchema
 	GtAgentHealthSchema,
 	GtAgentSummarySchema,
 	GtAgentSchema,
@@ -110,7 +120,9 @@ export {
 	GtTrackedIssueSchema,
 	GtConvoySchema,
 	// Bead schemas
-	BdBeadStatusSchema,
+	BdBeadStorageStatusSchema,
+	BdBeadDisplayStatusSchema,
+	BdBeadStatusSchema, // @deprecated - use BdBeadStorageStatusSchema
 	BdBeadSchema,
 	// Mail schemas
 	GtMailPrioritySchema,

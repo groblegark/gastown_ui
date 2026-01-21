@@ -16,7 +16,7 @@
       "role": "coordinator",
       "running": true,
       "has_work": false,
-      "state": "idle",
+      "state": "active",
       "unread_mail": 0
     },
     {
@@ -26,7 +26,7 @@
       "role": "health-check",
       "running": false,
       "has_work": false,
-      "state": "idle",
+      "state": "active",
       "unread_mail": 0
     }
   ],

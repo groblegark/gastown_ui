@@ -11,7 +11,12 @@ import type { ApiResponse } from '$lib/api/types';
 
 const browser = typeof window !== 'undefined';
 
-export type AgentStatus = 'idle' | 'working' | 'blocked' | 'error' | 'offline';
+/**
+ * Agent display status for UI
+ * NOTE: No 'idle' state - agents are either working, blocked, have error, or offline
+ * Polecats especially NEVER idle - they spawn, work, and get nuked
+ */
+export type AgentStatus = 'working' | 'blocked' | 'error' | 'offline';
 
 export interface Agent {
 	id: string;
@@ -103,10 +108,6 @@ class AgentsStore {
 		return this.#applyFilter(this.#state.items, this.#state.filter);
 	}
 
-	get idleAgents(): Agent[] {
-		return this.#state.items.filter((a) => a.status === 'idle');
-	}
-
 	get workingAgents(): Agent[] {
 		return this.#state.items.filter((a) => a.status === 'working');
 	}
@@ -133,7 +134,6 @@ class AgentsStore {
 
 	get byStatus(): Record<AgentStatus, Agent[]> {
 		return {
-			idle: this.idleAgents,
 			working: this.workingAgents,
 			blocked: this.blockedAgents,
 			error: this.errorAgents,

@@ -61,7 +61,7 @@ const sampleAgentSummary = {
 	role: 'coordinator',
 	running: true,
 	has_work: false,
-	state: 'idle' as const,
+	state: 'active' as const, // No 'idle' - agents are active, busy, parked, stuck, or orphaned
 	unread_mail: 0
 };
 
@@ -286,8 +286,8 @@ const sampleFeedItem: GtFeedItem = {
 const sampleSlingTarget: SlingTarget = {
 	rig: 'gastown_ui',
 	agent: 'amp',
-	status: 'idle',
-	display: 'gastown_ui/amp (idle)'
+	status: 'busy', // Note: SlingTarget 'idle' means available, but for test we use 'busy'
+	display: 'gastown_ui/amp (busy)'
 };
 
 const sampleSnapshot: GtSnapshot = {
@@ -660,7 +660,7 @@ describe('Gas Town Types - Optional Fields', () => {
 		const minimalAgent: GtAgent = {
 			name: 'test',
 			id: 'test-id',
-			status: 'idle',
+			status: 'active', // No 'idle' - use 'active', 'busy', 'parked', 'stuck', or 'orphaned'
 			session_id: 'session-123',
 			rig: 'test-rig',
 			worktree: '/path/to/worktree',

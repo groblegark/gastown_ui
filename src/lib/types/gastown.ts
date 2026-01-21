@@ -37,8 +37,43 @@ export interface GtDaemonStatus {
 	version: string;
 }
 
-/** Agent status values */
-export type GtAgentStatus = 'idle' | 'active' | 'busy' | 'parked' | 'stuck' | 'orphaned';
+/**
+ * Polecat operational state - from gastown source (internal/polecat/types.go)
+ *
+ * IMPORTANT: There is NO idle state. Polecats don't wait for work.
+ * They spawn, work, and get nuked. "There is no idle pool."
+ *
+ * - 'working': Actively processing assigned work
+ * - 'done': Completed work, cleaning up (transient)
+ * - 'stuck': Needs help, cannot proceed
+ */
+export type PolecatState = 'working' | 'done' | 'stuck';
+
+/**
+ * Agent display status - for UI rendering
+ * Derived from session state, not stored
+ */
+export type AgentDisplayStatus =
+	| 'running' // Has active tmux session, state=working
+	| 'completing' // state=done, cleaning up
+	| 'stuck' // state=stuck, needs help
+	| 'exited'; // No session found
+
+/**
+ * Cleanup status - for worktree management
+ */
+export type CleanupStatus =
+	| 'clean' // Safe to remove
+	| 'has_uncommitted' // Uncommitted changes
+	| 'has_stash' // Stashed work
+	| 'has_unpushed' // Unpushed commits (CRITICAL: do not nuke)
+	| 'unknown';
+
+/**
+ * @deprecated Use PolecatState for polecat state, AgentDisplayStatus for UI
+ * Kept for backward compatibility. Remove 'idle' from usage.
+ */
+export type GtAgentStatus = 'active' | 'busy' | 'parked' | 'stuck' | 'orphaned';
 
 /** Agent health levels */
 export type GtAgentHealth = 'healthy' | 'warning' | 'critical';
@@ -153,8 +188,32 @@ export interface GtTrackedIssue {
 // Bead Types
 // =============================================================================
 
-/** Bead status values */
-export type BdBeadStatus = 'open' | 'in_progress' | 'closed' | 'hooked';
+/**
+ * Bead STORAGE status - what gastown actually stores in beads.db
+ * Source of truth: internal/beads/beads.go
+ *
+ * IMPORTANT: Gastown only stores 'open' or 'closed'.
+ * Other statuses like 'in_progress', 'blocked' are DERIVED for display.
+ */
+export type BdBeadStorageStatus = 'open' | 'closed';
+
+/**
+ * Bead DISPLAY status - derived for UI presentation
+ *
+ * Derivation rules:
+ * - 'open': status=open, no active MR, no blocking deps
+ * - 'in_progress': status=open, has active MR or assignee working
+ * - 'blocked': status=open, has unresolved blocking dependencies
+ * - 'closed': status=closed
+ * - 'hooked': status=open, pinned to agent hook (special)
+ */
+export type BdBeadDisplayStatus = 'open' | 'in_progress' | 'blocked' | 'closed' | 'hooked';
+
+/**
+ * @deprecated Use BdBeadStorageStatus for API responses, BdBeadDisplayStatus for UI
+ * Kept for backward compatibility during migration (see bd-3jc)
+ */
+export type BdBeadStatus = BdBeadDisplayStatus;
 
 /** Bead (work item) from `bd list` or `bd show` */
 export interface BdBead {
@@ -433,8 +492,13 @@ export interface RigSnapshot {
 	active_work: number;
 }
 
-/** Polecat snapshot status values */
-export type PolecatSnapshotStatus = 'running' | 'idle';
+/**
+ * Polecat snapshot status - for dashboard display
+ *
+ * @deprecated Use PolecatState for actual state. There is NO 'idle' state.
+ * 'running' maps to 'working', 'exited' for no session
+ */
+export type PolecatSnapshotStatus = 'running' | 'exited';
 
 /** Polecat snapshot for dashboard */
 export interface PolecatSnapshot {

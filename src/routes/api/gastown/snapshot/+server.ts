@@ -121,7 +121,7 @@ export const GET: RequestHandler = async () => {
 					name: agent.name.charAt(0).toUpperCase() + agent.name.slice(1),
 					role: agent.role,
 					rig: rig.name,
-					status: agent.running ? 'running' : 'idle',
+					status: agent.running ? 'running' : 'exited', // No idle state - polecats run or exit
 					has_work: agent.has_work || false,
 					task: hookData?.bead_id || agent.first_subject || undefined
 				});

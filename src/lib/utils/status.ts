@@ -53,7 +53,98 @@ export function getConvoyStatusConfig(status: ConvoyStatus): ConvoyStatusConfig 
 }
 
 // =============================================================================
-// Issue Status
+// Bead Status Derivation
+// =============================================================================
+
+import type {
+	BdBeadStorageStatus,
+	BdBeadDisplayStatus,
+	BdBead
+} from '$lib/types/gastown';
+
+/**
+ * Input for status derivation - minimal bead fields needed
+ * Allows partial bead objects for flexibility
+ */
+export interface BeadStatusContext {
+	/** Storage status from gastown ('open' | 'closed') */
+	status: BdBeadStorageStatus | string;
+	/** Whether bead is pinned to an agent's hook */
+	hook_bead?: boolean;
+	/** Count of unresolved blocking dependencies */
+	blocked_by_count?: number;
+	/** Assignee working on this bead */
+	assignee?: string;
+}
+
+/**
+ * MR (Merge Request) status for determining in_progress state
+ */
+export type MRStatus = 'open' | 'in_progress' | 'merged' | 'closed';
+
+/**
+ * Derive display status from storage status + context
+ *
+ * IMPORTANT: Gastown only stores 'open' or 'closed'.
+ * Display statuses like 'in_progress' and 'blocked' are DERIVED.
+ *
+ * Derivation rules (in order of precedence):
+ * 1. status='closed' → 'closed'
+ * 2. hook_bead=true → 'hooked'
+ * 3. blocked_by_count > 0 → 'blocked'
+ * 4. has assignee OR mrStatus='in_progress' → 'in_progress'
+ * 5. default → 'open'
+ *
+ * @param bead - Bead or partial bead with status context
+ * @param mrStatus - Optional MR status for this bead
+ * @returns Derived display status for UI presentation
+ */
+export function deriveDisplayStatus(
+	bead: BeadStatusContext | BdBead,
+	mrStatus?: MRStatus
+): BdBeadDisplayStatus {
+	// 1. Closed beads stay closed
+	if (bead.status === 'closed') {
+		return 'closed';
+	}
+
+	// 2. Hooked beads show as hooked (pinned to agent hook)
+	if ('hook_bead' in bead && bead.hook_bead) {
+		return 'hooked';
+	}
+
+	// 3. Blocked by unresolved dependencies
+	if ('blocked_by_count' in bead && bead.blocked_by_count && bead.blocked_by_count > 0) {
+		return 'blocked';
+	}
+
+	// 4. Has active work (assignee or MR in progress)
+	if (mrStatus === 'in_progress' || ('assignee' in bead && bead.assignee)) {
+		return 'in_progress';
+	}
+
+	// 5. Default: open
+	return 'open';
+}
+
+/**
+ * Check if a bead is actionable (can be worked on)
+ * A bead is actionable if it's open and not blocked
+ */
+export function isBeadActionable(bead: BeadStatusContext | BdBead): boolean {
+	const displayStatus = deriveDisplayStatus(bead);
+	return displayStatus === 'open' || displayStatus === 'in_progress';
+}
+
+/**
+ * Check if a bead is blocked
+ */
+export function isBeadBlocked(bead: BeadStatusContext | BdBead): boolean {
+	return deriveDisplayStatus(bead) === 'blocked';
+}
+
+// =============================================================================
+// Issue Status (Display Configuration)
 // =============================================================================
 
 export type IssueStatus = 'open' | 'in_progress' | 'blocked' | 'completed' | 'closed';

@@ -27,7 +27,7 @@
 			"role": "refinery",
 			"running": true,
 			"has_work": false,
-			"state": "idle",
+			"state": "active",
 			"unread_mail": 0
 		}
 	],

@@ -77,11 +77,12 @@ export const commands: CommandItem[] = [
 
 // Mock data for search results
 export const mockAgents: AgentItem[] = [
+	// Note: No 'idle' status - agents are running or exited. Polecats never idle.
 	{ id: 'mayor', name: 'Mayor', status: 'running', task: 'Coordinating work' },
 	{ id: 'witness-1', name: 'Witness (gastown_ui)', status: 'running', task: 'Monitoring polecats' },
-	{ id: 'refinery-1', name: 'Refinery (gastown_ui)', status: 'idle', task: 'Waiting for merges' },
-	{ id: 'polecat-morsov', name: 'Polecat Morsov', status: 'running', task: 'Building features' },
-	{ id: 'polecat-rictus', name: 'Polecat Rictus', status: 'idle', task: 'Awaiting work' }
+	{ id: 'refinery-1', name: 'Refinery (gastown_ui)', status: 'running', task: 'Processing merge queue' },
+	{ id: 'polecat-morsov', name: 'Polecat Morsov', status: 'running', task: 'Building features' }
+	// Note: No idle polecat - if not working, it's nuked
 ];
 
 export const mockIssues: IssueItem[] = [
