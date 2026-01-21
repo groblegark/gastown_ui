@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "playwright test",
+    "test:unit": "vitest run",
     "analyze": "ANALYZE=true vite build"
   },
   "devDependencies": {
