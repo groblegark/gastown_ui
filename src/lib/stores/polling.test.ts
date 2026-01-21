@@ -5,7 +5,9 @@ import {
 	getPolling,
 	removePolling,
 	createMultiTierPolling,
-	POLLING_TIERS
+	POLLING_TIERS,
+	POLLING_JITTER,
+	addJitter
 } from './polling.svelte';
 import { apiClient } from '$lib/api/client';
 
@@ -22,6 +24,13 @@ vi.mock('./network.svelte', () => ({
 	networkState: {
 		isOffline: false,
 		onStatusChange: vi.fn(() => vi.fn())
+	}
+}));
+
+// Mock SWR cache
+vi.mock('./swr', () => ({
+	swrCache: {
+		invalidateAll: vi.fn()
 	}
 }));
 
@@ -81,17 +90,20 @@ describe('Multi-Tier Polling System', () => {
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 1000,
+				jitter: 0, // Disable jitter for deterministic testing
 				enabled: false
 			});
 
 			instance.start();
 
-			// Wait for fetch to complete
-			await vi.runAllTimersAsync();
+			// Wait for initial fetch to complete
+			await vi.advanceTimersByTimeAsync(100);
 
 			expect(apiClient.get).toHaveBeenCalledWith('/api/test', expect.any(Object));
 			expect(instance.state.data).toEqual(mockData);
 			expect(instance.state.error).toBeNull();
+
+			instance.stop();
 		});
 
 		it('polls at specified interval', async () => {
@@ -105,6 +117,7 @@ describe('Multi-Tier Polling System', () => {
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 5000,
+				jitter: 0, // Disable jitter for deterministic testing
 				enabled: false
 			});
 
@@ -121,11 +134,19 @@ describe('Multi-Tier Polling System', () => {
 			// Third poll
 			await vi.advanceTimersByTimeAsync(5000);
 			expect(apiClient.get).toHaveBeenCalledTimes(3);
+
+			instance.stop();
 		});
 
 		it('shows stale data while revalidating', async () => {
 			const initialData = { count: 1 };
 			const updatedData = { count: 2 };
+
+			// First call resolves immediately, second call is delayed
+			let resolveSecond: (value: unknown) => void;
+			const secondPromise = new Promise((resolve) => {
+				resolveSecond = resolve;
+			});
 
 			vi.mocked(apiClient.get)
 				.mockResolvedValueOnce({
@@ -133,42 +154,45 @@ describe('Multi-Tier Polling System', () => {
 					status: 200,
 					headers: new Headers()
 				})
-				.mockResolvedValueOnce({
-					data: updatedData,
-					status: 200,
-					headers: new Headers()
-				});
+				.mockImplementationOnce(() => secondPromise as Promise<unknown>);
 
 			const instance = usePolling({
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 10000,
 				staleTime: 5000,
+				jitter: 0, // Disable jitter for deterministic testing
 				enabled: false
 			});
 
 			instance.start();
 
 			// Initial fetch
-			await vi.runAllTimersAsync();
+			await vi.advanceTimersByTimeAsync(100);
 			expect(instance.state.data).toEqual(initialData);
 			expect(instance.state.isStale).toBe(false);
 
-			// Wait for data to become stale
-			await vi.advanceTimersByTimeAsync(6000);
+			// Wait for data to become stale and trigger revalidation
+			await vi.advanceTimersByTimeAsync(10000);
 
-			// Trigger revalidation
-			await vi.advanceTimersByTimeAsync(4000);
-
-			// Should show old data while validating
+			// Should show old data while validating (fetch is in progress)
 			expect(instance.state.isValidating).toBe(true);
 			expect(instance.state.data).toEqual(initialData);
 
+			// Resolve the second fetch
+			resolveSecond!({
+				data: updatedData,
+				status: 200,
+				headers: new Headers()
+			});
+			await vi.advanceTimersByTimeAsync(0);
+
 			// After validation completes
-			await vi.runAllTimersAsync();
 			expect(instance.state.data).toEqual(updatedData);
 			expect(instance.state.isValidating).toBe(false);
 			expect(instance.state.isStale).toBe(false);
+
+			instance.stop();
 		});
 
 		it('handles transform function', async () => {
@@ -183,6 +207,7 @@ describe('Multi-Tier Polling System', () => {
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 1000,
+				jitter: 0, // Disable jitter for deterministic testing
 				enabled: false,
 				transform: (data: unknown) => ({
 					value: parseInt((data as typeof rawData).value, 10)
@@ -190,9 +215,11 @@ describe('Multi-Tier Polling System', () => {
 			});
 
 			instance.start();
-			await vi.runAllTimersAsync();
+			await vi.advanceTimersByTimeAsync(100);
 
 			expect(instance.state.data).toEqual({ value: 42 });
+
+			instance.stop();
 		});
 
 		it('calls onSuccess callback', async () => {
@@ -209,14 +236,17 @@ describe('Multi-Tier Polling System', () => {
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 1000,
+				jitter: 0, // Disable jitter for deterministic testing
 				enabled: false,
 				onSuccess
 			});
 
 			instance.start();
-			await vi.runAllTimersAsync();
+			await vi.advanceTimersByTimeAsync(100);
 
 			expect(onSuccess).toHaveBeenCalledWith(mockData);
+
+			instance.stop();
 		});
 
 		it('calls onError callback on failure', async () => {
@@ -229,15 +259,19 @@ describe('Multi-Tier Polling System', () => {
 				key: 'test',
 				endpoint: '/api/test',
 				interval: 1000,
+				jitter: 0, // Disable jitter for deterministic testing
+				maxRetries: 0, // Disable retries to prevent exponential backoff loops
 				enabled: false,
 				onError
 			});
 
 			instance.start();
-			await vi.runAllTimersAsync();
+			await vi.advanceTimersByTimeAsync(100);
 
 			expect(onError).toHaveBeenCalledWith(error);
 			expect(instance.state.error).toBe(error);
+
+			instance.stop();
 		});
 	});
 
@@ -417,6 +451,70 @@ describe('Multi-Tier Polling System', () => {
 			expect(POLLING_TIERS.MEDIUM).toBe(15000);
 			expect(POLLING_TIERS.SLOW).toBe(60000);
 			expect(POLLING_TIERS.VERY_SLOW).toBe(300000);
+		});
+	});
+
+	describe('POLLING_JITTER', () => {
+		it('has expected jitter values', () => {
+			expect(POLLING_JITTER.REALTIME).toBe(200);
+			expect(POLLING_JITTER.FAST).toBe(500);
+			expect(POLLING_JITTER.MEDIUM).toBe(1000);
+			expect(POLLING_JITTER.SLOW).toBe(5000);
+			expect(POLLING_JITTER.VERY_SLOW).toBe(15000);
+		});
+	});
+
+	describe('addJitter', () => {
+		it('returns interval when jitter is 0', () => {
+			expect(addJitter(5000, 0)).toBe(5000);
+		});
+
+		it('returns interval when jitter is negative', () => {
+			expect(addJitter(5000, -100)).toBe(5000);
+		});
+
+		it('returns value within expected range', () => {
+			const interval = 5000;
+			const jitter = 500;
+
+			// Run multiple times to test randomness
+			for (let i = 0; i < 100; i++) {
+				const result = addJitter(interval, jitter);
+				expect(result).toBeGreaterThanOrEqual(interval - jitter);
+				expect(result).toBeLessThanOrEqual(interval + jitter);
+			}
+		});
+
+		it('enforces minimum interval of 100ms', () => {
+			// Very small interval with large jitter could go negative
+			const result = addJitter(50, 100);
+			expect(result).toBeGreaterThanOrEqual(100);
+		});
+
+		it('produces varied results (not deterministic)', () => {
+			const interval = 5000;
+			const jitter = 500;
+			const results = new Set<number>();
+
+			// Run 50 times - should get multiple unique values
+			for (let i = 0; i < 50; i++) {
+				results.add(addJitter(interval, jitter));
+			}
+
+			// With jitter of 500ms on 5000ms interval, we should see variation
+			// Probability of all 50 being same is astronomically low
+			expect(results.size).toBeGreaterThan(1);
+		});
+
+		it('handles large intervals correctly', () => {
+			const interval = 300000; // 5 minutes
+			const jitter = 15000; // 15 seconds
+
+			for (let i = 0; i < 20; i++) {
+				const result = addJitter(interval, jitter);
+				expect(result).toBeGreaterThanOrEqual(interval - jitter);
+				expect(result).toBeLessThanOrEqual(interval + jitter);
+			}
 		});
 	});
 });

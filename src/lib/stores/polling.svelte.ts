@@ -14,10 +14,11 @@
 import { networkState } from './network.svelte';
 import { apiClient, isApiError } from '$lib/api/client';
 import type { ApiResponse } from '$lib/api/types';
+import { swrCache } from './swr';
 
 const browser = typeof window !== 'undefined';
 
-/** Polling tier presets */
+/** Polling tier presets with intervals in ms */
 export const POLLING_TIERS = {
 	REALTIME: 2000, // 2s - critical real-time data
 	FAST: 5000, // 5s - important data that changes frequently
@@ -25,6 +26,29 @@ export const POLLING_TIERS = {
 	SLOW: 60000, // 60s - background updates
 	VERY_SLOW: 300000 // 5min - rarely changing data
 } as const;
+
+/** Jitter presets per tier (± ms) to prevent thundering herd */
+export const POLLING_JITTER = {
+	REALTIME: 200, // ± 200ms for 2s interval
+	FAST: 500, // ± 500ms for 5s interval
+	MEDIUM: 1000, // ± 1000ms for 15s interval
+	SLOW: 5000, // ± 5000ms for 60s interval
+	VERY_SLOW: 15000 // ± 15000ms for 5min interval
+} as const;
+
+/**
+ * Add random jitter to an interval to prevent thundering herd
+ * @param interval Base interval in ms
+ * @param jitter Maximum jitter in ms (applied as ± jitter)
+ * @returns Interval with random jitter applied
+ */
+export function addJitter(interval: number, jitter: number): number {
+	if (jitter <= 0) return interval;
+	// Random value between -jitter and +jitter
+	const randomOffset = Math.floor(Math.random() * jitter * 2) - jitter;
+	// Ensure minimum interval of 100ms
+	return Math.max(100, interval + randomOffset);
+}
 
 /** Resource state including cached data and metadata */
 export interface ResourceState<T> {
@@ -46,6 +70,8 @@ export interface PollingConfig<T> {
 	endpoint: string;
 	/** Polling interval in milliseconds */
 	interval: number;
+	/** Jitter in ms (± jitter) to prevent thundering herd. Defaults to 10% of interval */
+	jitter?: number;
 	/** Whether to start polling immediately */
 	enabled?: boolean;
 	/** Whether to pause polling when tab is hidden */
@@ -73,7 +99,8 @@ const DEFAULT_CONFIG = {
 	pauseWhenOffline: true,
 	maxRetries: 3,
 	staleTime: 5000,
-	cacheTime: 300000
+	cacheTime: 300000,
+	jitter: 0 // Will be computed as 10% of interval if not specified
 };
 
 /** Polling instance for a single resource */
@@ -96,6 +123,11 @@ class PollingInstance<T> {
 
 	constructor(config: PollingConfig<T>) {
 		this.#config = { ...DEFAULT_CONFIG, ...config } as Required<PollingConfig<T>>;
+
+		// Compute default jitter as 10% of interval if not specified
+		if (config.jitter === undefined) {
+			this.#config.jitter = Math.floor(this.#config.interval * 0.1);
+		}
 
 		if (browser && this.#config.enabled) {
 			this.start();
@@ -150,7 +182,7 @@ class PollingInstance<T> {
 		this.#clearTimer();
 		await this.#fetch();
 		if (this.#isPolling && !this.#isPaused) {
-			this.#scheduleFetch(this.#config.interval);
+			this.#scheduleFetch(this.#config.interval, true);
 		}
 	}
 
@@ -166,7 +198,7 @@ class PollingInstance<T> {
 		this.stop();
 	}
 
-	#scheduleFetch(delay: number) {
+	#scheduleFetch(delay: number, applyJitter = false) {
 		this.#clearTimer();
 
 		if (this.#isPaused) return;
@@ -181,13 +213,17 @@ class PollingInstance<T> {
 			return;
 		}
 
+		// Apply jitter to prevent thundering herd on recurring polls
+		const actualDelay = applyJitter ? addJitter(delay, this.#config.jitter) : delay;
+
 		this.#timerId = setTimeout(() => {
 			this.#fetch().then(() => {
 				if (this.#isPolling && !this.#isPaused) {
-					this.#scheduleFetch(this.#config.interval);
+					// Apply jitter for subsequent polls
+					this.#scheduleFetch(this.#config.interval, true);
 				}
 			});
-		}, delay);
+		}, actualDelay);
 	}
 
 	async #fetch() {
@@ -309,10 +345,12 @@ class PollingManager {
 			});
 		}
 
-		// Pause when offline, resume when online
+		// Pause when offline, resume and invalidate cache when online
 		this.#unsubscribers.push(
 			networkState.onStatusChange((isOnline) => {
 				if (isOnline) {
+					// Invalidate all cache entries for immediate refresh on reconnect
+					swrCache.invalidateAll();
 					this.resumeAll();
 				} else {
 					this.pauseAll();
@@ -432,9 +470,9 @@ export function removePolling(key: string): void {
  * });
  */
 export function createMultiTierPolling<T = unknown>(config: {
-	critical?: Array<Omit<PollingConfig<T>, 'interval'>>;
-	normal?: Array<Omit<PollingConfig<T>, 'interval'>>;
-	background?: Array<Omit<PollingConfig<T>, 'interval'>>;
+	critical?: Array<Omit<PollingConfig<T>, 'interval' | 'jitter'>>;
+	normal?: Array<Omit<PollingConfig<T>, 'interval' | 'jitter'>>;
+	background?: Array<Omit<PollingConfig<T>, 'interval' | 'jitter'>>;
 }) {
 	const instances = {
 		critical: [] as PollingInstance<T>[],
@@ -444,19 +482,19 @@ export function createMultiTierPolling<T = unknown>(config: {
 
 	if (config.critical) {
 		instances.critical = config.critical.map((c) =>
-			usePolling({ ...c, interval: POLLING_TIERS.FAST })
+			usePolling({ ...c, interval: POLLING_TIERS.FAST, jitter: POLLING_JITTER.FAST })
 		);
 	}
 
 	if (config.normal) {
 		instances.normal = config.normal.map((c) =>
-			usePolling({ ...c, interval: POLLING_TIERS.MEDIUM })
+			usePolling({ ...c, interval: POLLING_TIERS.MEDIUM, jitter: POLLING_JITTER.MEDIUM })
 		);
 	}
 
 	if (config.background) {
 		instances.background = config.background.map((c) =>
-			usePolling({ ...c, interval: POLLING_TIERS.SLOW })
+			usePolling({ ...c, interval: POLLING_TIERS.SLOW, jitter: POLLING_JITTER.SLOW })
 		);
 	}
 
