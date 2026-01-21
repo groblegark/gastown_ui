@@ -167,21 +167,30 @@ export const GtStatusSchema = z
 export type GtStatus = z.infer<typeof GtStatusSchema>;
 
 /**
- * Bead status values
+ * Bead STORAGE status - what gastown CLI returns
+ * NOTE: Gastown only stores 'open' or 'closed'. Display statuses like
+ * 'in_progress', 'blocked', 'hooked' are DERIVED in the UI layer.
  */
-export const BdBeadStatusSchema = z.enum(['open', 'in_progress', 'closed', 'hooked']);
+export const BdBeadStorageStatusSchema = z.enum(['open', 'closed']);
 
-export type BdBeadStatus = z.infer<typeof BdBeadStatusSchema>;
+export type BdBeadStorageStatus = z.infer<typeof BdBeadStorageStatusSchema>;
+
+/**
+ * @deprecated Use BdBeadStorageStatusSchema for CLI validation
+ */
+export const BdBeadStatusSchema = BdBeadStorageStatusSchema;
 
 /**
  * Bead (work item) from `bd list --json` or `bd show --json`
+ * NOTE: status is storage status ('open'|'closed'). Use deriveDisplayStatus()
+ * to compute display status from context fields (hook_bead, blocked_by_count, assignee).
  */
 export const BdBeadSchema = z
 	.object({
 		id: z.string(),
 		title: z.string(),
 		description: z.string(),
-		status: BdBeadStatusSchema,
+		status: BdBeadStorageStatusSchema,
 		priority: z.number().int().min(0).max(4),
 		issue_type: z.string(),
 		assignee: z.string().nullable().optional(),
@@ -191,7 +200,10 @@ export const BdBeadSchema = z
 		labels: z.array(z.string()),
 		ephemeral: z.boolean(),
 		parent_id: z.string().nullable().optional(),
-		children: z.array(z.string()).optional()
+		children: z.array(z.string()).optional(),
+		// Fields used to derive display status
+		hook_bead: z.boolean().optional(),
+		blocked_by_count: z.number().int().min(0).optional()
 	})
 	.passthrough();
 

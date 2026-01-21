@@ -92,16 +92,31 @@ describe('CLI Contracts - Valid Inputs', () => {
 			if (result.success) {
 				expect(result.data.id).toBe('gu-amx');
 				expect(result.data.title).toBe('Implement user authentication');
-				expect(result.data.status).toBe('in_progress');
+				// Storage status is 'open' - display status derived from context fields
+				expect(result.data.status).toBe('open');
 				expect(result.data.labels).toContain('auth');
+				// Context fields for status derivation
+				expect(result.data.hook_bead).toBe(false);
+				expect(result.data.blocked_by_count).toBe(0);
 			}
 		});
 
-		it('accepts all valid bead statuses', () => {
-			const statuses = ['open', 'in_progress', 'closed', 'hooked'] as const;
+		it('accepts all valid bead STORAGE statuses', () => {
+			// NOTE: Only 'open'|'closed' are valid storage statuses
+			// Display statuses (in_progress, blocked, hooked) are DERIVED in UI layer
+			const statuses = ['open', 'closed'] as const;
 			for (const status of statuses) {
 				const result = BdBeadStatusSchema.safeParse(status);
-				expect(result.success, `Status "${status}" should be valid`).toBe(true);
+				expect(result.success, `Storage status "${status}" should be valid`).toBe(true);
+			}
+		});
+
+		it('rejects display statuses in storage schema', () => {
+			// These are DISPLAY statuses, not valid for storage
+			const displayStatuses = ['in_progress', 'blocked', 'hooked'] as const;
+			for (const status of displayStatuses) {
+				const result = BdBeadStatusSchema.safeParse(status);
+				expect(result.success, `Display status "${status}" should NOT be valid for storage`).toBe(false);
 			}
 		});
 	});

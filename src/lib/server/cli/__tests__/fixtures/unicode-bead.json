@@ -12,5 +12,7 @@
 	"labels": ["i18n", "国際化", "🌍"],
 	"ephemeral": false,
 	"parent_id": null,
-	"children": []
+	"children": [],
+	"hook_bead": false,
+	"blocked_by_count": 0
 }

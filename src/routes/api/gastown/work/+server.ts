@@ -2,18 +2,24 @@
  * Work API Endpoint
  *
  * Returns all work items from the beads database with filtering support.
+ * NOTE: Bead storage status is 'open'|'closed'. Display status is DERIVED.
  */
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getProcessSupervisor } from '$lib/server/cli';
 import { randomUUID } from 'node:crypto';
+import { deriveDisplayStatus, type MRStatus } from '$lib/utils/status';
+import type { BdBeadDisplayStatus } from '$lib/types/gastown';
+
+/** WorkItem display status - derived from storage status + context */
+type WorkItemStatus = 'open' | 'in_progress' | 'done' | 'blocked';
 
 interface WorkItem {
 	id: string;
 	title: string;
 	description?: string;
-	status: 'open' | 'in_progress' | 'done' | 'blocked';
+	status: WorkItemStatus;
 	priority: number;
 	type: 'task' | 'bug' | 'feature' | 'epic';
 	assignee: string | null;
@@ -23,11 +29,15 @@ interface WorkItem {
 	createdBy: string;
 }
 
+/**
+ * Raw bead from CLI - status is storage status ('open'|'closed')
+ * Display status derived from: status + hook_bead + blocked_by_count + assignee
+ */
 interface BdBead {
 	id: string;
 	title: string;
 	description?: string;
-	status: string;
+	status: 'open' | 'closed'; // Storage status only
 	priority: number;
 	issue_type: string;
 	assignee?: string;
@@ -35,27 +45,43 @@ interface BdBead {
 	created_at: string;
 	updated_at: string;
 	created_by: string;
+	// Fields for deriving display status
+	hook_bead?: boolean;
+	blocked_by_count?: number;
 }
 
+/**
+ * Transform raw bead to WorkItem with derived display status
+ * Uses deriveDisplayStatus() to compute UI-friendly status from storage status + context
+ */
 function transformBead(bead: BdBead): WorkItem {
 	const allowedTypes = new Set(['task', 'bug', 'feature', 'epic']);
 	const type = allowedTypes.has(bead.issue_type) ? bead.issue_type : 'task';
-	const statusMap: Record<string, WorkItem['status']> = {
+
+	// Derive display status from storage status + context fields
+	const displayStatus = deriveDisplayStatus({
+		status: bead.status,
+		hook_bead: bead.hook_bead,
+		blocked_by_count: bead.blocked_by_count,
+		assignee: bead.assignee
+	});
+
+	// Map BdBeadDisplayStatus to WorkItemStatus
+	const statusMap: Record<BdBeadDisplayStatus, WorkItemStatus> = {
 		open: 'open',
 		in_progress: 'in_progress',
-		closed: 'done',
-		hooked: 'in_progress',
 		blocked: 'blocked',
-		done: 'done'
+		closed: 'done',
+		hooked: 'in_progress' // Hooked beads show as in_progress
 	};
 
 	return {
 		id: bead.id,
 		title: bead.title,
 		description: bead.description,
-		status: statusMap[bead.status] ?? 'open',
+		status: statusMap[displayStatus],
 		priority: Math.min(4, Math.max(0, bead.priority)),
-		type,
+		type: type as WorkItem['type'],
 		assignee: bead.assignee ?? null,
 		labels: bead.labels || [],
 		createdAt: bead.created_at,

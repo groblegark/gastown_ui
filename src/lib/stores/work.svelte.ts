@@ -11,10 +11,16 @@ import type { ApiResponse } from '$lib/api/types';
 
 const browser = typeof window !== 'undefined';
 
+/**
+ * Work item with DISPLAY status (derived from storage status + context)
+ * NOTE: Gastown stores only 'open'|'closed'. Display statuses like
+ * 'in_progress', 'blocked' are derived by the API from context fields.
+ */
 export interface WorkItem {
 	id: string;
 	title: string;
 	type: 'task' | 'bug' | 'feature' | 'epic';
+	/** Display status - derived from storage status + assignee/blocked/hook context */
 	status: 'open' | 'in_progress' | 'review' | 'done' | 'blocked';
 	priority: number;
 	assignee?: string | null;
