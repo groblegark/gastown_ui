@@ -40,6 +40,12 @@ export default defineConfig({
 			name: 'Mobile Safari',
 			use: { ...devices['iPhone 12'] },
 		},
+		// Accessibility testing project
+		{
+			name: 'a11y',
+			testDir: './tests/a11y',
+			use: { ...devices['Desktop Chrome'] },
+		},
 	],
 
 	// Run local dev server before starting tests

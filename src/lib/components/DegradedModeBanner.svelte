@@ -194,7 +194,7 @@
 {#if showBanner && degradedReason}
 	<div
 		class={cn(
-			'fixed top-0 left-0 right-0 z-40',
+			'fixed top-0 left-0 right-0 z-50',
 			'bg-warning/10 border-b border-warning/30',
 			'animate-blur-fade-down',
 			className
@@ -204,7 +204,7 @@
 		aria-atomic="true"
 	>
 		<div class="container mx-auto px-4 py-3">
-			<div class="flex items-center gap-3">
+			<div class="flex items-center gap-6">
 				<!-- Status icon - varies by degraded state -->
 				{#if degradedReason.icon === 'offline'}
 					<WifiOff class="w-5 h-5 text-warning shrink-0" aria-hidden="true" />
@@ -223,14 +223,14 @@
 					</p>
 				</div>
 
-				<!-- Retry button -->
+				<!-- Retry button (h-10 = 40px, meets WCAG 2.2 AA target size with gap) -->
 				<button
 					type="button"
 					onclick={handleRetry}
 					disabled={isRetrying}
 					class={cn(
-						'inline-flex items-center gap-1.5 px-3 py-1.5',
-						'text-xs font-medium',
+						'inline-flex items-center justify-center gap-2 px-4 h-10',
+						'text-sm font-medium',
 						'bg-warning/20 hover:bg-warning/30',
 						'text-warning-foreground',
 						'rounded-md',
@@ -241,26 +241,26 @@
 					aria-label="Retry connection"
 				>
 					<RefreshCw
-						class={cn('w-3.5 h-3.5', isRetrying && 'animate-spin')}
+						class={cn('w-4 h-4', isRetrying && 'animate-spin')}
 						aria-hidden="true"
 					/>
 					<span>Retry</span>
 				</button>
 
-				<!-- Dismiss button -->
+				<!-- Dismiss button (h-10 w-10 = 40px, meets WCAG 2.2 AA target size) -->
 				<button
 					type="button"
 					onclick={handleDismiss}
 					class={cn(
-						'p-1 -m-1',
+						'flex items-center justify-center h-10 w-10',
 						'text-muted-foreground hover:text-foreground',
 						'transition-colors',
-						'rounded',
+						'rounded-md',
 						'focus-ring'
 					)}
 					aria-label="Dismiss degraded mode banner"
 				>
-					<X class="w-4 h-4" aria-hidden="true" />
+					<X class="w-5 h-5" aria-hidden="true" />
 				</button>
 			</div>
 		</div>

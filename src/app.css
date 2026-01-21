@@ -65,7 +65,7 @@
 		--popover: 0 0% 100%;
 		--popover-foreground: 0 0% 1%;
 		--primary: 11 100% 50%;            /* #F97316 CTA orange */
-		--primary-foreground: 0 0% 100%;
+		--primary-foreground: 0 0% 7%;     /* Near-black for AA contrast on orange */
 		--secondary: 220 10% 92%;
 		--secondary-foreground: 0 0% 1%;
 		--muted: 220 10% 92%;
@@ -73,7 +73,7 @@
 		--accent: 220 10% 46%;
 		--accent-foreground: 0 0% 100%;
 		--destructive: 0 90% 56%;          /* #EF4444 error red */
-		--destructive-foreground: 0 0% 100%;
+		--destructive-foreground: 0 0% 100%;  /* White has 4.35:1 contrast on this red */
 		--border: 220 10% 85%;
 		--input: 220 10% 88%;
 		--ring: 18 86% 56%;

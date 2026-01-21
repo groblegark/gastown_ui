@@ -28,7 +28,7 @@
 		variants: {
 			active: {
 				true: [
-					'bg-primary/10 text-primary',
+					'bg-primary/15 text-foreground font-medium',
 					'border-r-[3px] border-primary',
 					'shadow-[inset_4px_0_8px_-4px_hsl(var(--primary)/0.3)]'
 				],
@@ -52,7 +52,7 @@
 	const groupHeaderVariants = tv({
 		base: [
 			'text-[10px] font-semibold uppercase tracking-[0.1em]',
-			'text-muted-foreground/60 mb-2 px-3',
+			'text-muted-foreground mb-2 px-3',
 			'transition-opacity duration-200'
 		],
 		variants: {
@@ -276,13 +276,14 @@
 			aria-hidden="true"
 		></div>
 
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions a11y_no_noninteractive_tabindex -->
 		<nav
 			bind:this={navRef}
 			onscroll={updateScrollState}
-			class="h-full overflow-y-auto py-4 px-2"
+			class="h-full overflow-y-auto py-4 px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
 			aria-label="Sidebar navigation"
 			onkeydown={handleKeyDown}
+			tabindex="0"
 		>
 		{#each navGroups as group, groupIndex}
 			<!-- Section divider with 24px vertical margins (except first group) -->
