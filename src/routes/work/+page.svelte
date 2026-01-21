@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { GridPattern, IssueTypeSelector, SkeletonCard, ErrorState, EmptyState, FloatingActionButton } from '$lib/components';
-	import { ClipboardList, PenLine, Target, Truck, ChevronDown, CheckSquare, Bug, Lightbulb, BookOpen, Plus } from 'lucide-svelte';
+	import { GridPattern, IssueTypeSelector, SkeletonCard, ErrorState, EmptyState, FloatingActionButton, WorkItemCard, WorkItemDetail, type WorkItem } from '$lib/components';
+	import { ClipboardList, PenLine, Target, Truck, ChevronDown, ChevronUp, CheckSquare, Bug, Lightbulb, BookOpen, Plus, Search, X, ArrowUpDown } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { hapticMedium, hapticSuccess, hapticError } from '$lib/utils/haptics';
+	import { hapticMedium, hapticSuccess, hapticError, hapticLight } from '$lib/utils/haptics';
 	import { cn } from '$lib/utils';
 	import { z } from 'zod';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	let { data } = $props();
-	
+
 	let isLoading = $state(true);
 
 	// Issue creation form state
@@ -34,9 +37,8 @@
 		issue: z.string().min(1, 'Issue is required'),
 		rig: z.string().min(1, 'Rig is required')
 	});
-	
+
 	onMount(() => {
-		// Simulate data loading with small delay
 		isLoading = false;
 	});
 
@@ -57,18 +59,152 @@
 	// Local copy of issues that updates after creation
 	let localIssues = $state<typeof data.issues>([]);
 
-	// Filter and sort state
+	// Search state with debouncing
+	let searchQuery = $state('');
+	let searchInput = $state('');
+	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+	// Filter and sort state - initialized from URL
 	let filters = $state({
 		type: 'all' as 'all' | 'task' | 'bug' | 'feature' | 'epic',
 		priority: 'all' as 'all' | 0 | 1 | 2 | 3 | 4,
 		status: 'all' as 'all' | 'open' | 'in_progress' | 'done'
 	});
-	let sortBy = $state('id' as 'id' | 'priority' | 'type');
+	let sortBy = $state('id' as 'id' | 'priority' | 'type' | 'updated');
 	let sortOrder = $state('asc' as 'asc' | 'desc');
+
+	// Detail panel state
+	let expandedItemId = $state<string | null>(null);
+	let detailPanelOpen = $state(false);
+	let selectedDetailItem = $state<WorkItem | null>(null);
+
+	// Initialize from URL params
+	$effect(() => {
+		if (browser) {
+			const url = $page.url;
+			const typeParam = url.searchParams.get('type');
+			const priorityParam = url.searchParams.get('priority');
+			const statusParam = url.searchParams.get('status');
+			const sortParam = url.searchParams.get('sort');
+			const orderParam = url.searchParams.get('order');
+			const searchParam = url.searchParams.get('q');
+
+			if (typeParam && ['all', 'task', 'bug', 'feature', 'epic'].includes(typeParam)) {
+				filters.type = typeParam as typeof filters.type;
+			}
+			if (priorityParam) {
+				if (priorityParam === 'all') {
+					filters.priority = 'all';
+				} else {
+					const p = parseInt(priorityParam, 10);
+					if (!isNaN(p) && p >= 0 && p <= 4) {
+						filters.priority = p as 0 | 1 | 2 | 3 | 4;
+					}
+				}
+			}
+			if (statusParam && ['all', 'open', 'in_progress', 'done'].includes(statusParam)) {
+				filters.status = statusParam as typeof filters.status;
+			}
+			if (sortParam && ['id', 'priority', 'type', 'updated'].includes(sortParam)) {
+				sortBy = sortParam as typeof sortBy;
+			}
+			if (orderParam && ['asc', 'desc'].includes(orderParam)) {
+				sortOrder = orderParam as typeof sortOrder;
+			}
+			if (searchParam) {
+				searchQuery = searchParam;
+				searchInput = searchParam;
+			}
+		}
+	});
+
+	// Update URL when filters change
+	function updateUrl() {
+		if (!browser) return;
+
+		const url = new URL($page.url);
+
+		// Set or remove params based on defaults
+		if (filters.type !== 'all') {
+			url.searchParams.set('type', filters.type);
+		} else {
+			url.searchParams.delete('type');
+		}
+
+		if (filters.priority !== 'all') {
+			url.searchParams.set('priority', String(filters.priority));
+		} else {
+			url.searchParams.delete('priority');
+		}
+
+		if (filters.status !== 'all') {
+			url.searchParams.set('status', filters.status);
+		} else {
+			url.searchParams.delete('status');
+		}
+
+		if (sortBy !== 'id') {
+			url.searchParams.set('sort', sortBy);
+		} else {
+			url.searchParams.delete('sort');
+		}
+
+		if (sortOrder !== 'asc') {
+			url.searchParams.set('order', sortOrder);
+		} else {
+			url.searchParams.delete('order');
+		}
+
+		if (searchQuery) {
+			url.searchParams.set('q', searchQuery);
+		} else {
+			url.searchParams.delete('q');
+		}
+
+		goto(url.toString(), { replaceState: true, noScroll: true });
+	}
+
+	// Debounced search
+	function handleSearchInput(e: Event) {
+		const value = (e.target as HTMLInputElement).value;
+		searchInput = value;
+
+		if (searchDebounceTimer) {
+			clearTimeout(searchDebounceTimer);
+		}
+
+		searchDebounceTimer = setTimeout(() => {
+			searchQuery = value;
+			updateUrl();
+		}, 300);
+	}
+
+	function clearSearch() {
+		searchInput = '';
+		searchQuery = '';
+		updateUrl();
+		hapticLight();
+	}
+
+	// Update URL when filters/sort change
+	$effect(() => {
+		if (browser && !isLoading) {
+			updateUrl();
+		}
+	});
 
 	// Filtered and sorted issues
 	const filteredIssues = $derived.by(() => {
 		let result = [...localIssues];
+
+		// Apply search
+		if (searchQuery.trim()) {
+			const query = searchQuery.toLowerCase();
+			result = result.filter(i =>
+				i.id.toLowerCase().includes(query) ||
+				i.title.toLowerCase().includes(query)
+			);
+		}
 
 		// Apply filters
 		if (filters.type !== 'all') {
@@ -83,17 +219,19 @@
 
 		// Apply sorting
 		result.sort((a, b) => {
-			let aVal: any;
-			let bVal: any;
-			
+			let aVal: string | number;
+			let bVal: string | number;
+
 			if (sortBy === 'priority') {
 				aVal = a.priority;
 				bVal = b.priority;
 			} else if (sortBy === 'type') {
 				aVal = a.type;
 				bVal = b.type;
+			} else if (sortBy === 'updated') {
+				aVal = a.updated || a.id;
+				bVal = b.updated || b.id;
 			} else {
-				// Default to ID (insertion order)
 				aVal = a.id;
 				bVal = b.id;
 			}
@@ -105,6 +243,19 @@
 
 		return result;
 	});
+
+	// Convert to WorkItem format for the card component
+	const workItems = $derived<WorkItem[]>(filteredIssues.map(issue => ({
+		id: issue.id,
+		title: issue.title,
+		type: issue.type as WorkItem['type'],
+		status: issue.status as WorkItem['status'],
+		priority: issue.priority as WorkItem['priority'],
+		assignee: (issue as { assignee?: string }).assignee,
+		description: (issue as { description?: string }).description,
+		created: (issue as { created?: string }).created,
+		updated: (issue as { updated?: string }).updated
+	})));
 
 	// Sync with server data
 	$effect(() => {
@@ -131,7 +282,6 @@
 		issueMessage = null;
 		issueErrors = {};
 
-		// Validate form
 		const result = issueSchema.safeParse({
 			title: issueTitle,
 			type: issueType,
@@ -148,7 +298,7 @@
 		}
 
 		issueSubmitting = true;
-		hapticMedium(); // Medium haptic on form submission
+		hapticMedium();
 
 		try {
 			const res = await fetch('/api/gastown/work/issues', {
@@ -167,16 +317,14 @@
 				throw new Error(data.error || 'Failed to create issue');
 			}
 
-			hapticSuccess(); // Success haptic on successful submission
+			hapticSuccess();
 			issueMessage = { type: 'success', text: `Created issue: ${data.id}` };
-			// Add to local issues list
 			localIssues = [...localIssues, data];
-			// Reset form
 			issueTitle = '';
 			issueType = 'task';
 			issuePriority = 2;
 		} catch (error) {
-			hapticError(); // Error haptic on failure
+			hapticError();
 			issueMessage = { type: 'error', text: error instanceof Error ? error.message : 'Failed to create issue' };
 		} finally {
 			issueSubmitting = false;
@@ -188,7 +336,6 @@
 		convoyMessage = null;
 		convoyErrors = {};
 
-		// Validate form
 		const result = convoySchema.safeParse({
 			name: convoyName,
 			issues: selectedIssues
@@ -204,7 +351,7 @@
 		}
 
 		convoySubmitting = true;
-		hapticMedium(); // Medium haptic on form submission
+		hapticMedium();
 
 		try {
 			const res = await fetch('/api/gastown/work/convoys', {
@@ -222,13 +369,12 @@
 				throw new Error(data.error || 'Failed to create convoy');
 			}
 
-			hapticSuccess(); // Success haptic on successful submission
+			hapticSuccess();
 			convoyMessage = { type: 'success', text: data.message || 'Convoy created successfully' };
-			// Reset form
 			convoyName = '';
 			selectedIssues = [];
 		} catch (error) {
-			hapticError(); // Error haptic on failure
+			hapticError();
 			convoyMessage = { type: 'error', text: error instanceof Error ? error.message : 'Failed to create convoy' };
 		} finally {
 			convoySubmitting = false;
@@ -240,7 +386,6 @@
 		slingMessage = null;
 		slingErrors = {};
 
-		// Validate form
 		const result = slingSchema.safeParse({
 			issue: slingIssue,
 			rig: slingRig
@@ -256,7 +401,7 @@
 		}
 
 		slingSubmitting = true;
-		hapticMedium(); // Medium haptic on form submission
+		hapticMedium();
 
 		try {
 			const res = await fetch('/api/gastown/work/sling', {
@@ -274,13 +419,12 @@
 				throw new Error(data.error || 'Failed to sling work');
 			}
 
-			hapticSuccess(); // Success haptic on successful submission
+			hapticSuccess();
 			slingMessage = { type: 'success', text: data.message || 'Work slung successfully' };
-			// Reset form
 			slingIssue = '';
 			slingRig = '';
 		} catch (error) {
-			hapticError(); // Error haptic on failure
+			hapticError();
 			slingMessage = { type: 'error', text: error instanceof Error ? error.message : 'Failed to sling work' };
 		} finally {
 			slingSubmitting = false;
@@ -294,6 +438,39 @@
 			selectedIssues = [...selectedIssues, id];
 		}
 	}
+
+	function handleItemExpand(id: string) {
+		if (expandedItemId === id) {
+			expandedItemId = null;
+		} else {
+			expandedItemId = id;
+		}
+	}
+
+	function handleOpenDetail(id: string) {
+		const item = workItems.find(i => i.id === id);
+		if (item) {
+			selectedDetailItem = item;
+			detailPanelOpen = true;
+		}
+	}
+
+	function handleCloseDetail() {
+		detailPanelOpen = false;
+		setTimeout(() => {
+			selectedDetailItem = null;
+		}, 300);
+	}
+
+	function toggleSortOrder() {
+		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+		hapticLight();
+	}
+
+	function setFilter(key: keyof typeof filters, value: typeof filters[keyof typeof filters]) {
+		(filters as Record<string, unknown>)[key] = value;
+		hapticLight();
+	}
 </script>
 
 <div class="relative min-h-screen bg-background">
@@ -304,16 +481,214 @@
 			<div class="container h-full flex items-center gap-3">
 				<div class="w-1.5 h-8 bg-primary rounded-sm shadow-glow shrink-0" aria-hidden="true"></div>
 				<div>
-					<h1 class="text-2xl font-display font-semibold text-foreground">Work Management</h1>
-					<p class="text-sm text-muted-foreground">Create issues, convoys, and assign work</p>
+					<h1 class="text-2xl font-display font-semibold text-foreground">Work Items</h1>
+					<p class="text-sm text-muted-foreground">Manage issues, convoys, and assignments</p>
 				</div>
 			</div>
 			<div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" aria-hidden="true"></div>
 		</header>
 
-		<main class="container py-6">
+		<main class="container py-6 space-y-6">
+			<!-- Search Bar -->
+			<div class="panel-glass p-4 mx-auto max-w-lg">
+				<div class="relative">
+					<Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+					<input
+						type="search"
+						value={searchInput}
+						oninput={handleSearchInput}
+						placeholder="Search by ID or title..."
+						class="w-full pl-10 pr-10 py-2 bg-input border border-border rounded-lg
+							   text-foreground placeholder:text-muted-foreground
+							   focus:outline-none focus:ring-2 focus:ring-ring"
+						aria-label="Search work items"
+					/>
+					{#if searchInput}
+						<button
+							type="button"
+							onclick={clearSearch}
+							class="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+							aria-label="Clear search"
+						>
+							<X class="w-4 h-4" />
+						</button>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Filters & Sort -->
+			<div class="panel-glass p-4 mx-auto max-w-lg space-y-4">
+				<!-- Type filter chips -->
+				<div>
+					<span class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">Type</span>
+					<div class="flex flex-wrap gap-2">
+						{#each [
+							{ label: 'All', value: 'all' },
+							{ label: 'Tasks', value: 'task' },
+							{ label: 'Bugs', value: 'bug' },
+							{ label: 'Features', value: 'feature' },
+							{ label: 'Epics', value: 'epic' }
+						] as chip}
+							<button
+								type="button"
+								class={cn(
+									'px-3 py-1.5 text-xs font-medium rounded-full transition-colors touch-target',
+									filters.type === chip.value
+										? 'bg-primary text-primary-foreground'
+										: 'bg-muted text-muted-foreground hover:bg-muted/80'
+								)}
+								onclick={() => setFilter('type', chip.value as typeof filters.type)}
+								aria-pressed={filters.type === chip.value}
+							>
+								{chip.label}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Priority filter chips -->
+				<div>
+					<span class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">Priority</span>
+					<div class="flex flex-wrap gap-2">
+						{#each [
+							{ label: 'All', value: 'all' },
+							{ label: 'P0', value: 0 },
+							{ label: 'P1', value: 1 },
+							{ label: 'P2', value: 2 },
+							{ label: 'P3', value: 3 }
+						] as chip}
+							<button
+								type="button"
+								class={cn(
+									'px-3 py-1.5 text-xs font-medium rounded-full transition-colors touch-target',
+									filters.priority === chip.value
+										? 'bg-primary text-primary-foreground'
+										: 'bg-muted text-muted-foreground hover:bg-muted/80'
+								)}
+								onclick={() => setFilter('priority', chip.value as typeof filters.priority)}
+								aria-pressed={filters.priority === chip.value}
+							>
+								{chip.label}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Status filter chips -->
+				<div>
+					<span class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">Status</span>
+					<div class="flex flex-wrap gap-2">
+						{#each [
+							{ label: 'All', value: 'all' },
+							{ label: 'Open', value: 'open' },
+							{ label: 'In Progress', value: 'in_progress' },
+							{ label: 'Done', value: 'done' }
+						] as chip}
+							<button
+								type="button"
+								class={cn(
+									'px-3 py-1.5 text-xs font-medium rounded-full transition-colors touch-target',
+									filters.status === chip.value
+										? 'bg-primary text-primary-foreground'
+										: 'bg-muted text-muted-foreground hover:bg-muted/80'
+								)}
+								onclick={() => setFilter('status', chip.value as typeof filters.status)}
+								aria-pressed={filters.status === chip.value}
+							>
+								{chip.label}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Sort controls -->
+				<div class="flex items-center justify-between pt-2 border-t border-border">
+					<div class="flex items-center gap-2">
+						<span class="text-xs font-medium text-muted-foreground">Sort by:</span>
+						<select
+							bind:value={sortBy}
+							class="px-2 py-1 text-xs bg-muted text-foreground rounded border border-border
+								   appearance-none pr-6 cursor-pointer
+								   focus:outline-none focus:ring-2 focus:ring-ring"
+						>
+							<option value="id">ID</option>
+							<option value="priority">Priority</option>
+							<option value="type">Type</option>
+							<option value="updated">Updated</option>
+						</select>
+					</div>
+					<button
+						type="button"
+						onclick={toggleSortOrder}
+						class="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground rounded hover:bg-muted/50 transition-colors touch-target"
+						aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
+					>
+						{#if sortOrder === 'asc'}
+							<ChevronUp class="w-4 h-4" />
+							Asc
+						{:else}
+							<ChevronDown class="w-4 h-4" />
+							Desc
+						{/if}
+					</button>
+				</div>
+			</div>
+
+			<!-- Work Items List -->
+			<section class="panel-glass p-4 mx-auto max-w-lg">
+				<div class="flex items-center justify-between mb-4">
+					<h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+						<ClipboardList class="w-5 h-5 text-foreground" strokeWidth={2} />
+						Items ({filteredIssues.length})
+					</h2>
+				</div>
+
+				{#if isLoading}
+					<SkeletonCard type="work" count={4} />
+				{:else if data.issuesError}
+					<ErrorState
+						title="Failed to load issues"
+						message={data.issuesError}
+						onRetry={() => window.location.reload()}
+						showRetryButton={true}
+						compact={true}
+					/>
+				{:else if localIssues.length === 0}
+					<EmptyState
+						title="No work items"
+						description="Create your first issue to get started"
+						actionLabel="Create Issue"
+						onaction={() => document.getElementById('issue-form')?.scrollIntoView({ behavior: 'smooth' })}
+						size="sm"
+					/>
+				{:else if filteredIssues.length === 0}
+					<EmptyState
+						title="No matches"
+						description="No items match your current filters"
+						actionLabel="Clear Filters"
+						onaction={() => {
+							filters = { type: 'all', priority: 'all', status: 'all' };
+							searchInput = '';
+							searchQuery = '';
+							hapticLight();
+						}}
+						size="sm"
+					/>
+				{:else}
+					<div class="space-y-3">
+						{#each workItems as item (item.id)}
+							<WorkItemCard
+								{item}
+								expanded={expandedItemId === item.id}
+								onexpand={handleItemExpand}
+							/>
+						{/each}
+					</div>
+				{/if}
+			</section>
+
 			<!-- Create Issue Section -->
-			<section class="panel-glass p-6 mx-auto mb-8 max-w-lg">
+			<section id="issue-form" class="panel-glass p-6 mx-auto max-w-lg">
 				<h2 class="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
 					<PenLine class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Create Issue
@@ -342,9 +717,8 @@
 						{/if}
 					</div>
 
-					<!-- Issue Type Selector Component -->
 					<div>
-						<IssueTypeSelector 
+						<IssueTypeSelector
 							options={issueTypes}
 							bind:value={issueType}
 							label="Type"
@@ -364,13 +738,13 @@
 								class="w-full px-3 py-2 bg-input border border-border rounded-lg
 									   text-foreground focus:outline-none focus:ring-2 focus:ring-ring
 									   appearance-none pr-10"
-								>
-									{#each priorities as p}
-										<option value={p.value}>{p.label}</option>
-									{/each}
-								</select>
-								<ChevronDown class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" strokeWidth={2} />
-							</div>
+							>
+								{#each priorities as p}
+									<option value={p.value}>{p.label}</option>
+								{/each}
+							</select>
+							<ChevronDown class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" strokeWidth={2} />
+						</div>
 					</div>
 
 					{#if issueMessage}
@@ -396,7 +770,7 @@
 			</section>
 
 			<!-- Create Convoy Section -->
-			<section class="panel-glass p-6 mx-auto mb-8 max-w-lg">
+			<section class="panel-glass p-6 mx-auto max-w-lg">
 				<h2 class="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
 					<Truck class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Create Convoy
@@ -484,7 +858,7 @@
 			</section>
 
 			<!-- Sling Work Section -->
-			<section class="panel-glass p-6 mx-auto mb-8 max-w-lg">
+			<section class="panel-glass p-6 mx-auto max-w-lg">
 				<h2 class="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
 					<Target class="w-5 h-5 text-foreground" strokeWidth={2} />
 					Sling Work
@@ -570,123 +944,6 @@
 					</button>
 				</form>
 			</section>
-
-			<!-- Current Issues List -->
-			<section class="panel-glass p-6 mx-auto mb-8 max-w-lg">
-				<div class="flex items-center justify-between mb-4">
-					<h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
-						<ClipboardList class="w-5 h-5 text-foreground" strokeWidth={2} />
-						Issues ({filteredIssues.length})
-					</h2>
-					<!-- Sort dropdown -->
-					<div class="relative inline-block">
-						<select
-							bind:value={sortBy}
-							class="px-3 py-1 text-xs bg-muted text-muted-foreground rounded border border-border
-								   appearance-none pr-8 cursor-pointer
-								   focus:outline-none focus:ring-2 focus:ring-ring"
-						>
-							<option value="id">ID</option>
-							<option value="priority">Priority</option>
-							<option value="type">Type</option>
-						</select>
-						<ChevronDown class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
-					</div>
-				</div>
-
-				{#if isLoading}
-					<!-- Show skeleton loaders while loading -->
-					<SkeletonCard type="work" count={4} />
-				{:else if data.issuesError}
-					<ErrorState
-						title="Failed to load issues"
-						message={data.issuesError}
-						onRetry={() => window.location.reload()}
-						showRetryButton={true}
-						compact={true}
-					/>
-				{:else if localIssues.length === 0}
-					<EmptyState
-						title="No open issues"
-						description="Create your first issue to get started"
-						actionLabel="Create Issue"
-						onaction={() => document.getElementById('issue-form')?.scrollIntoView({ behavior: 'smooth' })}
-						size="sm"
-					/>
-				{:else}
-					<!-- Filter chips -->
-					<div class="flex flex-wrap gap-2 mb-4">
-						{#each [
-							{ label: 'All Types', value: 'all', key: 'type' },
-							{ label: 'Tasks', value: 'task', key: 'type' },
-							{ label: 'Bugs', value: 'bug', key: 'type' },
-							{ label: 'Features', value: 'feature', key: 'type' },
-							{ label: 'Epics', value: 'epic', key: 'type' }
-						] as chip}
-							<button
-								type="button"
-								class={cn(
-									'px-3 py-1 text-xs font-medium rounded-full transition-colors',
-									filters.type === chip.value
-										? 'bg-primary text-primary-foreground'
-										: 'bg-muted text-muted-foreground hover:bg-muted/80'
-								)}
-								onclick={() => filters.type = chip.value as any}
-								aria-pressed={filters.type === chip.value}
-							>
-								{chip.label}
-							</button>
-						{/each}
-					</div>
-
-					<!-- Priority filter -->
-					<div class="flex flex-wrap gap-2 mb-4">
-						{#each [
-							{ label: 'All Priorities', value: 'all', key: 'priority' },
-							{ label: 'P0 - Critical', value: 0, key: 'priority' },
-							{ label: 'P1 - High', value: 1, key: 'priority' },
-							{ label: 'P2 - Medium', value: 2, key: 'priority' },
-							{ label: 'P3 - Low', value: 3, key: 'priority' }
-						] as chip}
-							<button
-								type="button"
-								class={cn(
-									'px-3 py-1 text-xs font-medium rounded-full transition-colors',
-									filters.priority === chip.value
-										? 'bg-primary text-primary-foreground'
-										: 'bg-muted text-muted-foreground hover:bg-muted/80'
-								)}
-								onclick={() => filters.priority = chip.value as any}
-								aria-pressed={filters.priority === chip.value}
-							>
-								{chip.label}
-							</button>
-						{/each}
-					</div>
-
-					<!-- Issues list -->
-					<div class="space-y-2">
-						{#each filteredIssues as issue}
-							<div class="flex items-center gap-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-								<span class="font-mono text-sm text-primary">{issue.id}</span>
-								<span class="flex-1 text-sm text-foreground truncate">{issue.title}</span>
-								<span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-									{issue.type}
-								</span>
-								<span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-									P{issue.priority}
-								</span>
-							</div>
-						{/each}
-					</div>
-
-					{#if filteredIssues.length === 0 && localIssues.length > 0}
-						<div class="text-center py-6 text-muted-foreground">
-							<p class="text-sm">No issues match your filters</p>
-						</div>
-					{/if}
-				{/if}
-			</section>
 		</main>
 
 		<!-- Mobile create issue FAB -->
@@ -697,4 +954,11 @@
 			<Plus class="w-5 h-5" strokeWidth={2.5} />
 		</FloatingActionButton>
 	</div>
+
+	<!-- Work Item Detail Panel -->
+	<WorkItemDetail
+		item={selectedDetailItem}
+		open={detailPanelOpen}
+		onclose={handleCloseDetail}
+	/>
 </div>

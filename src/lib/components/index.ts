@@ -29,6 +29,8 @@ export { default as UnreadDot } from './UnreadDot.svelte';
 export { default as EmptyState, emptyStateVariants, emptyStatePresets, type EmptyStatePreset, type EmptyStateProps, type EmptyStateVariants } from './EmptyState.svelte';
 export { default as StatsCard, statsCardVariants, type TrendDirection, type SparklinePoint, type StatusBreakdown, type StatsCardProps, type StatsCardVariants } from './StatsCard.svelte';
 export { default as DataTable, dataTableVariants, type Column, type DataTableProps, type DataTableVariants } from './DataTable.svelte';
+export { default as WorkItemCard, workItemCardVariants, type WorkItem, type WorkItemCardProps } from './WorkItemCard.svelte';
+export { default as WorkItemDetail, workItemDetailVariants, type WorkItemDetailProps } from './WorkItemDetail.svelte';
 
 // Layout components
 export { default as AgentDetailLayout } from './AgentDetailLayout.svelte';
