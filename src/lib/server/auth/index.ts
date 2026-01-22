@@ -17,3 +17,11 @@ export {
 	type UserPayload,
 	type TokenType
 } from './jwt';
+
+export {
+	verifyAuth,
+	requireAuth,
+	AuthError,
+	type AuthResult,
+	type AuthErrorCode
+} from './verify';
