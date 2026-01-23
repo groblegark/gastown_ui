@@ -12,3 +12,5 @@ export {
 	type BeadPriority,
 	type MailPriority
 } from './priority';
+
+export { normalizeAddress, formatDisplayAddress, isValidAddress } from './address';
