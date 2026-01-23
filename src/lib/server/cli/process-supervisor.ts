@@ -186,10 +186,10 @@ export class ProcessSupervisor {
 
 	destroy(): void {
 		this.destroyed = true;
-		for (const [id, process] of this.activeProcesses) {
+		this.activeProcesses.forEach((process, id) => {
 			process.kill('SIGKILL');
 			this.activeProcesses.delete(id);
-		}
+		});
 		this.limiter.clear();
 	}
 
@@ -209,4 +209,11 @@ export function getProcessSupervisor(config?: Partial<ProcessSupervisorConfig>):
 
 export function resetProcessSupervisor(): void {
 	globalSupervisor = null;
+}
+
+export function destroyProcessSupervisor(): void {
+	if (globalSupervisor) {
+		globalSupervisor.destroy();
+		globalSupervisor = null;
+	}
 }
