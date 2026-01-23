@@ -22,6 +22,9 @@ export interface GastownConfig {
 	gtBin: string;          // GASTOWN_GT_BIN (default: 'gt')
 	bdBin: string;          // GASTOWN_BD_BIN (default: 'bd')
 
+	// Rig configuration
+	rigName: string;        // GASTOWN_RIG (default: 'default')
+
 	// Timeouts (ms)
 	cliTimeout: number;     // Default 30000
 	cloneTimeout: number;   // Default 180000
@@ -57,6 +60,7 @@ export interface ValidationResult {
 export const DEFAULT_CONFIG: Omit<GastownConfig, 'townRoot' | 'gastownHome' | 'bdCwd' | 'cliEnv'> = {
 	gtBin: 'gt',
 	bdBin: 'bd',
+	rigName: 'default',
 	cliTimeout: 30_000,
 	cloneTimeout: 180_000,
 	pollCritical: 5_000,
@@ -99,12 +103,20 @@ function parseEnv(): Partial<GastownConfig> {
 		return value.toLowerCase() === 'true' || value === '1';
 	};
 
+	// Parse rig name with trimming and default handling
+	const parseRigName = (value: string | undefined): string => {
+		if (!value) return DEFAULT_CONFIG.rigName;
+		const trimmed = value.trim();
+		return trimmed || DEFAULT_CONFIG.rigName;
+	};
+
 	return {
 		townRoot: env.GASTOWN_TOWN_ROOT,
 		gastownHome: env.GASTOWN_HOME || join(env.HOME || '~', '.gastown'),
 		bdCwd: env.GASTOWN_BD_CWD,
 		gtBin: env.GASTOWN_GT_BIN || DEFAULT_CONFIG.gtBin,
 		bdBin: env.GASTOWN_BD_BIN || DEFAULT_CONFIG.bdBin,
+		rigName: parseRigName(env.GASTOWN_RIG),
 		cliTimeout: parseNumber(env.GASTOWN_CLI_TIMEOUT, DEFAULT_CONFIG.cliTimeout),
 		cloneTimeout: parseNumber(env.GASTOWN_CLONE_TIMEOUT, DEFAULT_CONFIG.cloneTimeout),
 		pollCritical: parseNumber(env.GASTOWN_POLL_CRITICAL, DEFAULT_CONFIG.pollCritical),
@@ -205,6 +217,7 @@ export function loadConfig(): GastownConfig {
 		bdCwd: parsedEnv.bdCwd || '',
 		gtBin: parsedEnv.gtBin || DEFAULT_CONFIG.gtBin,
 		bdBin: parsedEnv.bdBin || DEFAULT_CONFIG.bdBin,
+		rigName: parsedEnv.rigName || DEFAULT_CONFIG.rigName,
 		cliTimeout: parsedEnv.cliTimeout || DEFAULT_CONFIG.cliTimeout,
 		cloneTimeout: parsedEnv.cloneTimeout || DEFAULT_CONFIG.cloneTimeout,
 		pollCritical: parsedEnv.pollCritical || DEFAULT_CONFIG.pollCritical,

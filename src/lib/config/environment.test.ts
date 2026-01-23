@@ -173,6 +173,7 @@ describe('Environment Configuration', () => {
 			bdCwd: '/valid/bd/cwd',
 			gtBin: 'gt',
 			bdBin: 'bd',
+			rigName: 'default',
 			cliTimeout: 30_000,
 			cloneTimeout: 180_000,
 			pollCritical: 5_000,
@@ -339,6 +340,7 @@ describe('Environment Configuration', () => {
 				bdCwd: '/secret/path/bd',
 				gtBin: 'gt',
 				bdBin: 'bd',
+				rigName: 'default',
 				cliTimeout: 30_000,
 				cloneTimeout: 180_000,
 				pollCritical: 5_000,
@@ -378,7 +380,8 @@ describe('Environment Configuration', () => {
 				cacheTTL: 2_000,
 				enableWrites: false,
 				demoMode: true,
-				cliEnv: {}
+				cliEnv: {},
+				rigName: 'default'
 			};
 
 			const formatted = formatConfigForLogging(config);
@@ -386,6 +389,48 @@ describe('Environment Configuration', () => {
 			expect(formatted.townRootSet).toBe(false);
 			expect(formatted.gastownHomeSet).toBe(false);
 			expect(formatted.bdCwdSet).toBe(false);
+		});
+	});
+
+	describe('Rig Name Configuration', () => {
+		it('has default rig name', () => {
+			expect(DEFAULT_CONFIG.rigName).toBe('default');
+		});
+
+		it('loads rig name from GASTOWN_RIG environment variable', () => {
+			process.env.GASTOWN_TOWN_ROOT = '/valid/town/root';
+			process.env.GASTOWN_BD_CWD = '/valid/bd/cwd';
+			process.env.GASTOWN_RIG = 'my-custom-rig';
+
+			const config = loadConfig();
+
+			expect(config.rigName).toBe('my-custom-rig');
+		});
+
+		it('uses default when GASTOWN_RIG is not set', () => {
+			process.env.GASTOWN_TOWN_ROOT = '/valid/town/root';
+			process.env.GASTOWN_BD_CWD = '/valid/bd/cwd';
+			delete process.env.GASTOWN_RIG;
+
+			const config = loadConfig();
+
+			expect(config.rigName).toBe('default');
+		});
+
+		it('trims whitespace from rig name', () => {
+			process.env.GASTOWN_RIG = '  my-rig  ';
+
+			const config = loadConfig();
+
+			expect(config.rigName).toBe('my-rig');
+		});
+
+		it('uses default for empty string rig name', () => {
+			process.env.GASTOWN_RIG = '';
+
+			const config = loadConfig();
+
+			expect(config.rigName).toBe('default');
 		});
 	});
 });
