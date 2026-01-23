@@ -85,3 +85,32 @@ export { default as ErrorBoundary } from './ErrorBoundary.svelte';
 export { default as ApiError } from './ApiError.svelte';
 export { default as ErrorState } from './ErrorState.svelte';
 export { default as KnownBugDetector } from './KnownBugDetector.svelte';
+
+// Work components
+export {
+	WorkFilters,
+	WorkList,
+	WorkCreateForm,
+	WorkSlingForm,
+	workFiltersVariants,
+	workListVariants,
+	workCreateFormVariants,
+	workSlingFormVariants,
+	issueSchema,
+	convoySchema,
+	slingSchema
+} from './work';
+export type {
+	FilterType,
+	FilterPriority,
+	FilterStatus,
+	SortBy,
+	SortOrder,
+	WorkFiltersState,
+	LocalIssue,
+	Rig,
+	IssueTypeOption as WorkIssueTypeOption,
+	IssueFormData,
+	ConvoyFormData,
+	SlingFormData
+} from './work';
