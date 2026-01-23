@@ -24,3 +24,15 @@ export {
 	type BeadMetadata,
 	type GastownIssueType
 } from './labels';
+
+export {
+	deriveConvoyWorkStatus,
+	isValidConvoyStorageStatus,
+	isValidConvoyWorkStatus,
+	CONVOY_WORK_STATUSES,
+	CONVOY_STALENESS_THRESHOLD_HOURS,
+	type ConvoyStorageStatus,
+	type ConvoyWorkStatus,
+	type TrackedIssue,
+	type DeriveConvoyStatusInput
+} from './convoy';
