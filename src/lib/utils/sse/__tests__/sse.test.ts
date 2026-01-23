@@ -3,10 +3,12 @@ import {
 	calculateBackoff,
 	shouldFullRefresh,
 	createReconnectionState,
+	createDefaultConfig,
 	updateReconnectionState,
 	resetReconnectionState,
 	type SSEReconnectionConfig,
 	type SSEReconnectionState,
+	type SSEStateUpdateEvent,
 	SSEReconnectionError
 } from '../index';
 
@@ -559,5 +561,58 @@ describe('SSEReconnectionError', () => {
 		expect(err).toBeInstanceOf(SSEReconnectionError);
 		expect(err.stack).toMatch(/SSEReconnectionError: test message/);
 		expect(Object.getPrototypeOf(Object.getPrototypeOf(err))).toBe(Error.prototype);
+	});
+});
+
+describe('createDefaultConfig', () => {
+	it('creates config with correct default values', () => {
+		const config = createDefaultConfig();
+
+		expect(config).toEqual({
+			initialDelayMs: 1000,
+			maxDelayMs: 30000,
+			fullRefreshThresholdMs: 300000,
+			backoffMultiplier: 2
+		});
+	});
+
+	it('creates config that works with calculateBackoff', () => {
+		const config = createDefaultConfig();
+
+		// Test exponential sequence: 1s -> 2s -> 4s -> 8s
+		expect(calculateBackoff(0, config)).toBe(1000);
+		expect(calculateBackoff(1, config)).toBe(2000);
+		expect(calculateBackoff(2, config)).toBe(4000);
+		expect(calculateBackoff(3, config)).toBe(8000);
+	});
+
+	it('creates config that caps at maxDelayMs', () => {
+		const config = createDefaultConfig();
+
+		// 2^5 * 1000 = 32000 > 30000
+		expect(calculateBackoff(5, config)).toBe(30000);
+	});
+});
+
+describe('SSEStateUpdateEvent type', () => {
+	it('allows attempt event', () => {
+		const event: SSEStateUpdateEvent = { type: 'attempt' };
+		expect(event.type).toBe('attempt');
+	});
+
+	it('allows disconnect event', () => {
+		const event: SSEStateUpdateEvent = { type: 'disconnect' };
+		expect(event.type).toBe('disconnect');
+	});
+
+	it('allows event with eventId', () => {
+		const event: SSEStateUpdateEvent = { type: 'event', eventId: 'evt-123' };
+		expect(event.type).toBe('event');
+		expect(event.eventId).toBe('evt-123');
+	});
+
+	it('allows event without eventId', () => {
+		const event: SSEStateUpdateEvent = { type: 'event' };
+		expect(event.type).toBe('event');
 	});
 });
