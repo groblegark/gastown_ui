@@ -330,7 +330,9 @@ describe('Environment Configuration', () => {
 		it('uses custom binary paths when provided', () => {
 			const result = checkBinaries({ gtBin: 'custom-gt', bdBin: 'custom-bd' });
 
-			expect(result).toBeDefined();
+			// Mock returns false for custom binaries (not in 'which' mock)
+			expect(result.gt).toBe(false);
+			expect(result.bd).toBe(false);
 		});
 	});
 
