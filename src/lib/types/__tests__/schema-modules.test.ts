@@ -9,6 +9,20 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
+
+// =============================================================================
+// Helper for validating Zod schemas
+// =============================================================================
+
+/**
+ * Verifies that a value is a valid Zod schema by checking for safeParse method
+ * and the _def property that all Zod schemas have
+ */
+function expectZodSchema(value: unknown): void {
+	expect(typeof (value as z.ZodTypeAny).safeParse).toBe('function');
+	expect(typeof (value as z.ZodTypeAny)._def).toBe('object');
+}
 
 // =============================================================================
 // New Schema Module Imports (Testing New Locations)
@@ -16,13 +30,13 @@ import { describe, it, expect } from 'vitest';
 
 describe('Schema Module Split - New Locations', () => {
 	describe('bead.schema.ts exports', () => {
-		it('exports all bead-related schemas', async () => {
+		it('exports all bead-related schemas as valid Zod schemas', async () => {
 			const beadSchemas = await import('../schemas/bead.schema');
 
-			expect(beadSchemas.BdBeadStorageStatusSchema).toBeDefined();
-			expect(beadSchemas.BdBeadDisplayStatusSchema).toBeDefined();
-			expect(beadSchemas.BdBeadStatusSchema).toBeDefined();
-			expect(beadSchemas.BdBeadSchema).toBeDefined();
+			expectZodSchema(beadSchemas.BdBeadStorageStatusSchema);
+			expectZodSchema(beadSchemas.BdBeadDisplayStatusSchema);
+			expectZodSchema(beadSchemas.BdBeadStatusSchema);
+			expectZodSchema(beadSchemas.BdBeadSchema);
 		});
 
 		it('validates bead data correctly', async () => {
@@ -46,13 +60,13 @@ describe('Schema Module Split - New Locations', () => {
 	});
 
 	describe('mail.schema.ts exports', () => {
-		it('exports all mail-related schemas', async () => {
+		it('exports all mail-related schemas as valid Zod schemas', async () => {
 			const mailSchemas = await import('../schemas/mail.schema');
 
-			expect(mailSchemas.GtMailPrioritySchema).toBeDefined();
-			expect(mailSchemas.GtMailTypeSchema).toBeDefined();
-			expect(mailSchemas.GtMailDeliverySchema).toBeDefined();
-			expect(mailSchemas.GtMailMessageSchema).toBeDefined();
+			expectZodSchema(mailSchemas.GtMailPrioritySchema);
+			expectZodSchema(mailSchemas.GtMailTypeSchema);
+			expectZodSchema(mailSchemas.GtMailDeliverySchema);
+			expectZodSchema(mailSchemas.GtMailMessageSchema);
 		});
 
 		it('validates mail message correctly', async () => {
@@ -79,17 +93,17 @@ describe('Schema Module Split - New Locations', () => {
 	});
 
 	describe('agent.schema.ts exports', () => {
-		it('exports all agent-related schemas', async () => {
+		it('exports all agent-related schemas as valid Zod schemas', async () => {
 			const agentSchemas = await import('../schemas/agent.schema');
 
-			expect(agentSchemas.PolecatStateSchema).toBeDefined();
-			expect(agentSchemas.AgentDisplayStatusSchema).toBeDefined();
-			expect(agentSchemas.CleanupStatusSchema).toBeDefined();
-			expect(agentSchemas.GtAgentStatusSchema).toBeDefined();
-			expect(agentSchemas.GtAgentHealthSchema).toBeDefined();
-			expect(agentSchemas.GtAgentSummarySchema).toBeDefined();
-			expect(agentSchemas.GtAgentSchema).toBeDefined();
-			expect(agentSchemas.GtHookInfoSchema).toBeDefined();
+			expectZodSchema(agentSchemas.PolecatStateSchema);
+			expectZodSchema(agentSchemas.AgentDisplayStatusSchema);
+			expectZodSchema(agentSchemas.CleanupStatusSchema);
+			expectZodSchema(agentSchemas.GtAgentStatusSchema);
+			expectZodSchema(agentSchemas.GtAgentHealthSchema);
+			expectZodSchema(agentSchemas.GtAgentSummarySchema);
+			expectZodSchema(agentSchemas.GtAgentSchema);
+			expectZodSchema(agentSchemas.GtHookInfoSchema);
 		});
 
 		it('validates agent data correctly', async () => {
@@ -113,14 +127,14 @@ describe('Schema Module Split - New Locations', () => {
 	});
 
 	describe('convoy.schema.ts exports', () => {
-		it('exports all convoy-related schemas', async () => {
+		it('exports all convoy-related schemas as valid Zod schemas', async () => {
 			const convoySchemas = await import('../schemas/convoy.schema');
 
-			expect(convoySchemas.GtConvoyWorkStatusSchema).toBeDefined();
-			expect(convoySchemas.GtConvoyStatusSchema).toBeDefined();
-			expect(convoySchemas.GtTrackedIssueSchema).toBeDefined();
-			expect(convoySchemas.GtConvoyListItemSchema).toBeDefined();
-			expect(convoySchemas.GtConvoySchema).toBeDefined();
+			expectZodSchema(convoySchemas.GtConvoyWorkStatusSchema);
+			expectZodSchema(convoySchemas.GtConvoyStatusSchema);
+			expectZodSchema(convoySchemas.GtTrackedIssueSchema);
+			expectZodSchema(convoySchemas.GtConvoyListItemSchema);
+			expectZodSchema(convoySchemas.GtConvoySchema);
 		});
 
 		it('validates convoy data correctly', async () => {
@@ -145,15 +159,15 @@ describe('Schema Module Split - New Locations', () => {
 	});
 
 	describe('refinery.schema.ts exports', () => {
-		it('exports all refinery/MR-related schemas', async () => {
+		it('exports all refinery/MR-related schemas as valid Zod schemas', async () => {
 			const refinerySchemas = await import('../schemas/refinery.schema');
 
-			expect(refinerySchemas.GtMergeQueueStatusSchema).toBeDefined();
-			expect(refinerySchemas.GtMergeQueueCloseReasonSchema).toBeDefined();
-			expect(refinerySchemas.GtMergeQueueFailureTypeSchema).toBeDefined();
-			expect(refinerySchemas.GtCIStatusSchema).toBeDefined();
-			expect(refinerySchemas.GtMergeableStatusSchema).toBeDefined();
-			expect(refinerySchemas.GtMergeQueueItemSchema).toBeDefined();
+			expectZodSchema(refinerySchemas.GtMergeQueueStatusSchema);
+			expectZodSchema(refinerySchemas.GtMergeQueueCloseReasonSchema);
+			expectZodSchema(refinerySchemas.GtMergeQueueFailureTypeSchema);
+			expectZodSchema(refinerySchemas.GtCIStatusSchema);
+			expectZodSchema(refinerySchemas.GtMergeableStatusSchema);
+			expectZodSchema(refinerySchemas.GtMergeQueueItemSchema);
 		});
 
 		it('validates merge queue item correctly', async () => {
@@ -176,45 +190,45 @@ describe('Schema Module Split - New Locations', () => {
 	});
 
 	describe('schemas/index.ts re-exports', () => {
-		it('re-exports all schemas from index', async () => {
+		it('re-exports all schemas from index as valid Zod schemas', async () => {
 			const allSchemas = await import('../schemas');
 
 			// Bead schemas
-			expect(allSchemas.BdBeadStorageStatusSchema).toBeDefined();
-			expect(allSchemas.BdBeadDisplayStatusSchema).toBeDefined();
-			expect(allSchemas.BdBeadStatusSchema).toBeDefined();
-			expect(allSchemas.BdBeadSchema).toBeDefined();
+			expectZodSchema(allSchemas.BdBeadStorageStatusSchema);
+			expectZodSchema(allSchemas.BdBeadDisplayStatusSchema);
+			expectZodSchema(allSchemas.BdBeadStatusSchema);
+			expectZodSchema(allSchemas.BdBeadSchema);
 
 			// Mail schemas
-			expect(allSchemas.GtMailPrioritySchema).toBeDefined();
-			expect(allSchemas.GtMailTypeSchema).toBeDefined();
-			expect(allSchemas.GtMailDeliverySchema).toBeDefined();
-			expect(allSchemas.GtMailMessageSchema).toBeDefined();
+			expectZodSchema(allSchemas.GtMailPrioritySchema);
+			expectZodSchema(allSchemas.GtMailTypeSchema);
+			expectZodSchema(allSchemas.GtMailDeliverySchema);
+			expectZodSchema(allSchemas.GtMailMessageSchema);
 
 			// Agent schemas
-			expect(allSchemas.PolecatStateSchema).toBeDefined();
-			expect(allSchemas.AgentDisplayStatusSchema).toBeDefined();
-			expect(allSchemas.CleanupStatusSchema).toBeDefined();
-			expect(allSchemas.GtAgentStatusSchema).toBeDefined();
-			expect(allSchemas.GtAgentHealthSchema).toBeDefined();
-			expect(allSchemas.GtAgentSummarySchema).toBeDefined();
-			expect(allSchemas.GtAgentSchema).toBeDefined();
-			expect(allSchemas.GtHookInfoSchema).toBeDefined();
+			expectZodSchema(allSchemas.PolecatStateSchema);
+			expectZodSchema(allSchemas.AgentDisplayStatusSchema);
+			expectZodSchema(allSchemas.CleanupStatusSchema);
+			expectZodSchema(allSchemas.GtAgentStatusSchema);
+			expectZodSchema(allSchemas.GtAgentHealthSchema);
+			expectZodSchema(allSchemas.GtAgentSummarySchema);
+			expectZodSchema(allSchemas.GtAgentSchema);
+			expectZodSchema(allSchemas.GtHookInfoSchema);
 
 			// Convoy schemas
-			expect(allSchemas.GtConvoyWorkStatusSchema).toBeDefined();
-			expect(allSchemas.GtConvoyStatusSchema).toBeDefined();
-			expect(allSchemas.GtTrackedIssueSchema).toBeDefined();
-			expect(allSchemas.GtConvoyListItemSchema).toBeDefined();
-			expect(allSchemas.GtConvoySchema).toBeDefined();
+			expectZodSchema(allSchemas.GtConvoyWorkStatusSchema);
+			expectZodSchema(allSchemas.GtConvoyStatusSchema);
+			expectZodSchema(allSchemas.GtTrackedIssueSchema);
+			expectZodSchema(allSchemas.GtConvoyListItemSchema);
+			expectZodSchema(allSchemas.GtConvoySchema);
 
 			// Refinery schemas
-			expect(allSchemas.GtMergeQueueStatusSchema).toBeDefined();
-			expect(allSchemas.GtMergeQueueCloseReasonSchema).toBeDefined();
-			expect(allSchemas.GtMergeQueueFailureTypeSchema).toBeDefined();
-			expect(allSchemas.GtCIStatusSchema).toBeDefined();
-			expect(allSchemas.GtMergeableStatusSchema).toBeDefined();
-			expect(allSchemas.GtMergeQueueItemSchema).toBeDefined();
+			expectZodSchema(allSchemas.GtMergeQueueStatusSchema);
+			expectZodSchema(allSchemas.GtMergeQueueCloseReasonSchema);
+			expectZodSchema(allSchemas.GtMergeQueueFailureTypeSchema);
+			expectZodSchema(allSchemas.GtCIStatusSchema);
+			expectZodSchema(allSchemas.GtMergeableStatusSchema);
+			expectZodSchema(allSchemas.GtMergeQueueItemSchema);
 		});
 	});
 });
@@ -224,56 +238,56 @@ describe('Schema Module Split - New Locations', () => {
 // =============================================================================
 
 describe('Schema Module Split - Backwards Compatibility', () => {
-	it('gastown.schema.ts still exports all bead schemas', async () => {
+	it('gastown.schema.ts still exports all bead schemas as valid Zod schemas', async () => {
 		const legacySchemas = await import('../gastown.schema');
 
-		expect(legacySchemas.BdBeadStorageStatusSchema).toBeDefined();
-		expect(legacySchemas.BdBeadDisplayStatusSchema).toBeDefined();
-		expect(legacySchemas.BdBeadStatusSchema).toBeDefined();
-		expect(legacySchemas.BdBeadSchema).toBeDefined();
+		expectZodSchema(legacySchemas.BdBeadStorageStatusSchema);
+		expectZodSchema(legacySchemas.BdBeadDisplayStatusSchema);
+		expectZodSchema(legacySchemas.BdBeadStatusSchema);
+		expectZodSchema(legacySchemas.BdBeadSchema);
 	});
 
-	it('gastown.schema.ts still exports all mail schemas', async () => {
+	it('gastown.schema.ts still exports all mail schemas as valid Zod schemas', async () => {
 		const legacySchemas = await import('../gastown.schema');
 
-		expect(legacySchemas.GtMailPrioritySchema).toBeDefined();
-		expect(legacySchemas.GtMailTypeSchema).toBeDefined();
-		expect(legacySchemas.GtMailDeliverySchema).toBeDefined();
-		expect(legacySchemas.GtMailMessageSchema).toBeDefined();
+		expectZodSchema(legacySchemas.GtMailPrioritySchema);
+		expectZodSchema(legacySchemas.GtMailTypeSchema);
+		expectZodSchema(legacySchemas.GtMailDeliverySchema);
+		expectZodSchema(legacySchemas.GtMailMessageSchema);
 	});
 
-	it('gastown.schema.ts still exports all agent schemas', async () => {
+	it('gastown.schema.ts still exports all agent schemas as valid Zod schemas', async () => {
 		const legacySchemas = await import('../gastown.schema');
 
-		expect(legacySchemas.PolecatStateSchema).toBeDefined();
-		expect(legacySchemas.AgentDisplayStatusSchema).toBeDefined();
-		expect(legacySchemas.CleanupStatusSchema).toBeDefined();
-		expect(legacySchemas.GtAgentStatusSchema).toBeDefined();
-		expect(legacySchemas.GtAgentHealthSchema).toBeDefined();
-		expect(legacySchemas.GtAgentSummarySchema).toBeDefined();
-		expect(legacySchemas.GtAgentSchema).toBeDefined();
-		expect(legacySchemas.GtHookInfoSchema).toBeDefined();
+		expectZodSchema(legacySchemas.PolecatStateSchema);
+		expectZodSchema(legacySchemas.AgentDisplayStatusSchema);
+		expectZodSchema(legacySchemas.CleanupStatusSchema);
+		expectZodSchema(legacySchemas.GtAgentStatusSchema);
+		expectZodSchema(legacySchemas.GtAgentHealthSchema);
+		expectZodSchema(legacySchemas.GtAgentSummarySchema);
+		expectZodSchema(legacySchemas.GtAgentSchema);
+		expectZodSchema(legacySchemas.GtHookInfoSchema);
 	});
 
-	it('gastown.schema.ts still exports all convoy schemas', async () => {
+	it('gastown.schema.ts still exports all convoy schemas as valid Zod schemas', async () => {
 		const legacySchemas = await import('../gastown.schema');
 
-		expect(legacySchemas.GtConvoyWorkStatusSchema).toBeDefined();
-		expect(legacySchemas.GtConvoyStatusSchema).toBeDefined();
-		expect(legacySchemas.GtTrackedIssueSchema).toBeDefined();
-		expect(legacySchemas.GtConvoyListItemSchema).toBeDefined();
-		expect(legacySchemas.GtConvoySchema).toBeDefined();
+		expectZodSchema(legacySchemas.GtConvoyWorkStatusSchema);
+		expectZodSchema(legacySchemas.GtConvoyStatusSchema);
+		expectZodSchema(legacySchemas.GtTrackedIssueSchema);
+		expectZodSchema(legacySchemas.GtConvoyListItemSchema);
+		expectZodSchema(legacySchemas.GtConvoySchema);
 	});
 
-	it('gastown.schema.ts still exports all refinery schemas', async () => {
+	it('gastown.schema.ts still exports all refinery schemas as valid Zod schemas', async () => {
 		const legacySchemas = await import('../gastown.schema');
 
-		expect(legacySchemas.GtMergeQueueStatusSchema).toBeDefined();
-		expect(legacySchemas.GtMergeQueueCloseReasonSchema).toBeDefined();
-		expect(legacySchemas.GtMergeQueueFailureTypeSchema).toBeDefined();
-		expect(legacySchemas.GtCIStatusSchema).toBeDefined();
-		expect(legacySchemas.GtMergeableStatusSchema).toBeDefined();
-		expect(legacySchemas.GtMergeQueueItemSchema).toBeDefined();
+		expectZodSchema(legacySchemas.GtMergeQueueStatusSchema);
+		expectZodSchema(legacySchemas.GtMergeQueueCloseReasonSchema);
+		expectZodSchema(legacySchemas.GtMergeQueueFailureTypeSchema);
+		expectZodSchema(legacySchemas.GtCIStatusSchema);
+		expectZodSchema(legacySchemas.GtMergeableStatusSchema);
+		expectZodSchema(legacySchemas.GtMergeQueueItemSchema);
 	});
 
 	it('existing imports from gastown.schema.ts continue to work', async () => {
@@ -295,14 +309,14 @@ describe('Schema Module Split - Backwards Compatibility', () => {
 		expect(result.success).toBe(true);
 	});
 
-	it('types/index.ts re-exports still work', async () => {
+	it('types/index.ts re-exports still work as valid Zod schemas', async () => {
 		const indexExports = await import('../index');
 
 		// Verify key schemas are still accessible via index
-		expect(indexExports.BdBeadSchema).toBeDefined();
-		expect(indexExports.GtMailMessageSchema).toBeDefined();
-		expect(indexExports.GtAgentSchema).toBeDefined();
-		expect(indexExports.GtConvoySchema).toBeDefined();
-		expect(indexExports.GtMergeQueueItemSchema).toBeDefined();
+		expectZodSchema(indexExports.BdBeadSchema);
+		expectZodSchema(indexExports.GtMailMessageSchema);
+		expectZodSchema(indexExports.GtAgentSchema);
+		expectZodSchema(indexExports.GtConvoySchema);
+		expectZodSchema(indexExports.GtMergeQueueItemSchema);
 	});
 });
