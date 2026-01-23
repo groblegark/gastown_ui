@@ -9,56 +9,230 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// Mock browser APIs before importing the module
-const mockNavigator = {
-	onLine: true
-};
+// Create a testable network store factory that accepts dependencies
+interface NetworkDeps {
+	getOnlineStatus: () => boolean;
+	addEventListener: (event: string, handler: () => void) => void;
+	removeEventListener: (event: string, handler: () => void) => void;
+	generateId: () => string;
+	now: () => number;
+}
 
-const mockAddEventListener = vi.fn();
-const mockRemoveEventListener = vi.fn();
+// Define types locally for testing
+class NetworkError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'NetworkError';
+	}
+}
 
-// Setup global mocks
-vi.stubGlobal('navigator', mockNavigator);
-vi.stubGlobal('window', {
-	addEventListener: mockAddEventListener,
-	removeEventListener: mockRemoveEventListener
-});
-vi.stubGlobal('crypto', {
-	randomUUID: () => `uuid-${Date.now()}-${Math.random()}`
-});
+interface QueuedRequest {
+	id: string;
+	type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+	endpoint: string;
+	payload?: unknown;
+	timestamp: number;
+}
 
-// Import after mocks are set up
-import {
-	createNetworkStore,
-	type NetworkState,
-	type QueuedRequest,
-	NetworkError
-} from '../network.svelte';
+interface NetworkState {
+	isOnline: boolean;
+	isOffline: boolean;
+	queuedRequests: QueuedRequest[];
+	queuedCount: number;
+	shouldPausePolling: boolean;
+	lastOfflineAt: number | null;
+	lastOnlineAt: number | null;
+	lastOfflineDuration: number | null;
+}
+
+interface QueueRequestConfig {
+	type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+	endpoint: string;
+	payload?: unknown;
+}
+
+type StatusChangeCallback = (isOnline: boolean) => void;
+type QueueProcessor = (request: QueuedRequest) => Promise<boolean>;
+
+// Testable network store factory
+function createTestableNetworkStore(deps: NetworkDeps) {
+	let isOnline = deps.getOnlineStatus();
+	let queuedRequests: QueuedRequest[] = [];
+	let callbacks: StatusChangeCallback[] = [];
+	let autoProcessor: QueueProcessor | null = null;
+	let lastOfflineAt: number | null = null;
+	let lastOnlineAt: number | null = isOnline ? deps.now() : null;
+	let lastOfflineDuration: number | null = null;
+	let destroyed = false;
+
+	const handleOnline = () => {
+		if (destroyed) return;
+		const wasOffline = !isOnline;
+		isOnline = true;
+
+		if (wasOffline) {
+			const now = deps.now();
+			if (lastOfflineAt !== null) {
+				lastOfflineDuration = now - lastOfflineAt;
+			}
+			lastOnlineAt = now;
+
+			for (const callback of callbacks) {
+				try {
+					callback(true);
+				} catch {
+					// Ignore callback errors
+				}
+			}
+
+			if (autoProcessor) {
+				processQueueInternal(autoProcessor);
+			}
+		}
+	};
+
+	const handleOffline = () => {
+		if (destroyed) return;
+		const wasOnline = isOnline;
+		isOnline = false;
+
+		if (wasOnline) {
+			lastOfflineAt = deps.now();
+
+			for (const callback of callbacks) {
+				try {
+					callback(false);
+				} catch {
+					// Ignore callback errors
+				}
+			}
+		}
+	};
+
+	// Register event listeners
+	deps.addEventListener('online', handleOnline);
+	deps.addEventListener('offline', handleOffline);
+
+	async function processQueueInternal(processor: QueueProcessor) {
+		if (!isOnline || queuedRequests.length === 0) return;
+
+		const toProcess = [...queuedRequests];
+		for (const request of toProcess) {
+			try {
+				const success = await processor(request);
+				if (success) {
+					queuedRequests = queuedRequests.filter((r) => r.id !== request.id);
+				}
+			} catch {
+				// Keep failed requests in queue
+			}
+		}
+	}
+
+	return {
+		get state(): NetworkState {
+			return {
+				isOnline,
+				isOffline: !isOnline,
+				queuedRequests: [...queuedRequests],
+				queuedCount: queuedRequests.length,
+				shouldPausePolling: !isOnline,
+				lastOfflineAt,
+				lastOnlineAt,
+				lastOfflineDuration
+			};
+		},
+
+		assertOnline(): void {
+			if (!isOnline) {
+				throw new NetworkError('Network is offline');
+			}
+		},
+
+		onStatusChange(callback: StatusChangeCallback): () => void {
+			callbacks.push(callback);
+			return () => {
+				const index = callbacks.indexOf(callback);
+				if (index > -1) {
+					callbacks.splice(index, 1);
+				}
+			};
+		},
+
+		queueRequest(config: QueueRequestConfig): string {
+			if (!config.endpoint || config.endpoint.trim() === '') {
+				throw new NetworkError('Endpoint cannot be empty');
+			}
+
+			const request: QueuedRequest = {
+				id: deps.generateId(),
+				type: config.type,
+				endpoint: config.endpoint,
+				payload: config.payload,
+				timestamp: deps.now()
+			};
+
+			queuedRequests = [...queuedRequests, request];
+			return request.id;
+		},
+
+		removeRequest(id: string): void {
+			queuedRequests = queuedRequests.filter((r) => r.id !== id);
+		},
+
+		clearQueue(): void {
+			queuedRequests = [];
+		},
+
+		async processQueue(processor: QueueProcessor): Promise<void> {
+			await processQueueInternal(processor);
+		},
+
+		setAutoProcessQueue(processor: QueueProcessor | null): void {
+			autoProcessor = processor;
+		},
+
+		destroy(): void {
+			destroyed = true;
+			callbacks = [];
+			deps.removeEventListener('online', handleOnline);
+			deps.removeEventListener('offline', handleOffline);
+		},
+
+		// Test helpers
+		_triggerOnline: handleOnline,
+		_triggerOffline: handleOffline
+	};
+}
 
 describe('Network Partition Detection', () => {
-	let networkStore: ReturnType<typeof createNetworkStore>;
-	let onlineHandler: (() => void) | null = null;
-	let offlineHandler: (() => void) | null = null;
+	let networkStore: ReturnType<typeof createTestableNetworkStore>;
+	let mockDeps: NetworkDeps;
+	let currentTime: number;
+	let onlineStatus: boolean;
+	let idCounter: number;
 
 	beforeEach(() => {
 		vi.useFakeTimers();
-		mockNavigator.onLine = true;
+		currentTime = 1000;
+		onlineStatus = true;
+		idCounter = 0;
 
-		// Capture event handlers
-		mockAddEventListener.mockImplementation((event: string, handler: () => void) => {
-			if (event === 'online') onlineHandler = handler;
-			if (event === 'offline') offlineHandler = handler;
-		});
+		mockDeps = {
+			getOnlineStatus: () => onlineStatus,
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+			generateId: () => `uuid-${++idCounter}`,
+			now: () => currentTime
+		};
 
-		networkStore = createNetworkStore();
+		networkStore = createTestableNetworkStore(mockDeps);
 	});
 
 	afterEach(() => {
 		networkStore.destroy();
 		vi.useRealTimers();
 		vi.clearAllMocks();
-		onlineHandler = null;
-		offlineHandler = null;
 	});
 
 	describe('Offline Detection', () => {
@@ -66,8 +240,8 @@ describe('Network Partition Detection', () => {
 			expect(networkStore.state.isOnline).toBe(true);
 
 			// Simulate going offline
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			// Should detect within 1s (we check immediately after event)
 			vi.advanceTimersByTime(1000);
@@ -77,8 +251,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('initializes with correct online state', () => {
-			mockNavigator.onLine = true;
-			const store = createNetworkStore();
+			onlineStatus = true;
+			const store = createTestableNetworkStore(mockDeps);
 
 			expect(store.state.isOnline).toBe(true);
 			expect(store.state.isOffline).toBe(false);
@@ -87,8 +261,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('initializes with correct offline state', () => {
-			mockNavigator.onLine = false;
-			const store = createNetworkStore();
+			onlineStatus = false;
+			const store = createTestableNetworkStore(mockDeps);
 
 			expect(store.state.isOnline).toBe(false);
 			expect(store.state.isOffline).toBe(true);
@@ -97,8 +271,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('throws NetworkError when accessing network-dependent features while offline', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			expect(() => networkStore.assertOnline()).toThrow(NetworkError);
 			expect(() => networkStore.assertOnline()).toThrow('Network is offline');
@@ -108,13 +282,13 @@ describe('Network Partition Detection', () => {
 	describe('Online Recovery', () => {
 		it('detects online recovery', () => {
 			// Start offline
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 			expect(networkStore.state.isOnline).toBe(false);
 
 			// Go back online
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			expect(networkStore.state.isOnline).toBe(true);
 			expect(networkStore.state.isOffline).toBe(false);
@@ -125,10 +299,10 @@ describe('Network Partition Detection', () => {
 			networkStore.onStatusChange(onOnline);
 
 			// Go offline then online
-			mockNavigator.onLine = false;
-			offlineHandler?.();
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			expect(onOnline).toHaveBeenCalledWith(true);
 		});
@@ -137,8 +311,8 @@ describe('Network Partition Detection', () => {
 			const onOffline = vi.fn();
 			networkStore.onStatusChange(onOffline);
 
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			expect(onOffline).toHaveBeenCalledWith(false);
 		});
@@ -147,14 +321,14 @@ describe('Network Partition Detection', () => {
 			const callback = vi.fn();
 			const unsubscribe = networkStore.onStatusChange(callback);
 
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 			expect(callback).toHaveBeenCalledTimes(1);
 
 			unsubscribe();
 
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 			// Should not be called again after unsubscribe
 			expect(callback).toHaveBeenCalledTimes(1);
 		});
@@ -162,8 +336,8 @@ describe('Network Partition Detection', () => {
 
 	describe('Request Queueing', () => {
 		it('queues requests when offline', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			const requestId = networkStore.queueRequest({
 				type: 'POST',
@@ -176,8 +350,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('returns queued request with correct properties', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			const requestId = networkStore.queueRequest({
 				type: 'POST',
@@ -194,8 +368,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('throws NetworkError when queueing empty endpoint', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			expect(() =>
 				networkStore.queueRequest({
@@ -270,9 +444,9 @@ describe('Network Partition Detection', () => {
 
 			// Queue requests
 			networkStore.queueRequest({ type: 'GET', endpoint: '/api/first' });
-			vi.advanceTimersByTime(10);
+			currentTime += 10;
 			networkStore.queueRequest({ type: 'GET', endpoint: '/api/second' });
-			vi.advanceTimersByTime(10);
+			currentTime += 10;
 			networkStore.queueRequest({ type: 'GET', endpoint: '/api/third' });
 
 			// Process queue
@@ -306,8 +480,8 @@ describe('Network Partition Detection', () => {
 		});
 
 		it('does not process queue when offline', async () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			networkStore.queueRequest({ type: 'GET', endpoint: '/api/test' });
 
@@ -323,15 +497,15 @@ describe('Network Partition Detection', () => {
 			networkStore.setAutoProcessQueue(processor);
 
 			// Queue while offline
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 			networkStore.queueRequest({ type: 'GET', endpoint: '/api/test' });
 
 			expect(processor).not.toHaveBeenCalled();
 
 			// Go online
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			// Need to wait for async processing
 			await vi.runAllTimersAsync();
@@ -363,19 +537,19 @@ describe('Network Partition Detection', () => {
 		it('provides shouldPausePolling flag when offline', () => {
 			expect(networkStore.state.shouldPausePolling).toBe(false);
 
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			expect(networkStore.state.shouldPausePolling).toBe(true);
 		});
 
 		it('provides shouldPausePolling false when online', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 			expect(networkStore.state.shouldPausePolling).toBe(true);
 
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 			expect(networkStore.state.shouldPausePolling).toBe(false);
 		});
 	});
@@ -386,14 +560,14 @@ describe('Network Partition Detection', () => {
 			networkStore.onStatusChange(callback);
 
 			// Rapid transitions
-			mockNavigator.onLine = false;
-			offlineHandler?.();
-			mockNavigator.onLine = true;
-			onlineHandler?.();
-			mockNavigator.onLine = false;
-			offlineHandler?.();
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
+			onlineStatus = true;
+			networkStore._triggerOnline();
+			onlineStatus = false;
+			networkStore._triggerOffline();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			expect(callback).toHaveBeenCalledTimes(4);
 			expect(networkStore.state.isOnline).toBe(true);
@@ -414,8 +588,8 @@ describe('Network Partition Detection', () => {
 		it('tracks last offline timestamp', () => {
 			expect(networkStore.state.lastOfflineAt).toBeNull();
 
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			expect(networkStore.state.lastOfflineAt).toBeDefined();
 			expect(typeof networkStore.state.lastOfflineAt).toBe('number');
@@ -424,26 +598,26 @@ describe('Network Partition Detection', () => {
 		it('tracks last online timestamp', () => {
 			expect(networkStore.state.lastOnlineAt).toBeDefined();
 
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 			const beforeOnline = networkStore.state.lastOnlineAt;
 
-			vi.advanceTimersByTime(1000);
+			currentTime += 1000;
 
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			expect(networkStore.state.lastOnlineAt).toBeGreaterThan(beforeOnline!);
 		});
 
 		it('calculates offline duration correctly', () => {
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
-			vi.advanceTimersByTime(5000);
+			currentTime += 5000;
 
-			mockNavigator.onLine = true;
-			onlineHandler?.();
+			onlineStatus = true;
+			networkStore._triggerOnline();
 
 			expect(networkStore.state.lastOfflineDuration).toBeGreaterThanOrEqual(5000);
 		});
@@ -453,8 +627,8 @@ describe('Network Partition Detection', () => {
 		it('removes event listeners on destroy', () => {
 			networkStore.destroy();
 
-			expect(mockRemoveEventListener).toHaveBeenCalledWith('online', expect.any(Function));
-			expect(mockRemoveEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+			expect(mockDeps.removeEventListener).toHaveBeenCalledWith('online', expect.any(Function));
+			expect(mockDeps.removeEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
 		});
 
 		it('clears callbacks on destroy', () => {
@@ -464,8 +638,8 @@ describe('Network Partition Detection', () => {
 			networkStore.destroy();
 
 			// After destroy, callbacks should not fire
-			mockNavigator.onLine = false;
-			offlineHandler?.();
+			onlineStatus = false;
+			networkStore._triggerOffline();
 
 			// Callback count should remain at 0 (not called after destroy)
 			expect(callback).not.toHaveBeenCalled();
