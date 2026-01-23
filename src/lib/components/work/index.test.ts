@@ -18,10 +18,13 @@ describe('Work Components Module Exports', () => {
 			expect(module.WorkFilters).toMatch(/WorkFilters\.svelte/);
 		});
 
-		it('exports workFiltersVariants', async () => {
+		it('exports workFiltersVariants as callable with expected slots', async () => {
 			const { workFiltersVariants } = await import('./index');
-			expect(workFiltersVariants).toBeDefined();
 			expect(typeof workFiltersVariants).toBe('function');
+			const result = workFiltersVariants();
+			expect(result).toHaveProperty('container');
+			expect(result).toHaveProperty('chip');
+			expect(typeof result.container()).toBe('string');
 		});
 	});
 
@@ -32,10 +35,13 @@ describe('Work Components Module Exports', () => {
 			expect(module.WorkList).toMatch(/WorkList\.svelte/);
 		});
 
-		it('exports workListVariants', async () => {
+		it('exports workListVariants as callable with expected slots', async () => {
 			const { workListVariants } = await import('./index');
-			expect(workListVariants).toBeDefined();
 			expect(typeof workListVariants).toBe('function');
+			const result = workListVariants();
+			expect(result).toHaveProperty('container');
+			expect(result).toHaveProperty('list');
+			expect(typeof result.container()).toBe('string');
 		});
 	});
 
@@ -46,16 +52,22 @@ describe('Work Components Module Exports', () => {
 			expect(module.WorkCreateForm).toMatch(/WorkCreateForm\.svelte/);
 		});
 
-		it('exports workCreateFormVariants', async () => {
+		it('exports workCreateFormVariants as callable with expected slots', async () => {
 			const { workCreateFormVariants } = await import('./index');
-			expect(workCreateFormVariants).toBeDefined();
 			expect(typeof workCreateFormVariants).toBe('function');
+			const result = workCreateFormVariants();
+			expect(result).toHaveProperty('container');
+			expect(result).toHaveProperty('form');
+			expect(result).toHaveProperty('submitButton');
+			expect(typeof result.container()).toBe('string');
 		});
 
-		it('exports issueSchema validation', async () => {
+		it('exports issueSchema validation with safeParse method', async () => {
 			const { issueSchema } = await import('./index');
-			expect(issueSchema).toBeDefined();
 			expect(typeof issueSchema.safeParse).toBe('function');
+			// Verify it can actually parse
+			const validResult = issueSchema.safeParse({ title: 'test', type: 'task', priority: 1 });
+			expect(validResult.success).toBe(true);
 		});
 	});
 
@@ -66,16 +78,22 @@ describe('Work Components Module Exports', () => {
 			expect(module.WorkSlingForm).toMatch(/WorkSlingForm\.svelte/);
 		});
 
-		it('exports workSlingFormVariants', async () => {
+		it('exports workSlingFormVariants as callable with expected slots', async () => {
 			const { workSlingFormVariants } = await import('./index');
-			expect(workSlingFormVariants).toBeDefined();
 			expect(typeof workSlingFormVariants).toBe('function');
+			const result = workSlingFormVariants();
+			expect(result).toHaveProperty('container');
+			expect(result).toHaveProperty('form');
+			expect(result).toHaveProperty('submitButton');
+			expect(typeof result.container()).toBe('string');
 		});
 
-		it('exports slingSchema validation', async () => {
+		it('exports slingSchema validation with safeParse method', async () => {
 			const { slingSchema } = await import('./index');
-			expect(slingSchema).toBeDefined();
 			expect(typeof slingSchema.safeParse).toBe('function');
+			// Verify it can actually parse
+			const validResult = slingSchema.safeParse({ issue: 'bd-123', rig: 'test' });
+			expect(validResult.success).toBe(true);
 		});
 	});
 
