@@ -4,7 +4,18 @@
  * MR (Merge Request) status lifecycle: open -> in_progress -> closed
  * NOTE: 'merged' is a CloseReason, NOT a status.
  *
+ * Status Lifecycle:
+ * ```
+ * [open] -> [in_progress] -> [closed]
+ *            (processing)    (done - check close_reason)
+ * ```
+ *
+ * Common Pitfall: Don't confuse 'merged' (a close_reason) with a status.
+ * Check: status === 'closed' && close_reason === 'merged'
+ *
  * Source of truth: internal/refinery/types.go
+ * @see CONTRACTS.md for full documentation
+ * @module contracts/refinery
  */
 
 // =============================================================================

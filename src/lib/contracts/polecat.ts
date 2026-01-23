@@ -4,7 +4,20 @@
  * CRITICAL: There is NO idle state. Polecats are ephemeral workers.
  * They spawn with work assigned, process it, and get nuked.
  *
+ * State Machine:
+ * ```
+ * (spawned) -> [working] -> [done] -> (nuked)
+ *                  |
+ *                  v
+ *              [stuck] -> (needs help)
+ * ```
+ *
+ * Common Pitfall: Old code may reference 'idle' state. This is deprecated.
+ * Remove any idle handling and use the three-state model.
+ *
  * Source of truth: internal/polecat/types.go
+ * @see CONTRACTS.md for full documentation
+ * @module contracts/polecat
  */
 
 // =============================================================================

@@ -4,7 +4,16 @@
  * IMPORTANT: Gastown only stores 'open' or 'closed' in beads.db.
  * Display statuses like 'in_progress', 'blocked', 'hooked' are DERIVED.
  *
+ * Derivation rules (in precedence order):
+ * 1. status === 'closed' -> 'closed'
+ * 2. hook_bead === true -> 'hooked'
+ * 3. blocked_by_count > 0 -> 'blocked'
+ * 4. has assignee OR mrStatus === 'in_progress' -> 'in_progress'
+ * 5. default -> 'open'
+ *
  * Source of truth: internal/beads/beads.go
+ * @see CONTRACTS.md for full documentation
+ * @module contracts/bead
  */
 
 // =============================================================================

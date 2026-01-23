@@ -4,7 +4,20 @@
  * Convoy storage status is 'open' | 'closed' (same as beads).
  * Work status is DERIVED from tracked issues, not stored.
  *
+ * Work status derivation rules (in precedence order):
+ * 1. trackedIssues.length === 0 -> 'waiting'
+ * 2. all issues closed -> 'complete'
+ * 3. any issue has isStuck === true -> 'stuck'
+ * 4. any issue has assignee -> 'active'
+ * 5. hours since update > threshold -> 'stale'
+ * 6. default -> 'active'
+ *
+ * Note: deriveConvoyWorkStatus() is in utils/format/convoy.ts
+ * This module only defines the contract types and validation.
+ *
  * Source of truth: internal/convoy/types.go
+ * @see CONTRACTS.md for full documentation
+ * @module contracts/convoy
  */
 
 // =============================================================================

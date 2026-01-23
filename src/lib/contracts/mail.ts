@@ -1,7 +1,18 @@
 /**
  * Mail Contract - Priority, Types, Delivery Modes, Address Format
  *
+ * Address format follows Postel's Law: "Be liberal in what you accept,
+ * conservative in what you send."
+ *
+ * Address Types:
+ * - Overseer: 'overseer' (no trailing slash)
+ * - Town-level agent: '{agent}/' (trailing slash) - mayor/, witness/, deacon/
+ * - Rig polecat: '{rig}/{polecat}' - gastownui/furiosa
+ * - Rig crew: '{rig}/{member}' - gastownui/amrit
+ *
  * Source of truth: internal/mail/types.go
+ * @see CONTRACTS.md for full documentation
+ * @module contracts/mail
  */
 
 // =============================================================================
