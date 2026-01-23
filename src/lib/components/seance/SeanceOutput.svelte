@@ -40,8 +40,8 @@
 		});
 	}
 
-	function getRoleIcon(role: SessionMessage['role']): string {
-		const roleIcons = {
+	function getRoleIcon(role: SessionMessage['role']): keyof typeof icons {
+		const roleIcons: Record<SessionMessage['role'], keyof typeof icons> = {
 			user: 'user',
 			assistant: 'bot',
 			tool: 'terminal'

@@ -87,8 +87,8 @@
 		return types[status];
 	}
 
-	function getAgentTypeIcon(type: Session['agentType']): string {
-		const typeIcons = {
+	function getAgentTypeIcon(type: Session['agentType']): keyof typeof icons {
+		const typeIcons: Record<Session['agentType'], keyof typeof icons> = {
 			polecat: 'bot',
 			witness: 'search',
 			refinery: 'tool',

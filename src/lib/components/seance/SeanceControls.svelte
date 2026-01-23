@@ -21,13 +21,13 @@
 		onFiltersChange?: (filters: SeanceFilters) => void;
 	} = $props();
 
-	// Local filter state synced from props
-	let selectedAgent = $state(filters.agent);
-	let selectedRig = $state(filters.rig);
-	let selectedStatus = $state(filters.status);
-	let searchQuery = $state(filters.search);
-	let dateFrom = $state(filters.dateFrom);
-	let dateTo = $state(filters.dateTo);
+	// Local filter state - synced from props via $effect
+	let selectedAgent = $state('');
+	let selectedRig = $state('');
+	let selectedStatus = $state('');
+	let searchQuery = $state('');
+	let dateFrom = $state('');
+	let dateTo = $state('');
 
 	// Icon SVGs
 	const icons = {
