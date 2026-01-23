@@ -116,20 +116,18 @@ describe('CommandPaletteItem', () => {
 			expect(action).toHaveBeenCalledTimes(1);
 		});
 
-		it('dispatches select event on mouseenter', async () => {
-			const { component } = render(CommandPaletteItem, {
+		it('calls onSelect callback on mouseenter', async () => {
+			const onSelect = vi.fn();
+			render(CommandPaletteItem, {
 				props: {
 					result: mockResult,
 					isSelected: false,
-					index: 3
+					index: 3,
+					onSelect
 				}
 			});
-			let selectedIndex = -1;
-			component.$on('select', (e: CustomEvent<number>) => {
-				selectedIndex = e.detail;
-			});
 			await fireEvent.mouseEnter(screen.getByRole('option'));
-			expect(selectedIndex).toBe(3);
+			expect(onSelect).toHaveBeenCalledWith(3);
 		});
 	});
 

@@ -121,20 +121,18 @@ describe('CommandPaletteList', () => {
 			expect(options[3]).toHaveAttribute('aria-selected', 'false');
 		});
 
-		it('dispatches select event when item is hovered', async () => {
-			const { component } = render(CommandPaletteList, {
+		it('calls onSelect callback when item is hovered', async () => {
+			const onSelect = vi.fn();
+			render(CommandPaletteList, {
 				props: {
 					results: createMockResults(),
-					selectedIndex: 0
+					selectedIndex: 0,
+					onSelect
 				}
-			});
-			let newIndex = -1;
-			component.$on('select', (e: CustomEvent<number>) => {
-				newIndex = e.detail;
 			});
 			const options = screen.getAllByRole('option');
 			await fireEvent.mouseEnter(options[2]);
-			expect(newIndex).toBe(2);
+			expect(onSelect).toHaveBeenCalledWith(2);
 		});
 	});
 
