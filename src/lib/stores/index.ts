@@ -1,6 +1,24 @@
+/**
+ * Stores Module - Main Entry Point
+ *
+ * Re-exports all stores for backwards compatibility.
+ * New code should prefer importing from core/ or domains/ directly.
+ */
+
+// ============================================================================
+// CORE STORES (Infrastructure)
+// ============================================================================
+
+// Network state (legacy simple implementation)
 export { networkState, type QueuedAction } from './network.svelte';
+
+// Toast notifications
 export { toastStore, type Toast, type ToastType, type ToastOptions } from './toast.svelte';
+
+// Theme
 export { themeStore, type Theme } from './theme.svelte';
+
+// WebSocket client
 export {
 	wsClient,
 	createWebSocketClient,
@@ -12,6 +30,8 @@ export {
 	type QueueUpdatePayload,
 	type WorkflowUpdatePayload
 } from './websocket.svelte';
+
+// Data synchronization
 export {
 	syncStore,
 	createSyncStore,
@@ -23,6 +43,8 @@ export {
 	type SyncEvent,
 	type ConflictStrategy
 } from './sync.svelte';
+
+// Multi-tier polling system
 export {
 	pollingManager,
 	usePolling,
@@ -33,6 +55,8 @@ export {
 	type ResourceState,
 	type PollingConfig
 } from './polling.svelte';
+
+// Operations tracking
 export {
 	operationsStore,
 	trackOperation,
@@ -57,7 +81,20 @@ export {
 	type SWROptions
 } from './swr';
 
-// Domain stores with SWR
+// Server-Sent Events
+export {
+	sseStore,
+	useSSE,
+	type SSEConnectionState,
+	type SSEEvent,
+	type SSEEventType
+} from './sse.svelte';
+
+// ============================================================================
+// DOMAIN STORES (Business Entities)
+// ============================================================================
+
+// Work (beads/issues)
 export {
 	workStore,
 	useWork,
@@ -65,6 +102,7 @@ export {
 	type WorkFilter
 } from './work.svelte';
 
+// Convoys
 export {
 	convoysStore,
 	useConvoys,
@@ -73,6 +111,7 @@ export {
 	type ConvoyFilter
 } from './convoys.svelte';
 
+// Agents (polecats)
 export {
 	agentsStore,
 	useAgents,
@@ -81,6 +120,7 @@ export {
 	type AgentFilter
 } from './agents.svelte';
 
+// Mail
 export {
 	mailStore,
 	useMail,
@@ -91,6 +131,7 @@ export {
 	type MailFilter
 } from './mail.svelte';
 
+// Rigs
 export {
 	rigsStore,
 	useRigs,
@@ -101,6 +142,7 @@ export {
 	type RigFilter
 } from './rigs.svelte';
 
+// Merge Queue
 export {
 	queueStore,
 	useQueue,
@@ -110,14 +152,6 @@ export {
 	type MergeableStatus,
 	type QueueFilter
 } from './queue.svelte';
-
-export {
-	sseStore,
-	useSSE,
-	type SSEConnectionState,
-	type SSEEvent,
-	type SSEEventType
-} from './sse.svelte';
 
 // Search index with Fuse.js
 export {
