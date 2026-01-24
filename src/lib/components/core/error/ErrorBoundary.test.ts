@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import ErrorBoundaryWrapper from '../../tests/wrappers/ErrorBoundaryWrapper.svelte';
+import ErrorBoundaryWrapper from '../../../../tests/wrappers/ErrorBoundaryWrapper.svelte';
 
 // Mock crypto.randomUUID for consistent request IDs in tests
 vi.stubGlobal('crypto', {

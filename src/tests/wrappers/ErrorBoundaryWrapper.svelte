@@ -3,7 +3,7 @@
 	 * Test wrapper for ErrorBoundary component
 	 * Provides children snippet for testing and error trigger mechanism
 	 */
-	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
+	import { ErrorBoundary } from '$lib/components';
 
 	interface Props {
 		fallbackMessage?: string;

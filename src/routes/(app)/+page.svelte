@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { GridPattern, PageHeader, Button, SkeletonCard, ActivityFeed } from '$lib/components';
-	import StatusCards from '$lib/components/StatusCards.svelte';
-	import QuickActions from '$lib/components/QuickActions.svelte';
+	import { GridPattern, PageHeader, Button, SkeletonCard, ActivityFeed, StatusCards, QuickActions } from '$lib/components';
 	import { RefreshCw, Server, Users, Layers, Package, HeartPulse, Plus, ClipboardList } from 'lucide-svelte';
 	import { hapticSuccess, hapticError } from '$lib/utils/haptics';
 
