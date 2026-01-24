@@ -3,34 +3,34 @@
  *
  * Tests for the core primitive UI components barrel exports.
  * These are the foundational building blocks used across the application.
+ *
+ * NOTE: In Svelte 5, components are exported as functions (component constructors).
  */
 import { describe, it, expect } from 'vitest';
 
 describe('Core Components Module Exports', () => {
 	describe('Button', () => {
-		it('exports Button component with correct path reference', async () => {
+		it('exports Button component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Button).toBe('string');
-			expect(module.Button).toMatch(/Button\.svelte/);
+			expect(typeof module.Button).toBe('function');
 		});
 
-		it('exports buttonVariants as callable function', async () => {
+		it('exports buttonVariants as callable function that returns className string', async () => {
 			const { buttonVariants } = await import('./index');
 			expect(typeof buttonVariants).toBe('function');
-			const result = buttonVariants({ variant: 'default', size: 'md' });
+			const result = buttonVariants({ variant: 'default', size: 'default' });
 			expect(typeof result).toBe('string');
 			expect(result.length).toBeGreaterThan(0);
 		});
 	});
 
 	describe('Badge', () => {
-		it('exports Badge component with correct path reference', async () => {
+		it('exports Badge component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Badge).toBe('string');
-			expect(module.Badge).toMatch(/Badge\.svelte/);
+			expect(typeof module.Badge).toBe('function');
 		});
 
-		it('exports badgeVariants as callable function', async () => {
+		it('exports badgeVariants as callable function that returns className string', async () => {
 			const { badgeVariants } = await import('./index');
 			expect(typeof badgeVariants).toBe('function');
 			const result = badgeVariants({ variant: 'default' });
@@ -40,26 +40,23 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('Input', () => {
-		it('exports Input component with correct path reference', async () => {
+		it('exports Input component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Input).toBe('string');
-			expect(module.Input).toMatch(/Input\.svelte/);
+			expect(typeof module.Input).toBe('function');
 		});
 	});
 
 	describe('Icon', () => {
-		it('exports Icon component with correct path reference', async () => {
+		it('exports Icon component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Icon).toBe('string');
-			expect(module.Icon).toMatch(/Icon\.svelte/);
+			expect(typeof module.Icon).toBe('function');
 		});
 	});
 
 	describe('Switch', () => {
-		it('exports Switch component with correct path reference', async () => {
+		it('exports Switch component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Switch).toBe('string');
-			expect(module.Switch).toMatch(/Switch\.svelte/);
+			expect(typeof module.Switch).toBe('function');
 		});
 
 		it('exports switchVariants as callable function', async () => {
@@ -69,10 +66,9 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('CircularProgress', () => {
-		it('exports CircularProgress component with correct path reference', async () => {
+		it('exports CircularProgress component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.CircularProgress).toBe('string');
-			expect(module.CircularProgress).toMatch(/CircularProgress\.svelte/);
+			expect(typeof module.CircularProgress).toBe('function');
 		});
 
 		it('exports circularProgressVariants as callable function', async () => {
@@ -82,18 +78,16 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('ProgressBar', () => {
-		it('exports ProgressBar component with correct path reference', async () => {
+		it('exports ProgressBar component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ProgressBar).toBe('string');
-			expect(module.ProgressBar).toMatch(/ProgressBar\.svelte/);
+			expect(typeof module.ProgressBar).toBe('function');
 		});
 	});
 
 	describe('StatusIndicator', () => {
-		it('exports StatusIndicator component with correct path reference', async () => {
+		it('exports StatusIndicator component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.StatusIndicator).toBe('string');
-			expect(module.StatusIndicator).toMatch(/StatusIndicator\.svelte/);
+			expect(typeof module.StatusIndicator).toBe('function');
 		});
 
 		it('exports statusIndicatorVariants as callable function', async () => {
@@ -103,10 +97,9 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('StatusBadge', () => {
-		it('exports StatusBadge component with correct path reference', async () => {
+		it('exports StatusBadge component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.StatusBadge).toBe('string');
-			expect(module.StatusBadge).toMatch(/StatusBadge\.svelte/);
+			expect(typeof module.StatusBadge).toBe('function');
 		});
 
 		it('exports statusBadgeVariants as callable function', async () => {
@@ -116,10 +109,9 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('EmptyState', () => {
-		it('exports EmptyState component with correct path reference', async () => {
+		it('exports EmptyState component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.EmptyState).toBe('string');
-			expect(module.EmptyState).toMatch(/EmptyState\.svelte/);
+			expect(typeof module.EmptyState).toBe('function');
 		});
 
 		it('exports emptyStateVariants as callable function', async () => {
@@ -129,86 +121,74 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('ErrorState', () => {
-		it('exports ErrorState component with correct path reference', async () => {
+		it('exports ErrorState component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ErrorState).toBe('string');
-			expect(module.ErrorState).toMatch(/ErrorState\.svelte/);
+			expect(typeof module.ErrorState).toBe('function');
 		});
 	});
 
 	describe('Toast', () => {
-		it('exports Toast component with correct path reference', async () => {
+		it('exports Toast component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Toast).toBe('string');
-			expect(module.Toast).toMatch(/Toast\.svelte/);
+			expect(typeof module.Toast).toBe('function');
 		});
 	});
 
 	describe('ToastContainer', () => {
-		it('exports ToastContainer component with correct path reference', async () => {
+		it('exports ToastContainer component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ToastContainer).toBe('string');
-			expect(module.ToastContainer).toMatch(/ToastContainer\.svelte/);
+			expect(typeof module.ToastContainer).toBe('function');
 		});
 	});
 
 	describe('Skeleton components', () => {
-		it('exports Skeleton component with correct path reference', async () => {
+		it('exports Skeleton component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Skeleton).toBe('string');
-			expect(module.Skeleton).toMatch(/Skeleton\.svelte/);
+			expect(typeof module.Skeleton).toBe('function');
 		});
 
-		it('exports SkeletonCard component with correct path reference', async () => {
+		it('exports SkeletonCard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SkeletonCard).toBe('string');
-			expect(module.SkeletonCard).toMatch(/SkeletonCard\.svelte/);
+			expect(typeof module.SkeletonCard).toBe('function');
 		});
 
-		it('exports SkeletonGroup component with correct path reference', async () => {
+		it('exports SkeletonGroup component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SkeletonGroup).toBe('string');
-			expect(module.SkeletonGroup).toMatch(/SkeletonGroup\.svelte/);
+			expect(typeof module.SkeletonGroup).toBe('function');
 		});
 
-		it('exports SkeletonLoader component with correct path reference', async () => {
+		it('exports SkeletonLoader component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SkeletonLoader).toBe('string');
-			expect(module.SkeletonLoader).toMatch(/SkeletonLoader\.svelte/);
+			expect(typeof module.SkeletonLoader).toBe('function');
 		});
 	});
 
 	describe('Utility components', () => {
-		it('exports UnreadDot component with correct path reference', async () => {
+		it('exports UnreadDot component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.UnreadDot).toBe('string');
-			expect(module.UnreadDot).toMatch(/UnreadDot\.svelte/);
+			expect(typeof module.UnreadDot).toBe('function');
 		});
 
-		it('exports ShimmerText component with correct path reference', async () => {
+		it('exports ShimmerText component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ShimmerText).toBe('string');
-			expect(module.ShimmerText).toMatch(/ShimmerText\.svelte/);
+			expect(typeof module.ShimmerText).toBe('function');
 		});
 
-		it('exports GridPattern component with correct path reference', async () => {
+		it('exports GridPattern component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.GridPattern).toBe('string');
-			expect(module.GridPattern).toMatch(/GridPattern\.svelte/);
+			expect(typeof module.GridPattern).toBe('function');
 		});
 
-		it('exports NumberCounter component with correct path reference', async () => {
+		it('exports NumberCounter component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.NumberCounter).toBe('string');
-			expect(module.NumberCounter).toMatch(/NumberCounter\.svelte/);
+			expect(typeof module.NumberCounter).toBe('function');
 		});
 	});
 
 	describe('Data display components', () => {
-		it('exports DataTable component with correct path reference', async () => {
+		it('exports DataTable component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.DataTable).toBe('string');
-			expect(module.DataTable).toMatch(/DataTable\.svelte/);
+			expect(typeof module.DataTable).toBe('function');
 		});
 
 		it('exports dataTableVariants as callable function', async () => {
@@ -216,10 +196,9 @@ describe('Core Components Module Exports', () => {
 			expect(typeof dataTableVariants).toBe('function');
 		});
 
-		it('exports StatsCard component with correct path reference', async () => {
+		it('exports StatsCard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.StatsCard).toBe('string');
-			expect(module.StatsCard).toMatch(/StatsCard\.svelte/);
+			expect(typeof module.StatsCard).toBe('function');
 		});
 
 		it('exports statsCardVariants as callable function', async () => {
@@ -229,10 +208,9 @@ describe('Core Components Module Exports', () => {
 	});
 
 	describe('Form components', () => {
-		it('exports IssueTypeSelector component with correct path reference', async () => {
+		it('exports IssueTypeSelector component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.IssueTypeSelector).toBe('string');
-			expect(module.IssueTypeSelector).toMatch(/IssueTypeSelector\.svelte/);
+			expect(typeof module.IssueTypeSelector).toBe('function');
 		});
 
 		it('exports issueTypeSelectorVariants as callable function', async () => {
@@ -240,10 +218,9 @@ describe('Core Components Module Exports', () => {
 			expect(typeof issueTypeSelectorVariants).toBe('function');
 		});
 
-		it('exports CopyCliButton component with correct path reference', async () => {
+		it('exports CopyCliButton component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.CopyCliButton).toBe('string');
-			expect(module.CopyCliButton).toMatch(/CopyCliButton\.svelte/);
+			expect(typeof module.CopyCliButton).toBe('function');
 		});
 
 		it('exports copyCliButtonVariants as callable function', async () => {
@@ -251,68 +228,58 @@ describe('Core Components Module Exports', () => {
 			expect(typeof copyCliButtonVariants).toBe('function');
 		});
 
-		it('exports ThemeToggle component with correct path reference', async () => {
+		it('exports ThemeToggle component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ThemeToggle).toBe('string');
-			expect(module.ThemeToggle).toMatch(/ThemeToggle\.svelte/);
+			expect(typeof module.ThemeToggle).toBe('function');
 		});
 	});
 
 	describe('Interactive components', () => {
-		it('exports SwipeableItem component with correct path reference', async () => {
+		it('exports SwipeableItem component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SwipeableItem).toBe('string');
-			expect(module.SwipeableItem).toMatch(/SwipeableItem\.svelte/);
+			expect(typeof module.SwipeableItem).toBe('function');
 		});
 
-		it('exports SwipeableTabs component with correct path reference', async () => {
+		it('exports SwipeableTabs component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SwipeableTabs).toBe('string');
-			expect(module.SwipeableTabs).toMatch(/SwipeableTabs\.svelte/);
+			expect(typeof module.SwipeableTabs).toBe('function');
 		});
 
-		it('exports PullToRefresh component with correct path reference', async () => {
+		it('exports PullToRefresh component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.PullToRefresh).toBe('string');
-			expect(module.PullToRefresh).toMatch(/PullToRefresh\.svelte/);
+			expect(typeof module.PullToRefresh).toBe('function');
 		});
 
-		it('exports FloatingActionButton component with correct path reference', async () => {
+		it('exports FloatingActionButton component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.FloatingActionButton).toBe('string');
-			expect(module.FloatingActionButton).toMatch(/FloatingActionButton\.svelte/);
+			expect(typeof module.FloatingActionButton).toBe('function');
 		});
 
-		it('exports TouchTarget component with correct path reference', async () => {
+		it('exports TouchTarget component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.TouchTarget).toBe('string');
-			expect(module.TouchTarget).toMatch(/TouchTarget\.svelte/);
+			expect(typeof module.TouchTarget).toBe('function');
 		});
 
-		it('exports VirtualList component with correct path reference', async () => {
+		it('exports VirtualList component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.VirtualList).toBe('string');
-			expect(module.VirtualList).toMatch(/VirtualList\.svelte/);
+			expect(typeof module.VirtualList).toBe('function');
 		});
 	});
 
 	describe('Error handling components', () => {
-		it('exports ErrorBoundary component with correct path reference', async () => {
+		it('exports ErrorBoundary component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ErrorBoundary).toBe('string');
-			expect(module.ErrorBoundary).toMatch(/ErrorBoundary\.svelte/);
+			expect(typeof module.ErrorBoundary).toBe('function');
 		});
 
-		it('exports ApiError component with correct path reference', async () => {
+		it('exports ApiError component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ApiError).toBe('string');
-			expect(module.ApiError).toMatch(/ApiError\.svelte/);
+			expect(typeof module.ApiError).toBe('function');
 		});
 
-		it('exports KnownBugDetector component with correct path reference', async () => {
+		it('exports KnownBugDetector component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.KnownBugDetector).toBe('string');
-			expect(module.KnownBugDetector).toMatch(/KnownBugDetector\.svelte/);
+			expect(typeof module.KnownBugDetector).toBe('function');
 		});
 	});
 

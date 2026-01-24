@@ -3,69 +3,65 @@
  *
  * Tests for the business domain components barrel exports.
  * These components are organized by domain area (work, agents, mail, queue, convoys).
+ *
+ * NOTE: In Svelte 5, components are exported as functions (component constructors).
  */
 import { describe, it, expect } from 'vitest';
 
 describe('Domain Components Module Exports', () => {
 	describe('Work domain', () => {
-		it('exports WorkFilters component', async () => {
+		it('exports WorkFilters component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkFilters).toBe('string');
-			expect(module.WorkFilters).toMatch(/WorkFilters\.svelte/);
+			expect(typeof module.WorkFilters).toBe('function');
 		});
 
-		it('exports WorkList component', async () => {
+		it('exports WorkList component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkList).toBe('string');
-			expect(module.WorkList).toMatch(/WorkList\.svelte/);
+			expect(typeof module.WorkList).toBe('function');
 		});
 
-		it('exports WorkCreateForm component', async () => {
+		it('exports WorkCreateForm component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkCreateForm).toBe('string');
-			expect(module.WorkCreateForm).toMatch(/WorkCreateForm\.svelte/);
+			expect(typeof module.WorkCreateForm).toBe('function');
 		});
 
-		it('exports WorkSlingForm component', async () => {
+		it('exports WorkSlingForm component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkSlingForm).toBe('string');
-			expect(module.WorkSlingForm).toMatch(/WorkSlingForm\.svelte/);
+			expect(typeof module.WorkSlingForm).toBe('function');
 		});
 
-		it('exports WorkItemCard component', async () => {
+		it('exports WorkItemCard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkItemCard).toBe('string');
-			expect(module.WorkItemCard).toMatch(/WorkItemCard\.svelte/);
+			expect(typeof module.WorkItemCard).toBe('function');
 		});
 
-		it('exports WorkItemDetail component', async () => {
+		it('exports WorkItemDetail component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkItemDetail).toBe('string');
-			expect(module.WorkItemDetail).toMatch(/WorkItemDetail\.svelte/);
+			expect(typeof module.WorkItemDetail).toBe('function');
 		});
 
-		it('exports workFiltersVariants as callable function', async () => {
+		it('exports workFiltersVariants as callable function with expected slots', async () => {
 			const { workFiltersVariants } = await import('./index');
 			expect(typeof workFiltersVariants).toBe('function');
 			const result = workFiltersVariants();
 			expect(result).toHaveProperty('container');
 		});
 
-		it('exports workListVariants as callable function', async () => {
+		it('exports workListVariants as callable function with expected slots', async () => {
 			const { workListVariants } = await import('./index');
 			expect(typeof workListVariants).toBe('function');
 			const result = workListVariants();
 			expect(result).toHaveProperty('container');
 		});
 
-		it('exports workCreateFormVariants as callable function', async () => {
+		it('exports workCreateFormVariants as callable function with expected slots', async () => {
 			const { workCreateFormVariants } = await import('./index');
 			expect(typeof workCreateFormVariants).toBe('function');
 			const result = workCreateFormVariants();
 			expect(result).toHaveProperty('container');
 		});
 
-		it('exports workSlingFormVariants as callable function', async () => {
+		it('exports workSlingFormVariants as callable function with expected slots', async () => {
 			const { workSlingFormVariants } = await import('./index');
 			expect(typeof workSlingFormVariants).toBe('function');
 			const result = workSlingFormVariants();
@@ -110,56 +106,48 @@ describe('Domain Components Module Exports', () => {
 	});
 
 	describe('Agents domain', () => {
-		it('exports AgentCard component', async () => {
+		it('exports AgentCard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.AgentCard).toBe('string');
-			expect(module.AgentCard).toMatch(/AgentCard\.svelte/);
+			expect(typeof module.AgentCard).toBe('function');
 		});
 
-		it('exports AgentCardSkeleton component', async () => {
+		it('exports AgentCardSkeleton component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.AgentCardSkeleton).toBe('string');
-			expect(module.AgentCardSkeleton).toMatch(/AgentCardSkeleton\.svelte/);
+			expect(typeof module.AgentCardSkeleton).toBe('function');
 		});
 	});
 
 	describe('Seance domain', () => {
-		it('exports SeanceControls component', async () => {
+		it('exports SeanceControls component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SeanceControls).toBe('string');
-			expect(module.SeanceControls).toMatch(/SeanceControls\.svelte/);
+			expect(typeof module.SeanceControls).toBe('function');
 		});
 
-		it('exports SeanceOutput component', async () => {
+		it('exports SeanceOutput component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SeanceOutput).toBe('string');
-			expect(module.SeanceOutput).toMatch(/SeanceOutput\.svelte/);
+			expect(typeof module.SeanceOutput).toBe('function');
 		});
 
-		it('exports SeanceHistory component', async () => {
+		it('exports SeanceHistory component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SeanceHistory).toBe('string');
-			expect(module.SeanceHistory).toMatch(/SeanceHistory\.svelte/);
+			expect(typeof module.SeanceHistory).toBe('function');
 		});
 	});
 
 	describe('Workflows domain', () => {
-		it('exports WorkflowFilters component', async () => {
+		it('exports WorkflowFilters component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkflowFilters).toBe('string');
-			expect(module.WorkflowFilters).toMatch(/WorkflowFilters\.svelte/);
+			expect(typeof module.WorkflowFilters).toBe('function');
 		});
 
-		it('exports WorkflowList component', async () => {
+		it('exports WorkflowList component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkflowList).toBe('string');
-			expect(module.WorkflowList).toMatch(/WorkflowList\.svelte/);
+			expect(typeof module.WorkflowList).toBe('function');
 		});
 
-		it('exports WorkflowDetail component', async () => {
+		it('exports WorkflowDetail component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkflowDetail).toBe('string');
-			expect(module.WorkflowDetail).toMatch(/WorkflowDetail\.svelte/);
+			expect(typeof module.WorkflowDetail).toBe('function');
 		});
 	});
 

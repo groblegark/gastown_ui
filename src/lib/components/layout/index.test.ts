@@ -3,41 +3,38 @@
  *
  * Tests for the layout scaffolding components barrel exports.
  * These components provide page structure and navigation patterns.
+ *
+ * NOTE: In Svelte 5, components are exported as functions (component constructors).
  */
 import { describe, it, expect } from 'vitest';
 
 describe('Layout Components Module Exports', () => {
 	describe('Navigation components', () => {
-		it('exports BottomNav component with correct path reference', async () => {
+		it('exports BottomNav component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.BottomNav).toBe('string');
-			expect(module.BottomNav).toMatch(/BottomNav\.svelte/);
+			expect(typeof module.BottomNav).toBe('function');
 		});
 
-		it('exports Sidebar component with correct path reference', async () => {
+		it('exports Sidebar component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Sidebar).toBe('string');
-			expect(module.Sidebar).toMatch(/Sidebar\.svelte/);
+			expect(typeof module.Sidebar).toBe('function');
 		});
 
-		it('exports SheetNav component with correct path reference', async () => {
+		it('exports SheetNav component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SheetNav).toBe('string');
-			expect(module.SheetNav).toMatch(/SheetNav\.svelte/);
+			expect(typeof module.SheetNav).toBe('function');
 		});
 
-		it('exports NavigationLoader component with correct path reference', async () => {
+		it('exports NavigationLoader component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.NavigationLoader).toBe('string');
-			expect(module.NavigationLoader).toMatch(/NavigationLoader\.svelte/);
+			expect(typeof module.NavigationLoader).toBe('function');
 		});
 	});
 
 	describe('Page structure components', () => {
-		it('exports PageHeader component with correct path reference', async () => {
+		it('exports PageHeader component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.PageHeader).toBe('string');
-			expect(module.PageHeader).toMatch(/PageHeader\.svelte/);
+			expect(typeof module.PageHeader).toBe('function');
 		});
 
 		it('exports pageHeaderVariants as callable function', async () => {
@@ -45,168 +42,145 @@ describe('Layout Components Module Exports', () => {
 			expect(typeof pageHeaderVariants).toBe('function');
 		});
 
-		it('exports DashboardLayout component with correct path reference', async () => {
+		it('exports DashboardLayout component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.DashboardLayout).toBe('string');
-			expect(module.DashboardLayout).toMatch(/DashboardLayout\.svelte/);
+			expect(typeof module.DashboardLayout).toBe('function');
 		});
 
-		it('exports Dashboard component with correct path reference', async () => {
+		it('exports Dashboard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Dashboard).toBe('string');
-			expect(module.Dashboard).toMatch(/Dashboard\.svelte/);
+			expect(typeof module.Dashboard).toBe('function');
 		});
 
-		it('exports MobileDashboard component with correct path reference', async () => {
+		it('exports MobileDashboard component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.MobileDashboard).toBe('string');
-			expect(module.MobileDashboard).toMatch(/MobileDashboard\.svelte/);
+			expect(typeof module.MobileDashboard).toBe('function');
 		});
 	});
 
 	describe('Specialized layout components', () => {
-		it('exports LogsLayout component with correct path reference', async () => {
+		it('exports LogsLayout component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.LogsLayout).toBe('string');
-			expect(module.LogsLayout).toMatch(/LogsLayout\.svelte/);
+			expect(typeof module.LogsLayout).toBe('function');
 		});
 
-		it('exports QueueLayout component with correct path reference', async () => {
+		it('exports QueueLayout component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.QueueLayout).toBe('string');
-			expect(module.QueueLayout).toMatch(/QueueLayout\.svelte/);
+			expect(typeof module.QueueLayout).toBe('function');
 		});
 
-		it('exports WorkflowLayout component with correct path reference', async () => {
+		it('exports WorkflowLayout component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.WorkflowLayout).toBe('string');
-			expect(module.WorkflowLayout).toMatch(/WorkflowLayout\.svelte/);
+			expect(typeof module.WorkflowLayout).toBe('function');
 		});
 
-		it('exports SplitView component with correct path reference', async () => {
+		it('exports SplitView component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SplitView).toBe('string');
-			expect(module.SplitView).toMatch(/SplitView\.svelte/);
+			expect(typeof module.SplitView).toBe('function');
 		});
 
-		it('exports AgentDetailLayout component with correct path reference', async () => {
+		it('exports AgentDetailLayout component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.AgentDetailLayout).toBe('string');
-			expect(module.AgentDetailLayout).toMatch(/AgentDetailLayout\.svelte/);
+			expect(typeof module.AgentDetailLayout).toBe('function');
 		});
 	});
 
 	describe('Accessibility components', () => {
-		it('exports SkipLink component with correct path reference', async () => {
+		it('exports SkipLink component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.SkipLink).toBe('string');
-			expect(module.SkipLink).toMatch(/SkipLink\.svelte/);
+			expect(typeof module.SkipLink).toBe('function');
 		});
 
-		it('exports Announcer component with correct path reference', async () => {
+		it('exports Announcer component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.Announcer).toBe('string');
-			expect(module.Announcer).toMatch(/Announcer\.svelte/);
+			expect(typeof module.Announcer).toBe('function');
 		});
 
-		it('exports LiveRegion component with correct path reference', async () => {
+		it('exports LiveRegion component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.LiveRegion).toBe('string');
-			expect(module.LiveRegion).toMatch(/LiveRegion\.svelte/);
+			expect(typeof module.LiveRegion).toBe('function');
 		});
 	});
 
 	describe('Status and indicator components', () => {
-		it('exports OperationCenter component with correct path reference', async () => {
+		it('exports OperationCenter component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.OperationCenter).toBe('string');
-			expect(module.OperationCenter).toMatch(/OperationCenter\.svelte/);
+			expect(typeof module.OperationCenter).toBe('function');
 		});
 
-		it('exports StatusCards component with correct path reference', async () => {
+		it('exports StatusCards component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.StatusCards).toBe('string');
-			expect(module.StatusCards).toMatch(/StatusCards\.svelte/);
+			expect(typeof module.StatusCards).toBe('function');
 		});
 
-		it('exports QuickActions component with correct path reference', async () => {
+		it('exports QuickActions component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.QuickActions).toBe('string');
-			expect(module.QuickActions).toMatch(/QuickActions\.svelte/);
+			expect(typeof module.QuickActions).toBe('function');
 		});
 
-		it('exports ActivityFeed component with correct path reference', async () => {
+		it('exports ActivityFeed component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ActivityFeed).toBe('string');
-			expect(module.ActivityFeed).toMatch(/ActivityFeed\.svelte/);
+			expect(typeof module.ActivityFeed).toBe('function');
 		});
 	});
 
 	describe('Network status components', () => {
-		it('exports OfflineIndicator component with correct path reference', async () => {
+		it('exports OfflineIndicator component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.OfflineIndicator).toBe('string');
-			expect(module.OfflineIndicator).toMatch(/OfflineIndicator\.svelte/);
+			expect(typeof module.OfflineIndicator).toBe('function');
 		});
 
-		it('exports ConnectionLost component with correct path reference', async () => {
+		it('exports ConnectionLost component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.ConnectionLost).toBe('string');
-			expect(module.ConnectionLost).toMatch(/ConnectionLost\.svelte/);
+			expect(typeof module.ConnectionLost).toBe('function');
 		});
 
-		it('exports DegradedModeBanner component with correct path reference', async () => {
+		it('exports DegradedModeBanner component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.DegradedModeBanner).toBe('string');
-			expect(module.DegradedModeBanner).toMatch(/DegradedModeBanner\.svelte/);
+			expect(typeof module.DegradedModeBanner).toBe('function');
 		});
 	});
 
 	describe('PWA components', () => {
-		it('exports UpdatePrompt component with correct path reference', async () => {
+		it('exports UpdatePrompt component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.UpdatePrompt).toBe('string');
-			expect(module.UpdatePrompt).toMatch(/UpdatePrompt\.svelte/);
+			expect(typeof module.UpdatePrompt).toBe('function');
 		});
 	});
 
 	describe('Keyboard components', () => {
-		it('exports KeyboardHelpDialog component with correct path reference', async () => {
+		it('exports KeyboardHelpDialog component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.KeyboardHelpDialog).toBe('string');
-			expect(module.KeyboardHelpDialog).toMatch(/KeyboardHelpDialog\.svelte/);
+			expect(typeof module.KeyboardHelpDialog).toBe('function');
 		});
 
-		it('exports VimSequenceIndicator component with correct path reference', async () => {
+		it('exports VimSequenceIndicator component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.VimSequenceIndicator).toBe('string');
-			expect(module.VimSequenceIndicator).toMatch(/VimSequenceIndicator\.svelte/);
+			expect(typeof module.VimSequenceIndicator).toBe('function');
 		});
 	});
 
 	describe('Search components', () => {
-		it('exports GlobalSearch component', async () => {
+		it('exports GlobalSearch component as a function', async () => {
 			const module = await import('./index');
-			expect(module.GlobalSearch).toMatch(/GlobalSearch/);
+			expect(typeof module.GlobalSearch).toBe('function');
 		});
 
-		it('exports CommandPalette component', async () => {
+		it('exports CommandPalette component as a function', async () => {
 			const module = await import('./index');
-			expect(module.CommandPalette).toMatch(/CommandPalette/);
+			expect(typeof module.CommandPalette).toBe('function');
 		});
 	});
 
 	describe('Log components', () => {
-		it('exports LogEntry component with correct path reference', async () => {
+		it('exports LogEntry component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.LogEntry).toBe('string');
-			expect(module.LogEntry).toMatch(/LogEntry\.svelte/);
+			expect(typeof module.LogEntry).toBe('function');
 		});
 
-		it('exports LogEntrySkeleton component with correct path reference', async () => {
+		it('exports LogEntrySkeleton component as a function', async () => {
 			const module = await import('./index');
-			expect(typeof module.LogEntrySkeleton).toBe('string');
-			expect(module.LogEntrySkeleton).toMatch(/LogEntrySkeleton\.svelte/);
+			expect(typeof module.LogEntrySkeleton).toBe('function');
 		});
 	});
 
