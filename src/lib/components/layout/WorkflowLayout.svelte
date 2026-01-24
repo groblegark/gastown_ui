@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { tv, type VariantProps } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
-	import StatusIndicator from './StatusIndicator.svelte';
-	import GridPattern from './GridPattern.svelte';
+	import StatusIndicator from '../core/StatusIndicator.svelte';
+	import GridPattern from '../core/GridPattern.svelte';
 	import type { Snippet } from 'svelte';
 
 	/**

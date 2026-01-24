@@ -140,8 +140,8 @@
 
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import StatusIndicator from './StatusIndicator.svelte';
-	import ProgressBar from './ProgressBar.svelte';
+	import StatusIndicator from '../core/StatusIndicator.svelte';
+	import ProgressBar from '../core/ProgressBar.svelte';
 	import type { Snippet } from 'svelte';
 	import {
 		ChevronDown,

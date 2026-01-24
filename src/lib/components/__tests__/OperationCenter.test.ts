@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import OperationCenter from '../OperationCenter.svelte';
+import OperationCenter from '../layout/OperationCenter.svelte';
 import { operationsStore } from '$lib/stores';
 
 // Mock toast store

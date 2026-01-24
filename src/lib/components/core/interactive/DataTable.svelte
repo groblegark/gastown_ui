@@ -106,7 +106,7 @@
 	import { cn } from '$lib/utils';
 	import { ArrowUp, ArrowDown, ArrowUpDown, Check, Minus } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
-	import Skeleton from './Skeleton.svelte';
+	import Skeleton from '../Skeleton.svelte';
 
 	interface Props extends DataTableProps<T> {
 		/** Custom cell renderer - receives value, row, column key, and row index */

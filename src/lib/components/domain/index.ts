@@ -28,28 +28,28 @@ export type {
 	WorkFiltersState,
 	LocalIssue,
 	Rig,
-	IssueTypeOption,
+	IssueTypeOption as WorkIssueTypeOption,
 	IssueFormData,
 	ConvoyFormData,
 	SlingFormData
 } from '../work';
 
-// Work item display components
+// Work item display components (now in domain/)
 export {
 	default as WorkItemCard,
 	workItemCardVariants,
 	type WorkItem,
 	type WorkItemCardProps
-} from '../WorkItemCard.svelte';
+} from './WorkItemCard.svelte';
 export {
 	default as WorkItemDetail,
 	workItemDetailVariants,
 	type WorkItemDetailProps
-} from '../WorkItemDetail.svelte';
+} from './WorkItemDetail.svelte';
 
-// Agents domain components
-export { default as AgentCard } from '../AgentCard.svelte';
-export { default as AgentCardSkeleton } from '../AgentCardSkeleton.svelte';
+// Agents domain components (now in domain/)
+export { default as AgentCard } from './AgentCard.svelte';
+export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
 
 // Seance domain components
 export { SeanceControls, SeanceOutput, SeanceHistory } from '../seance';

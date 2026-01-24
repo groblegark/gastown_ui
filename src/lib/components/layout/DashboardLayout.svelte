@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import GridPattern from './GridPattern.svelte';
-	import StatusIndicator from './StatusIndicator.svelte';
+	import GridPattern from '../core/GridPattern.svelte';
+	import StatusIndicator from '../core/StatusIndicator.svelte';
 	import PageHeader from './PageHeader.svelte';
 	import type { Snippet } from 'svelte';
 

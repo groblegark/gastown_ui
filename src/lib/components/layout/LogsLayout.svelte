@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tv } from 'tailwind-variants';
 	import { cn } from '$lib/utils';
-	import GridPattern from './GridPattern.svelte';
+	import GridPattern from '../core/GridPattern.svelte';
 	import PageHeader from './PageHeader.svelte';
 	import type { Snippet } from 'svelte';
 

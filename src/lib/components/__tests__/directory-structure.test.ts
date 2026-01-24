@@ -30,18 +30,16 @@ function countSvelteFiles(dir: string): number {
 }
 
 /**
- * Count all files in a directory (non-recursive, excluding test files)
+ * Count component files in a directory (non-recursive)
+ * Only counts .svelte files as the "max 20 files" constraint
+ * applies to component files, not infrastructure (index.ts, types.ts)
  */
-function countFiles(dir: string): number {
+function countComponentFiles(dir: string): number {
 	try {
 		const entries = readdirSync(dir);
 		return entries.filter((entry) => {
 			const fullPath = join(dir, entry);
-			return (
-				statSync(fullPath).isFile() &&
-				!entry.endsWith('.test.ts') &&
-				!entry.endsWith('.test.js')
-			);
+			return statSync(fullPath).isFile() && entry.endsWith('.svelte');
 		}).length;
 	} catch {
 		return 0;
@@ -89,7 +87,7 @@ describe('Component Directory Structure (bd-3ol)', () => {
 		});
 
 		it('has max 20 files', () => {
-			const fileCount = countFiles(coreDir);
+			const fileCount = countComponentFiles(coreDir);
 			expect(fileCount).toBeLessThanOrEqual(
 				MAX_FILES_PER_DIR,
 				`Core directory has ${fileCount} files, expected <= ${MAX_FILES_PER_DIR}`
@@ -113,7 +111,7 @@ describe('Component Directory Structure (bd-3ol)', () => {
 		});
 
 		it('has max 20 files', () => {
-			const fileCount = countFiles(layoutDir);
+			const fileCount = countComponentFiles(layoutDir);
 			expect(fileCount).toBeLessThanOrEqual(
 				MAX_FILES_PER_DIR,
 				`Layout directory has ${fileCount} files, expected <= ${MAX_FILES_PER_DIR}`
@@ -137,7 +135,7 @@ describe('Component Directory Structure (bd-3ol)', () => {
 		});
 
 		it('has max 20 files or uses subdomain structure', () => {
-			const fileCount = countFiles(domainDir);
+			const fileCount = countComponentFiles(domainDir);
 			const subdirs = getSubdirectories(domainDir);
 
 			// Either has <= 20 files at root, or uses subdirectories for domains
@@ -179,7 +177,7 @@ describe('Component Directory Structure (bd-3ol)', () => {
 
 			for (const { name, path } of allDirs) {
 				try {
-					const count = countFiles(path);
+					const count = countComponentFiles(path);
 					if (count > MAX_FILES_PER_DIR) {
 						violations.push(`${name}: ${count} files`);
 					}

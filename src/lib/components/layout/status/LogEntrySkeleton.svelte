@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Skeleton from './Skeleton.svelte';
+	import Skeleton from '../../core/Skeleton.svelte';
 	import { cn } from '$lib/utils';
 
 	let { class: className = '' }: { class?: string } = $props();

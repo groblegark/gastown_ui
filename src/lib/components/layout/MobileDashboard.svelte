@@ -17,10 +17,10 @@
 	 * </MobileDashboard>
 	 */
 	import { cn } from '$lib/utils';
-	import SwipeableTabs from './SwipeableTabs.svelte';
-	import StatusIndicator from './StatusIndicator.svelte';
-	import GridPattern from './GridPattern.svelte';
-	import PullToRefresh from './PullToRefresh.svelte';
+	import SwipeableTabs from '../core/interactive/SwipeableTabs.svelte';
+	import StatusIndicator from '../core/StatusIndicator.svelte';
+	import GridPattern from '../core/GridPattern.svelte';
+	import PullToRefresh from '../core/interactive/PullToRefresh.svelte';
 	import type { Snippet, ComponentType } from 'svelte';
 	import { Bot, FlaskConical, ClipboardList, ScrollText } from 'lucide-svelte';
 

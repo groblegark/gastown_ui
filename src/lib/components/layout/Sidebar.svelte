@@ -11,7 +11,7 @@
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { Fuel } from 'lucide-svelte';
-	import ThemeToggle from './ThemeToggle.svelte';
+	import ThemeToggle from '../core/interactive/ThemeToggle.svelte';
 
 	/**
 	 * Navigation item styling variants

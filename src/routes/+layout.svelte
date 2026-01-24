@@ -291,7 +291,7 @@
 		<VimSequenceIndicator />
 
 		<!-- Keyboard shortcuts help dialog for desktop (lazy loaded) -->
-		{#await import('$lib/components/KeyboardHelpDialog.svelte') then m}
+		{#await import('$lib/components/layout/status/KeyboardHelpDialog.svelte') then m}
 			<m.default />
 		{/await}
 	</div>
@@ -376,7 +376,7 @@
 		<BottomNav items={navItems} {activeId} />
 		
 		<!-- Keyboard shortcuts help dialog (lazy loaded) -->
-		{#await import('$lib/components/KeyboardHelpDialog.svelte') then m}
+		{#await import('$lib/components/layout/status/KeyboardHelpDialog.svelte') then m}
 			<m.default />
 		{/await}
 

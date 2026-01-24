@@ -109,7 +109,7 @@
 
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { buttonVariants } from './Button.svelte';
+	import { buttonVariants } from '../core/Button.svelte';
 	import { ChevronRight } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 
