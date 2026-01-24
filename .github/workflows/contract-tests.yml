@@ -24,13 +24,18 @@ jobs:
 
       - name: Install gastown CLI
         run: |
-          # Install gt and bd from releases
-          # Falls back gracefully if installer unavailable
-          if curl -fsSL https://gastown.io/install.sh -o /tmp/install.sh 2>/dev/null; then
-            chmod +x /tmp/install.sh
-            /tmp/install.sh
+          # Install gt from GitHub releases
+          # Falls back gracefully if unavailable
+          GT_VERSION="0.5.0"
+          GT_URL="https://github.com/steveyegge/gastown/releases/download/v${GT_VERSION}/gastown_${GT_VERSION}_linux_amd64.tar.gz"
+
+          if curl -fsSL "$GT_URL" -o /tmp/gastown.tar.gz; then
+            tar -xzf /tmp/gastown.tar.gz -C /tmp
+            sudo mv /tmp/gt /usr/local/bin/gt 2>/dev/null || mv /tmp/gt ~/.local/bin/gt
+            echo "Installed gastown CLI v${GT_VERSION}"
+            gt --version || true
           else
-            echo "::warning::Gastown CLI installer not available - contract tests will run in mock mode"
+            echo "::warning::Gastown CLI not available - contract tests will run in mock mode"
           fi
 
       - name: Setup test town
