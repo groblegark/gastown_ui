@@ -46,6 +46,11 @@ export {
 	type EscalationSeverityConfig,
 	escalationSeverityConfig,
 	getEscalationSeverityConfig,
+	// Decision urgency
+	type DecisionUrgency,
+	type DecisionUrgencyConfig,
+	decisionUrgencyConfig,
+	getDecisionUrgencyConfig,
 	// Priority
 	type PriorityConfig,
 	priorityLabels,

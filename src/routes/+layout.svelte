@@ -20,6 +20,7 @@
 		GitBranch,
 		Server,
 		Bell,
+		Scale,
 		HeartPulse,
 		BarChart3,
 		Eye,
@@ -68,6 +69,7 @@
 		{ id: 'rigs', label: 'Rigs', href: '/rigs', icon: Server },
 		// Communication
 		{ id: 'escalations', label: 'Escalations', href: '/escalations', icon: Bell, badge: escalationCount || undefined },
+		{ id: 'decisions', label: 'Decisions', href: '/decisions', icon: Scale },
 		// Monitoring
 		{ id: 'health', label: 'Health', href: '/health', icon: HeartPulse },
 		{ id: 'activity', label: 'Activity', href: '/activity', icon: BarChart3 },

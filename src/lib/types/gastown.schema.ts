@@ -668,6 +668,46 @@ export const GtDashboardSnapshotSchema = z
 	.passthrough();
 
 // =============================================================================
+// Decision Schemas
+// =============================================================================
+
+/** Decision urgency enum */
+export const GtDecisionUrgencySchema = z.enum(['high', 'medium', 'low']);
+
+/** Decision status enum */
+export const GtDecisionStatusSchema = z.enum(['pending', 'resolved']);
+
+/** Decision option schema */
+export const GtDecisionOptionSchema = z
+	.object({
+		id: z.string(),
+		label: z.string(),
+		description: z.string().optional(),
+		recommended: z.boolean().optional()
+	})
+	.passthrough();
+
+/** Decision schema (from bd decision list/show) */
+export const GtDecisionSchema = z
+	.object({
+		id: z.string(),
+		prompt: z.string(),
+		context: z.string().optional(),
+		options: z.array(GtDecisionOptionSchema),
+		urgency: GtDecisionUrgencySchema,
+		status: GtDecisionStatusSchema,
+		requested_by: z.string().optional(),
+		requested_at: z.string(),
+		selected_option: z.string().optional(),
+		resolved_by: z.string().optional(),
+		resolved_at: z.string().optional(),
+		response_text: z.string().optional(),
+		parent_bead_id: z.string().optional(),
+		parent_bead_title: z.string().optional()
+	})
+	.passthrough();
+
+// =============================================================================
 // API Error Schemas
 // =============================================================================
 
@@ -712,3 +752,7 @@ export type GtRigInferred = z.infer<typeof GtRigSchema>;
 export type GtFeedItemInferred = z.infer<typeof GtFeedItemSchema>;
 export type GtSnapshotInferred = z.infer<typeof GtSnapshotSchema>;
 export type GtDashboardSnapshotInferred = z.infer<typeof GtDashboardSnapshotSchema>;
+export type GtDecisionInferred = z.infer<typeof GtDecisionSchema>;
+export type GtDecisionOptionInferred = z.infer<typeof GtDecisionOptionSchema>;
+export type GtDecisionUrgencyInferred = z.infer<typeof GtDecisionUrgencySchema>;
+export type GtDecisionStatusInferred = z.infer<typeof GtDecisionStatusSchema>;

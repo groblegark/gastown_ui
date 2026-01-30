@@ -309,6 +309,52 @@ export function getEscalationSeverityConfig(severity: EscalationSeverity): Escal
 }
 
 // =============================================================================
+// Decision Urgency
+// =============================================================================
+
+export type DecisionUrgency = 'high' | 'medium' | 'low';
+
+export interface DecisionUrgencyConfig {
+	bg: string;
+	text: string;
+	badge: string;
+	border: string;
+	icon: string;
+	label: string;
+}
+
+export const decisionUrgencyConfig: Record<DecisionUrgency, DecisionUrgencyConfig> = {
+	high: {
+		bg: 'bg-warning/10',
+		text: 'text-warning',
+		badge: 'bg-warning text-warning-foreground',
+		border: 'border-warning/30',
+		icon: '!',
+		label: 'High'
+	},
+	medium: {
+		bg: 'bg-status-pending/10',
+		text: 'text-status-pending',
+		badge: 'bg-status-pending text-black',
+		border: 'border-status-pending/30',
+		icon: '?',
+		label: 'Medium'
+	},
+	low: {
+		bg: 'bg-muted/20',
+		text: 'text-muted-foreground',
+		badge: 'bg-muted text-muted-foreground',
+		border: 'border-muted',
+		icon: '-',
+		label: 'Low'
+	}
+};
+
+export function getDecisionUrgencyConfig(urgency: DecisionUrgency): DecisionUrgencyConfig {
+	return decisionUrgencyConfig[urgency] || decisionUrgencyConfig.medium;
+}
+
+// =============================================================================
 // Priority Labels (for issues)
 // =============================================================================
 
