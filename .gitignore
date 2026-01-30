@@ -155,3 +155,4 @@ test-results/
 # Gas Town (added by gt)
 .runtime/
 .logs/
+.claude
