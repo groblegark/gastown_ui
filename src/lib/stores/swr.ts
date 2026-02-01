@@ -467,7 +467,9 @@ export const CACHE_KEYS = {
 	RIGS: 'rigs',
 	RIG: (name: string) => `rig:${name}`,
 	QUEUE: 'queue',
-	QUEUE_RIG: (name: string) => `queue:${name}`
+	QUEUE_RIG: (name: string) => `queue:${name}`,
+	DECISIONS: 'decisions',
+	DECISION: (id: string) => `decision:${id}`
 } as const;
 
 export const CACHE_TTLS = {

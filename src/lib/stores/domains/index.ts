@@ -73,3 +73,15 @@ export {
 	type SearchableItem,
 	type SearchableType
 } from '../search-index.svelte';
+
+// Decisions
+export {
+	decisionsStore,
+	useDecisions,
+	type Decision,
+	type DecisionOption,
+	type DecisionUrgency,
+	type DecisionStatus,
+	type DecisionFilter,
+	type DecisionCounts
+} from './decisions.svelte';
