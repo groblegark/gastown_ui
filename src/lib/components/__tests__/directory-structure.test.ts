@@ -65,10 +65,10 @@ describe('Component Directory Structure (bd-3ol)', () => {
 	describe('Root components directory constraints', () => {
 		it('has max 20 Svelte files at root level', () => {
 			const rootSvelteCount = countSvelteFiles(COMPONENTS_DIR);
-			expect(rootSvelteCount).toBeLessThanOrEqual(
-				MAX_FILES_PER_DIR,
+			expect(
+				rootSvelteCount,
 				`Root components directory has ${rootSvelteCount} .svelte files, expected <= ${MAX_FILES_PER_DIR}`
-			);
+			).toBeLessThanOrEqual(MAX_FILES_PER_DIR);
 		});
 
 		it('has required subdirectory structure', () => {
@@ -88,18 +88,18 @@ describe('Component Directory Structure (bd-3ol)', () => {
 
 		it('has max 20 files', () => {
 			const fileCount = countComponentFiles(coreDir);
-			expect(fileCount).toBeLessThanOrEqual(
-				MAX_FILES_PER_DIR,
+			expect(
+				fileCount,
 				`Core directory has ${fileCount} files, expected <= ${MAX_FILES_PER_DIR}`
-			);
+			).toBeLessThanOrEqual(MAX_FILES_PER_DIR);
 		});
 
 		it('contains primitive UI components', () => {
 			const svelteCount = countSvelteFiles(coreDir);
-			expect(svelteCount).toBeGreaterThan(
-				0,
+			expect(
+				svelteCount,
 				'Core directory should contain Svelte components'
-			);
+			).toBeGreaterThan(0);
 		});
 	});
 
@@ -112,18 +112,18 @@ describe('Component Directory Structure (bd-3ol)', () => {
 
 		it('has max 20 files', () => {
 			const fileCount = countComponentFiles(layoutDir);
-			expect(fileCount).toBeLessThanOrEqual(
-				MAX_FILES_PER_DIR,
+			expect(
+				fileCount,
 				`Layout directory has ${fileCount} files, expected <= ${MAX_FILES_PER_DIR}`
-			);
+			).toBeLessThanOrEqual(MAX_FILES_PER_DIR);
 		});
 
 		it('contains layout/navigation components', () => {
 			const svelteCount = countSvelteFiles(layoutDir);
-			expect(svelteCount).toBeGreaterThan(
-				0,
+			expect(
+				svelteCount,
 				'Layout directory should contain Svelte components'
-			);
+			).toBeGreaterThan(0);
 		});
 	});
 
@@ -153,10 +153,10 @@ describe('Component Directory Structure (bd-3ol)', () => {
 				totalSvelteCount += countSvelteFiles(join(domainDir, subdir));
 			}
 
-			expect(totalSvelteCount).toBeGreaterThan(
-				0,
+			expect(
+				totalSvelteCount,
 				'Domain directory should contain Svelte components'
-			);
+			).toBeGreaterThan(0);
 		});
 	});
 

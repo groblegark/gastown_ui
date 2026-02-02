@@ -26,7 +26,14 @@ function createRequestEvent() {
 	const url = new URL('http://localhost/api/gastown/mail');
 	return {
 		request: new Request(url),
-		locals: {},
+		locals: {
+			session: {
+				user: null,
+				accessToken: null,
+				refreshToken: null,
+				expiresAt: null
+			}
+		},
 		params: {},
 		url,
 		platform: undefined,
@@ -36,7 +43,10 @@ function createRequestEvent() {
 		setHeaders: vi.fn(),
 		isDataRequest: false,
 		isSubRequest: false,
-		route: { id: '/api/gastown/mail' }
+		route: { id: '/api/gastown/mail' as const },
+		// SvelteKit 2.x RequestEvent properties
+		tracing: {} as any,
+		isRemoteRequest: false
 	};
 }
 

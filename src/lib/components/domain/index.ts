@@ -69,8 +69,6 @@ export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
 export {
 	default as AdviceCard,
 	adviceCardVariants,
-	type Advice,
-	type AdviceScope,
 	type AdviceCardProps
 } from './AdviceCard.svelte';
 

@@ -21,6 +21,35 @@ vi.mock('$lib/server/cli', () => ({
 // Import after mocking
 import { GET } from '../status/+server';
 
+// Helper to create request event
+function createRequestEvent() {
+	const url = new URL('http://localhost/api/gastown/status');
+	return {
+		request: new Request(url),
+		locals: {
+			session: {
+				user: null,
+				accessToken: null,
+				refreshToken: null,
+				expiresAt: null
+			}
+		},
+		params: {},
+		url,
+		platform: undefined,
+		cookies: {} as any,
+		fetch: fetch,
+		getClientAddress: () => '127.0.0.1',
+		setHeaders: vi.fn(),
+		isDataRequest: false,
+		isSubRequest: false,
+		route: { id: '/api/gastown/status' as const },
+		// SvelteKit 2.x RequestEvent properties
+		tracing: {} as any,
+		isRemoteRequest: false
+	};
+}
+
 describe('GET /api/gastown/status', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -50,20 +79,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			} satisfies CLIResult<typeof mockStatus>);
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			expect(response.status).toBe(200);
 
@@ -85,20 +101,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			});
 
-			await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			await GET(createRequestEvent());
 
 			expect(mockGt).toHaveBeenCalledTimes(1);
 			expect(mockGt).toHaveBeenCalledWith(['status', '--json']);
@@ -116,20 +119,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			} satisfies CLIResult<null>);
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			expect(response.status).toBe(500);
 
@@ -141,20 +131,7 @@ describe('GET /api/gastown/status', () => {
 		it('returns 500 when CLI throws exception', async () => {
 			mockGt.mockRejectedValueOnce(new Error('CLI process timed out'));
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			expect(response.status).toBe(500);
 
@@ -166,20 +143,7 @@ describe('GET /api/gastown/status', () => {
 		it('handles non-Error exceptions gracefully', async () => {
 			mockGt.mockRejectedValueOnce('Unknown string error');
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			expect(response.status).toBe(500);
 
@@ -198,20 +162,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			});
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			const data = await response.json();
 			expect(data.requestId).toBeDefined();
@@ -232,20 +183,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			});
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			const data = await response.json();
 			expect(data.name).toBe('first-test');
@@ -265,20 +203,7 @@ describe('GET /api/gastown/status', () => {
 				command: 'gt status --json'
 			});
 
-			const response = await GET({
-				request: new Request('http://localhost/api/gastown/status'),
-				locals: {},
-				params: {},
-				url: new URL('http://localhost/api/gastown/status'),
-				platform: undefined,
-				cookies: {} as any,
-				fetch: fetch,
-				getClientAddress: () => '127.0.0.1',
-				setHeaders: vi.fn(),
-				isDataRequest: false,
-				isSubRequest: false,
-				route: { id: '/api/gastown/status' }
-			});
+			const response = await GET(createRequestEvent());
 
 			const data = await response.json();
 			expect(data.name).toBe('second-test');

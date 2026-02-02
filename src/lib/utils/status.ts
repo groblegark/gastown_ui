@@ -361,14 +361,16 @@ export function getDecisionUrgencyConfig(urgency: DecisionUrgency): DecisionUrge
 export interface PriorityConfig {
 	label: string;
 	class: string;
+	bg: string;
+	text: string;
 }
 
 export const priorityLabels: Record<number, PriorityConfig> = {
-	0: { label: 'P0 Critical', class: 'text-destructive bg-destructive/10' },
-	1: { label: 'P1 High', class: 'text-warning bg-warning/10' },
-	2: { label: 'P2 Medium', class: 'text-warning/80 bg-warning/10' },
-	3: { label: 'P3 Low', class: 'text-info bg-info/10' },
-	4: { label: 'P4 Backlog', class: 'text-muted-foreground bg-muted' }
+	0: { label: 'P0 Critical', class: 'text-destructive bg-destructive/10', bg: 'bg-destructive/10', text: 'text-destructive' },
+	1: { label: 'P1 High', class: 'text-warning bg-warning/10', bg: 'bg-warning/10', text: 'text-warning' },
+	2: { label: 'P2 Medium', class: 'text-warning/80 bg-warning/10', bg: 'bg-warning/10', text: 'text-warning/80' },
+	3: { label: 'P3 Low', class: 'text-info bg-info/10', bg: 'bg-info/10', text: 'text-info' },
+	4: { label: 'P4 Backlog', class: 'text-muted-foreground bg-muted', bg: 'bg-muted', text: 'text-muted-foreground' }
 };
 
 export function getPriorityConfig(priority: number): PriorityConfig {

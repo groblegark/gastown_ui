@@ -26,7 +26,14 @@ function createRequestEvent(url: string) {
 	const urlObj = new URL(url, 'http://localhost');
 	return {
 		request: new Request(urlObj),
-		locals: {},
+		locals: {
+			session: {
+				user: null,
+				accessToken: null,
+				refreshToken: null,
+				expiresAt: null
+			}
+		},
 		params: {},
 		url: urlObj,
 		platform: undefined,
@@ -36,7 +43,10 @@ function createRequestEvent(url: string) {
 		setHeaders: vi.fn(),
 		isDataRequest: false,
 		isSubRequest: false,
-		route: { id: '/api/gastown/work' }
+		route: { id: '/api/gastown/work' as const },
+		// SvelteKit 2.x RequestEvent properties
+		tracing: {} as any,
+		isRemoteRequest: false
 	};
 }
 
