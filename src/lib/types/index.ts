@@ -181,6 +181,11 @@ export {
 	// Error schemas
 	ErrorCategorySchema,
 	ApiErrorResponseSchema,
+	// Advice schemas
+	AdviceHookTriggerSchema,
+	AdviceHookFailureModeSchema,
+	AdviceHookConfigSchema,
+	AdviceBeadSchema,
 	// Inferred types (from schemas)
 	type GtStatusInferred,
 	type GtAgentInferred,
@@ -194,5 +199,21 @@ export {
 	type GtRigInferred,
 	type GtFeedItemInferred,
 	type GtSnapshotInferred,
-	type GtDashboardSnapshotInferred
+	type GtDashboardSnapshotInferred,
+	type AdviceBeadInferred,
+	type AdviceHookConfigInferred,
+	type AdviceHookTriggerInferred,
+	type AdviceHookFailureModeInferred
 } from './gastown.schema';
+
+// Export advice helper types
+export type {
+	AdviceScope,
+	AdviceFilters,
+	AdviceCreateInput,
+	AdviceUpdateInput,
+	AgentMatch
+} from './advice';
+
+// Export advice helper functions
+export { getAdviceScope, getScopeBadgeColor, extractLabelValue, hasHookConfig } from './advice';

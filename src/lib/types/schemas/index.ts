@@ -62,3 +62,15 @@ export {
 	GtMergeQueueItemSchema,
 	type GtMergeQueueItemInferred
 } from './refinery.schema';
+
+// Advice schemas
+export {
+	AdviceHookTriggerSchema,
+	AdviceHookFailureModeSchema,
+	AdviceHookConfigSchema,
+	AdviceBeadSchema,
+	type AdviceBeadInferred,
+	type AdviceHookConfigInferred,
+	type AdviceHookTriggerInferred,
+	type AdviceHookFailureModeInferred
+} from './advice.schema';
