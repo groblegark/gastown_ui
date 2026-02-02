@@ -3,7 +3,8 @@
 	import { GridPattern } from '$lib/components';
 	import { Lightbulb, Zap, Search, X } from 'lucide-svelte';
 	import type { PageData } from './$types';
-	import { getScopeBadgeColor, type Advice } from './+page.server';
+	import { getScopeBadgeColor } from '$lib/domain/advice';
+	import type { Advice } from './+page.server';
 
 	let { data }: { data: PageData } = $props();
 
