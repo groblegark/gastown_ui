@@ -98,6 +98,22 @@ describe('Domain Components Module Exports', () => {
 		});
 	});
 
+	describe('Advice domain', () => {
+		it('exports AdviceList component as a function', () => {
+			expect(typeof domainModule.AdviceList).toBe('function');
+		});
+
+		it('exports adviceListVariants as callable function with expected slots', () => {
+			expect(typeof domainModule.adviceListVariants).toBe('function');
+			const result = domainModule.adviceListVariants();
+			expect(result).toHaveProperty('container');
+			expect(result).toHaveProperty('filterBar');
+			expect(result).toHaveProperty('listContainer');
+			expect(result).toHaveProperty('item');
+			expect(result).toHaveProperty('skeleton');
+		});
+	});
+
 	describe('Agents domain', () => {
 		it('exports AgentCard component as a function', () => {
 			expect(typeof domainModule.AgentCard).toBe('function');
@@ -156,6 +172,10 @@ describe('Domain Components Module Exports', () => {
 			expect(exportKeys).toContain('issueSchema');
 			expect(exportKeys).toContain('convoySchema');
 			expect(exportKeys).toContain('slingSchema');
+
+			// Advice domain
+			expect(exportKeys).toContain('AdviceList');
+			expect(exportKeys).toContain('adviceListVariants');
 
 			// Agents domain
 			expect(exportKeys).toContain('AgentCard');
