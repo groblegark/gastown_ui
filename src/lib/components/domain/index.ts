@@ -47,6 +47,20 @@ export {
 	type WorkItemDetailProps
 } from './WorkItemDetail.svelte';
 
+// Advice domain components
+export {
+	default as AdviceList,
+	adviceListVariants,
+	type AdviceListVariants,
+	type Advice,
+	type AdviceScope,
+	type AdviceStatus,
+	type AdviceSortBy,
+	type AdviceSortOrder,
+	type AdviceFilters,
+	type AdviceListProps
+} from './AdviceList.svelte';
+
 // Agents domain components (now in domain/)
 export { default as AgentCard } from './AgentCard.svelte';
 export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
