@@ -21,6 +21,7 @@
 		Server,
 		Bell,
 		Scale,
+		Lightbulb,
 		HeartPulse,
 		BarChart3,
 		Eye,
@@ -47,6 +48,7 @@
 	// Badge counts (fetched from API)
 	let unreadMail = $state(0);
 	let escalationCount = $state(0);
+	let adviceCount = $state(0);
 
 	// Accessibility: Route change announcement
 	let routeAnnouncement = $state('');
@@ -70,6 +72,7 @@
 		// Communication
 		{ id: 'escalations', label: 'Escalations', href: '/escalations', icon: Bell, badge: escalationCount || undefined },
 		{ id: 'decisions', label: 'Decisions', href: '/decisions', icon: Scale },
+		{ id: 'advice', label: 'Advice', href: '/advice', icon: Lightbulb, badge: adviceCount || undefined },
 		// Monitoring
 		{ id: 'health', label: 'Health', href: '/health', icon: HeartPulse },
 		{ id: 'activity', label: 'Activity', href: '/activity', icon: BarChart3 },
@@ -115,6 +118,9 @@
 
 			// Escalation count from beads CLI (open issues with escalation label)
 			escalationCount = status.escalation_count ?? 0;
+
+			// Advice count from beads CLI (open issues with advice label)
+			adviceCount = status.advice_count ?? 0;
 		} catch (e) {
 			console.error('Failed to fetch badge counts:', e);
 		}

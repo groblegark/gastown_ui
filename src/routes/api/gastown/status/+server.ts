@@ -42,25 +42,39 @@ export const GET: RequestHandler = async () => {
 
 		// Fetch escalation count from beads
 		let escalationCount = 0;
+		// Fetch advice count from beads
+		let adviceCount = 0;
 
 		if (isDemoMode()) {
-			// Demo mode: return a consistent placeholder count
+			// Demo mode: return consistent placeholder counts
 			escalationCount = 2;
+			adviceCount = 3;
 		} else {
 			// Production: fetch from beads CLI
-			const escalationResult = await supervisor.bd<BeadsIssue[]>(
-				['list', '--status=open', '--label', 'escalation', '--json'],
-				{ timeout: 5000 }
-			);
+			const [escalationResult, adviceResult] = await Promise.all([
+				supervisor.bd<BeadsIssue[]>(
+					['list', '--status=open', '--label', 'escalation', '--json'],
+					{ timeout: 5000 }
+				),
+				supervisor.bd<BeadsIssue[]>(
+					['list', '--status=open', '--label', 'advice', '--json'],
+					{ timeout: 5000 }
+				)
+			]);
 
 			if (escalationResult.success && escalationResult.data) {
 				escalationCount = escalationResult.data.length;
+			}
+
+			if (adviceResult.success && adviceResult.data) {
+				adviceCount = adviceResult.data.length;
 			}
 		}
 
 		return json({
 			...result.data,
 			escalation_count: escalationCount,
+			advice_count: adviceCount,
 			requestId
 		});
 	} catch (error) {
