@@ -51,6 +51,15 @@ export {
 export { default as AgentCard } from './AgentCard.svelte';
 export { default as AgentCardSkeleton } from './AgentCardSkeleton.svelte';
 
+// Advice domain components
+export {
+	default as AdviceCard,
+	adviceCardVariants,
+	type Advice,
+	type AdviceScope,
+	type AdviceCardProps
+} from './AdviceCard.svelte';
+
 // Seance domain components
 export { SeanceControls, SeanceOutput, SeanceHistory } from '../seance';
 export type * from '../seance/types';
