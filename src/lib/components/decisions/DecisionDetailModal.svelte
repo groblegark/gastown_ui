@@ -97,10 +97,10 @@
 		User,
 		Link2,
 		MessageSquare,
-		ChevronRight,
 		Loader2,
 		ExternalLink
 	} from 'lucide-svelte';
+	import DecisionChain from './DecisionChain.svelte';
 
 	interface DecisionOption {
 		id: string;
@@ -470,42 +470,14 @@
 				{#if chain.length > 1}
 					<div class={styles.section()}>
 						<h3 class={styles.sectionTitle()}>Decision History</h3>
-						<div class="space-y-2">
-							{#each chain as item, index (item.id)}
-								<div
-									class={cn(
-										'p-3 rounded-lg border',
-										item.id === decision.id ? 'border-primary bg-primary/5' : 'border-border'
-									)}
-								>
-									<div class="flex items-start gap-2">
-										<div
-											class={cn(
-												'w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0',
-												item.response ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'
-											)}
-										>
-											{index + 1}
-										</div>
-										<div class="flex-1 min-w-0">
-											<p class="text-sm text-foreground line-clamp-2">{item.prompt}</p>
-											<p class="text-xs text-muted-foreground mt-1">
-												{formatRelativeTime(item.createdAt)}
-											</p>
-											{#if item.response}
-												<div class="mt-2 flex items-center gap-1 text-xs text-success">
-													<CheckCircle2 class="w-3 h-3" />
-													<span>Resolved: {item.response.selectedOption}</span>
-												</div>
-											{/if}
-										</div>
-										{#if item.id === decision.id}
-											<ChevronRight class="w-4 h-4 text-primary flex-shrink-0" />
-										{/if}
-									</div>
-								</div>
-							{/each}
-						</div>
+						<DecisionChain
+							{chain}
+							currentId={decision.id}
+							onSelectItem={(id) => {
+								decisionId = id;
+								fetchDecision();
+							}}
+						/>
 					</div>
 				{/if}
 
