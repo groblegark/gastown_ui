@@ -101,6 +101,8 @@
 		ExternalLink
 	} from 'lucide-svelte';
 	import DecisionChain from './DecisionChain.svelte';
+	import GuidanceModal from './GuidanceModal.svelte';
+	import { useDecisions } from '$lib/stores/domains/decisions.svelte';
 
 	interface DecisionOption {
 		id: string;
@@ -165,7 +167,9 @@
 	let selectedOptionId = $state<string | null>(null);
 	let rationale = $state('');
 	let isSubmitting = $state(false);
+	let showGuidanceModal = $state(false);
 
+	const decisions = useDecisions();
 	const styles = $derived(
 		decisionDetailVariants({
 			open,
@@ -235,6 +239,17 @@
 		} finally {
 			isSubmitting = false;
 		}
+	}
+
+	async function handleGuidanceSubmit(text: string) {
+		if (!decision) return;
+		const result = await decisions.guidance(decision.id, text);
+		if (!result.success) {
+			throw new Error(result.error || 'Failed to submit guidance');
+		}
+		showGuidanceModal = false;
+		// Refresh to reflect new state
+		fetchDecision();
 	}
 
 	function handleClose() {
@@ -504,6 +519,20 @@
 					</button>
 					<button
 						type="button"
+						class={cn(
+							styles.actionBtn(),
+							'border border-primary text-primary hover:bg-primary/10'
+						)}
+						onclick={() => {
+							hapticLight();
+							showGuidanceModal = true;
+						}}
+					>
+						<MessageSquare class="w-4 h-4" />
+						Provide Guidance
+					</button>
+					<button
+						type="button"
 						class={cn(styles.actionBtn(), 'bg-primary hover:bg-primary/90 text-primary-foreground')}
 						onclick={handleSubmit}
 						disabled={!canSubmit}
@@ -533,4 +562,14 @@
 			{/if}
 		{/if}
 	</aside>
+
+	{#if decision}
+		<GuidanceModal
+			{decision}
+			iterationCount={chain.length}
+			open={showGuidanceModal}
+			onclose={() => (showGuidanceModal = false)}
+			onsubmit={handleGuidanceSubmit}
+		/>
+	{/if}
 {/if}
